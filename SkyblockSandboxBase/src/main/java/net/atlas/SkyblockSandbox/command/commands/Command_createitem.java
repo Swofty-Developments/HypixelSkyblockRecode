@@ -5,8 +5,7 @@ import net.atlas.SkyblockSandbox.command.abstraction.SBCommandArgs;
 import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
 //import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemCreator;
 //import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemCreatorPage;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemCreator;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemCreatorPage;
+import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.ItemCreatorGUIMain;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -27,7 +26,7 @@ public class Command_createitem extends SkyblockCommandFramework {
         if (cmd.getSender() instanceof Player) {
             SBPlayer p = new SBPlayer((Player) cmd.getSender());
             String[] args = cmd.getArgs();
-            new ItemCreator(p, ItemCreatorPage.MAIN).open();
+            new ItemCreatorGUIMain(p).open();
         }
 
     }

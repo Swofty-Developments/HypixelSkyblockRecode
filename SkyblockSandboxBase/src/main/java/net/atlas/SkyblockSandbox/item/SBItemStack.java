@@ -516,6 +516,35 @@ public class SBItemStack extends ItemStack {
         return null;
     }
 
+    public ItemStack removeAbilityDescriptionLine(ItemStack host, int abilIndex, int lineindex) {
+        if (host != null) {
+            net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(host);
+            NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+            NBTTagCompound data = tag.getCompound("ExtraAttributes");
+            NBTTagCompound abilities = data.getCompound("Abilities");
+            NBTTagCompound ability = abilities.getCompound("Ability_" + abilIndex);
+            NBTTagCompound description = ability.getCompound("description");
+            List<String> descriptionStrings = new ArrayList<>();
+            for (int j = 0; j < description.c().size(); j++) {
+                descriptionStrings.add(description.getString(String.valueOf(j)));
+            }
+            List<String> descriptionList = new ArrayList<>(descriptionStrings);
+            descriptionList.remove(lineindex);
+            NBTTagCompound descript2 = new NBTTagCompound();
+            for (int i = 0; i < descriptionList.size(); i++) {
+                descript2.setString(String.valueOf(i), descriptionList.get(i));
+            }
+            ability.set("description", descript2);
+            abilities.set("Ability_" + abilIndex, ability);
+            data.set("Abilities", abilities);
+            tag.set("ExtraAttributes", data);
+
+            nmsItem.setTag(tag);
+            return CraftItemStack.asBukkitCopy(nmsItem);
+        }
+        return null;
+    }
+
     public ItemStack setAbilDescriptLine(String line, int abilIndex, int lineindex) {
         line = ChatColor.translateAlternateColorCodes('&', line);
         if (this.stack != null) {

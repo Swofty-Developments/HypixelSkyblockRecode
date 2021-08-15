@@ -1,12 +1,10 @@
 package net.atlas.SkyblockSandbox.gui.guis.slayerGUI;
 
-import dev.triumphteam.gui.guis.Gui;
-import net.atlas.SkyblockSandbox.gui.SBGUI;
+import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.slayer.SlayerTier;
 import net.atlas.SkyblockSandbox.slayer.Slayers;
 import net.atlas.SkyblockSandbox.util.SUtil;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -15,7 +13,7 @@ import java.util.HashMap;
 
 import static net.atlas.SkyblockSandbox.SBX.activeSlayers;
 
-public class ConfirmGUI extends SBGUI {
+public class ConfirmGUI extends NormalGUI {
 
     private SBPlayer owner;
     private Slayers slayer;

@@ -2,7 +2,6 @@ package net.atlas.SkyblockSandbox.player;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.block.SkullOwner;
 import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationAbandonedEvent;
 import org.bukkit.entity.*;
@@ -1005,13 +1004,5 @@ public abstract class PluginPlayer implements Player {
         player.setOp(b);
     }
 
-    public Map<String, Object> getData() {
-        return player.getData();
-    }
-
-    @Override
-    public SkullOwner.Texture getTexture() {
-        return player.getTexture();
-    }
 }
 

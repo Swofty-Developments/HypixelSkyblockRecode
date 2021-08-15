@@ -1,21 +1,16 @@
 package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages;
 
 import dev.triumphteam.gui.builder.item.ItemBuilder;
-import dev.triumphteam.gui.guis.Gui;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.gui.AnvilGUI;
-import net.atlas.SkyblockSandbox.gui.SBGUI;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemCreator;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemCreatorPage;
+import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.SUtil;
-import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -25,7 +20,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ItemLoreGUI extends SBGUI {
+public class ItemLoreGUI extends NormalGUI {
 
     public static final String[] PROFANITIES = {
             "amy", "fuck", "shit", "ass", "nigga", "nigger", "niggger", "niggerr", "cum", "sex", "niger",
@@ -57,7 +52,7 @@ public class ItemLoreGUI extends SBGUI {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        new ItemCreator(player, ItemCreatorPage.SET_LORE).open();
+                        new ItemLoreGUI(getOwner()).open();
                     }
                 }.runTaskLater(SBX.getInstance(), 2);
             } else {
@@ -74,7 +69,7 @@ public class ItemLoreGUI extends SBGUI {
                     player.setItemInHand(b.addDescriptionLine((player.getItemInHand()), NBTUtil.getString(event.getCurrentItem(), "Lore_" + (i + 1))));
                     player.playSound(event.getWhoClicked().getLocation(), Sound.CAT_MEOW, 2, 0);
                     player.sendMessage(ChatColor.GREEN + "Success! Transferred line #" + (i + 1) + " to item description!");
-                    new ItemCreator(player, ItemCreatorPage.SET_LORE).open();
+                    new ItemLoreGUI(getOwner()).open();
                 } else {
                     String[] s = event.getCurrentItem().getItemMeta().getDisplayName().split("#");
                     int i = Integer.parseInt(s[1]) - 1;
@@ -97,7 +92,7 @@ public class ItemLoreGUI extends SBGUI {
                                 new BukkitRunnable() {
                                     @Override
                                     public void run() {
-                                        new ItemCreator(player, ItemCreatorPage.SET_LORE).open();
+                                        new ItemLoreGUI(getOwner()).open();
                                     }
                                 }.runTaskLater(SBX.getInstance(), 2);
                             }
@@ -121,7 +116,7 @@ public class ItemLoreGUI extends SBGUI {
     public boolean setClickActions() {
         SBPlayer player = getOwner();
         setAction(31, event -> {
-            new ItemCreator(new SBPlayer((Player) event.getWhoClicked()), ItemCreatorPage.MAIN).open();
+            new ItemCreatorGUIMain(getOwner()).open();
         });
         setAction(35, event -> {
             if (player.getItemInHand().hasItemMeta()) {
@@ -164,7 +159,7 @@ public class ItemLoreGUI extends SBGUI {
                         new BukkitRunnable() {
                             @Override
                             public void run() {
-                                new ItemCreator(player, ItemCreatorPage.SET_LORE).open();
+                                new ItemLoreGUI(getOwner()).open();
                             }
                         }.runTaskLater(SBX.getInstance(), 2);
 
@@ -179,7 +174,7 @@ public class ItemLoreGUI extends SBGUI {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            new ItemCreator(player, ItemCreatorPage.SET_LORE).open();
+                            new ItemLoreGUI(getOwner()).open();
                         }
                     }.runTaskLater(SBX.getInstance(), 2);
                 }

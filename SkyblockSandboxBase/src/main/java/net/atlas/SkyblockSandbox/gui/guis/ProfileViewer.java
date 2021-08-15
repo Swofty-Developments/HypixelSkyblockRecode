@@ -1,10 +1,8 @@
 package net.atlas.SkyblockSandbox.gui.guis;
 
-import dev.triumphteam.gui.guis.Gui;
 import net.atlas.SkyblockSandbox.SBX;
-import net.atlas.SkyblockSandbox.gui.SBGUI;
+import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -17,7 +15,7 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.UUID;
 
-public class ProfileViewer extends SBGUI {
+public class ProfileViewer extends NormalGUI {
     private Player openedProfile;
 
     public ProfileViewer(SBPlayer owner, String uuid) {

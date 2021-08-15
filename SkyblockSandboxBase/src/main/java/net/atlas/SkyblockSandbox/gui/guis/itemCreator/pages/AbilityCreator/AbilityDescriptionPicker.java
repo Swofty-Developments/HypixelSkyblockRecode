@@ -1,8 +1,6 @@
 package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator;
 
-import net.atlas.SkyblockSandbox.gui.SBGUI;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemCreator;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemCreatorPage;
+import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.SUtil;
@@ -11,7 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class AbilityDescriptionPicker extends SBGUI {
+public class AbilityDescriptionPicker extends NormalGUI {
 
     public AbilityDescriptionPicker(SBPlayer owner) {
         super(owner);
@@ -30,28 +28,19 @@ public class AbilityDescriptionPicker extends SBGUI {
 
     @Override
     public void handleMenu(InventoryClickEvent event) {
-        switch (event.getSlot()) {
-            case 11:
-                new ItemCreator(getOwner(), ItemCreatorPage.BASE_ABILITIES, 1).open();
-                break;
-            case 12:
-                new ItemCreator(getOwner(), ItemCreatorPage.BASE_ABILITIES, 2).open();
-                break;
-            case 13:
-                new ItemCreator(getOwner(), ItemCreatorPage.BASE_ABILITIES, 3).open();
-                break;
-            case 14:
-                new ItemCreator(getOwner(), ItemCreatorPage.BASE_ABILITIES, 4).open();
-                break;
-            case 15:
-                new ItemCreator(getOwner(), ItemCreatorPage.BASE_ABILITIES, 5).open();
-                break;
-        }
     }
 
     @Override
     public boolean setClickActions() {
-        return false;
+        int b=0;
+        for(int i=11;i<15;i++) {
+            b++;
+            int finalB = b;
+            setAction(i, event -> {
+                new SetAbilityDescriptionMenu(getOwner(), finalB).open();
+            });
+        }
+        return true;
     }
 
     @Override

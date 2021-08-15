@@ -1,24 +1,18 @@
 package net.atlas.SkyblockSandbox.gui.guis.slayerGUI;
 
-import dev.triumphteam.gui.builder.item.ItemBuilder;
-import dev.triumphteam.gui.guis.Gui;
-import net.atlas.SkyblockSandbox.gui.SBGUI;
+import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.slayer.SlayerTier;
 import net.atlas.SkyblockSandbox.slayer.Slayers;
-import net.atlas.SkyblockSandbox.util.SUtil;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Optional;
 
 import static net.atlas.SkyblockSandbox.SBX.activeSlayers;
 
-public class MaddoxGUI extends SBGUI {
+public class MaddoxGUI extends NormalGUI {
 
     public MaddoxGUI(SBPlayer owner) {
         super(owner);

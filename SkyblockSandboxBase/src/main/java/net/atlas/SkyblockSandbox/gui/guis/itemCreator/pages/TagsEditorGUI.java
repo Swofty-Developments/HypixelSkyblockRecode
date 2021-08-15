@@ -1,13 +1,10 @@
 package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages;
 
 import dev.triumphteam.gui.guis.Gui;
-import net.atlas.SkyblockSandbox.gui.SBGUI;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemCreator;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemCreatorPage;
+import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.SUtil;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
@@ -17,7 +14,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public class TagsEditorGUI extends SBGUI {
+public class TagsEditorGUI extends NormalGUI {
 
     private Gui gui;
 
@@ -52,7 +49,7 @@ public class TagsEditorGUI extends SBGUI {
             }
         });
         setAction(49, event -> {
-            new ItemCreator((Player) event.getWhoClicked(), ItemCreatorPage.MAIN);
+            new ItemCreatorGUIMain(getOwner()).open();
         });
         setAction(15, event -> {
             ItemStack item = event.getWhoClicked().getItemInHand();

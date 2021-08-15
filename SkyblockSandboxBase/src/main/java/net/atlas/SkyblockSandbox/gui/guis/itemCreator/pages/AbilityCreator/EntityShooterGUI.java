@@ -1,8 +1,9 @@
 package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator;
 
-import net.maploop.items.data.Entities;
-import net.maploop.items.gui.PaginatedGUI;
-import net.maploop.items.gui.PlayerMenuUtility;
+
+import net.atlas.SkyblockSandbox.gui.PaginatedGUI;
+import net.atlas.SkyblockSandbox.item.ability.Entities;
+import net.atlas.SkyblockSandbox.player.SBPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
@@ -19,31 +20,32 @@ public class EntityShooterGUI extends PaginatedGUI {
     private final int count;
     private final boolean update;
     private final Entities entity;
+    private final SBPlayer owner;
 
-    public EntityShooterGUI(PlayerMenuUtility playerMenuUtility, int index, int count, boolean update, Entities entity) {
-        super(playerMenuUtility);
+    public EntityShooterGUI(SBPlayer owner, int index, int count, boolean update, Entities entity) {
+        super(owner);
         this.index2 = index;
         this.count = count;
         this.update = update;
         this.entity = entity;
+        this.owner = owner;
     }
 
     @Override
     public String getTitle() {
-        int i = page + 1;
-        int i1 = index + 1;
-        return "Select a Entity (Page " + i + ")";
+        return "Select a Entity (Page " + getGui().getCurrentPageNum() + ")";
     }
 
     @Override
-    public int getMaxItemsPerPage() {
+    public int getRows() {
+        return 6;
+    }
+
+    @Override
+    public int getPageSize() {
         return 28;
     }
 
-    @Override
-    public int getSize() {
-        return 54;
-    }
 
     @Override
     public void handleMenu(InventoryClickEvent event) {
@@ -161,6 +163,11 @@ public class EntityShooterGUI extends PaginatedGUI {
     }
 
     @Override
+    public boolean setClickActions() {
+        return false;
+    }
+
+    @Override
     public void setItems() {
         /*
         fillBorder();
@@ -245,4 +252,6 @@ public class EntityShooterGUI extends PaginatedGUI {
     }
          */
     }
+
+
 }

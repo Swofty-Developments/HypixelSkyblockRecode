@@ -1,21 +1,17 @@
 package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages;
 
-import dev.triumphteam.gui.guis.Gui;
-import net.atlas.SkyblockSandbox.gui.SBGUI;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemCreator;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemCreatorPage;
+import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.item.Rarity;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class RaritiesGUI extends SBGUI {
+public class RaritiesGUI extends NormalGUI {
     
 
     public RaritiesGUI(SBPlayer owner) {
@@ -32,7 +28,7 @@ public class RaritiesGUI extends SBGUI {
     @Override
     public boolean setClickActions() {
         setAction(31, event -> {
-            new ItemCreator((Player) event.getWhoClicked(),ItemCreatorPage.MAIN).open();
+            new ItemCreatorGUIMain(getOwner()).open();
         });
 
         setAction(10, event -> {

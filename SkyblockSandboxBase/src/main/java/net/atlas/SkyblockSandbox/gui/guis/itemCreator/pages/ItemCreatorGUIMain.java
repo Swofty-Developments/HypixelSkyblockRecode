@@ -1,26 +1,22 @@
 package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages;
 
-import dev.triumphteam.gui.guis.Gui;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.gui.AnvilGUI;
-import net.atlas.SkyblockSandbox.gui.SBGUI;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemCreator;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemCreatorPage;
+import net.atlas.SkyblockSandbox.gui.NormalGUI;
+import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.AbilityEditorGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.SUtil;
-import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.stream.Stream;
 
-public class ItemCreatorGUIMain extends SBGUI {
+public class ItemCreatorGUIMain extends NormalGUI {
 
     public ItemCreatorGUIMain(SBPlayer owner) {
         super(owner);
@@ -70,10 +66,10 @@ public class ItemCreatorGUIMain extends SBGUI {
             gui.open();
         });
         setAction(13, event -> {
-            new ItemCreator((Player) event.getWhoClicked(), ItemCreatorPage.SET_LORE).open();
+            new ItemLoreGUI(getOwner()).open();
         });
         setAction(15, event -> {
-            //new ItemCreator((Player) event.getWhoClicked(), ItemCreatorPage.ABILITY_EDITOR).open();
+            new AbilityEditorGUI(getOwner()).open();
         });
         setAction(22, event -> {
             SBPlayer player = new SBPlayer((Player) event.getWhoClicked());
@@ -85,7 +81,7 @@ public class ItemCreatorGUIMain extends SBGUI {
             }
         });
         setAction(14, event -> {
-            new ItemCreator((Player) event.getWhoClicked(),ItemCreatorPage.STATS_EDITOR).open();
+            new StatsEditorGUI(getOwner()).open();
         });
         setAction(12, event -> {
             SBPlayer player = new SBPlayer((Player) event.getWhoClicked());

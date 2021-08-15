@@ -1,13 +1,8 @@
-package net.atlas.SkyblockSandbox.gui;
+package net.atlas.SkyblockSandbox.util;
 
-import dev.triumphteam.gui.components.InteractionModifier;
-import dev.triumphteam.gui.guis.BaseGui;
-import dev.triumphteam.gui.guis.Gui;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
-import net.atlas.SkyblockSandbox.player.SBPlayer;
-import net.atlas.SkyblockSandbox.util.Logger;
-import net.atlas.SkyblockSandbox.util.SUtil;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -15,27 +10,38 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
-public abstract class SBGUI {
+public class StackUtils {
 
-    private final SBPlayer owner;
+    public static String textureFromSkullMeta(SkullMeta skullMeta, ItemStack item) {
+        if(item.getType().equals(Material.SKULL_ITEM) || item.getType().equals(Material.SKULL))
+            new NullPointerException("That is not a skull!");
 
-    protected ItemStack FILLER_GLASS = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte)15);
-
-    public SBGUI(SBPlayer owner) {
-        this.owner = owner;
+        Field profileField = null;
+        try {
+            try {
+                profileField = skullMeta.getClass().getDeclaredField("profile");
+                profileField.setAccessible(true);
+                GameProfile profile = (GameProfile) profileField.get(skullMeta);
+                Collection<Property> textures = profile.getProperties().get("textures");
+                for(Property property : textures) {
+                    return property.getValue();
+                }
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            }
+        }catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
-    public abstract String getTitle();
-
-    public abstract int getRows();
-
-    public ItemStack makeColorfulItem(Material material, String displayName, int amount, int durability, String... lore) {
+    public static ItemStack makeColorfulItem(Material material, String displayName, int amount, int durability, String... lore) {
         ItemStack item = new ItemStack(material, amount, (short) durability);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(SUtil.colorize(displayName));
@@ -47,7 +53,7 @@ public abstract class SBGUI {
         return item;
     }
 
-    public ItemStack makeColorfulItem(Material material, String displayName, int amount, int durability, String lore) {
+    public static ItemStack makeColorfulItem(Material material, String displayName, int amount, int durability, String lore) {
         ItemStack item = new ItemStack(material, amount, (short) durability);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(SUtil.colorize(displayName));
@@ -60,7 +66,7 @@ public abstract class SBGUI {
         return item;
     }
 
-    public ItemStack makeColorfulItem(Material material, String displayName, int amount, int durability, String lore, boolean glowing) {
+    public static ItemStack makeColorfulItem(Material material, String displayName, int amount, int durability, String lore, boolean glowing) {
         ItemStack item = new ItemStack(material, amount, (short) durability);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(SUtil.colorize(displayName));
@@ -78,7 +84,7 @@ public abstract class SBGUI {
         return item;
     }
 
-    public ItemStack makeColorfulItem(Material material, String displayName, int amount, int durability, List<String> lore) {
+    public static ItemStack makeColorfulItem(Material material, String displayName, int amount, int durability, List<String> lore) {
         ItemStack item = new ItemStack(material, amount, (short) durability);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(SUtil.colorize(displayName));

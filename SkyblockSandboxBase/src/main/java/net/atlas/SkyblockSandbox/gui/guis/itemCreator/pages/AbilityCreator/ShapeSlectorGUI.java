@@ -1,12 +1,12 @@
 package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator;
 
-import net.atlas.SkyblockSandbox.gui.SBGUI;
+import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.Particles;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
-public class ShapeSlectorGUI extends SBGUI {
+public class ShapeSlectorGUI extends NormalGUI {
     private final int index;
     private final String function;
     private final int count;

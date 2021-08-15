@@ -84,7 +84,7 @@ public class NBTUtil {
         return 0;
     }
 
-    public ItemStack setInteger(ItemStack stack, int v, String key) {
+    public static ItemStack setInteger(ItemStack stack, int v, String key) {
         if (stack != null) {
             if (stack.hasItemMeta()) {
                 net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);

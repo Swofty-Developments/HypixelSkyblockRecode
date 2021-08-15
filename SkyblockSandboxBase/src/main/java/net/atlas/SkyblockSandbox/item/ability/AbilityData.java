@@ -1,12 +1,66 @@
 package net.atlas.SkyblockSandbox.item.ability;
 
+import net.atlas.SkyblockSandbox.item.ability.functions.EnumFunctionsData;
+import net.atlas.SkyblockSandbox.util.NBTUtil;
+import net.atlas.SkyblockSandbox.util.NumUtils;
+import net.atlas.SkyblockSandbox.util.Particles;
+import net.atlas.SkyblockSandbox.util.StackUtils;
+import net.minecraft.server.v1_8_R3.NBTTagCompound;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 public class AbilityData {
 
+    public static ItemStack setData(EnumAbilityData dataType, ItemStack item, Object data, int index) {
+        if(index > 5)
+            throw new NullPointerException("Ability index can't be higher than 5!");
 
+        net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+        NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+        NBTTagCompound attributes = (tag.getCompound("ExtraAttributes") != null ? tag.getCompound("ExtraAttributes") : new NBTTagCompound());
+        NBTTagCompound ability = (attributes.getCompound("Abilities") != null ? attributes.getCompound("Abilities") : new NBTTagCompound());
+        NBTTagCompound abilitySlot = (ability.getCompound("Ability_" + index) != null ? ability.getCompound("Ability_" + index) : new NBTTagCompound());
+        abilitySlot.setString(dataType.getA(), data.toString());
+        ability.set("Ability_" + index, abilitySlot);
+        abilitySlot.setString("FunctionCount", "0");
+        abilitySlot.setString("id", UUID.randomUUID().toString());
 
+        attributes.set("Abilities", ability);
+        tag.set("ExtraAttributes", attributes);
+        nmsItem.setTag(tag);
 
+        return NBTUtil.setInteger(CraftItemStack.asBukkitCopy(nmsItem), 1, "hasAbility");
+    }
 
-    /*public static boolean hasAbility(ItemStack item, int index) {
+    public static boolean hasAbility(ItemStack itemStack) {
+        net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(itemStack);
+        NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+        NBTTagCompound attributes = (tag.getCompound("ExtraAttributes") != null ? tag.getCompound("ExtraAttributes") : new NBTTagCompound());
+
+        return attributes.hasKey("hasAbility");
+    }
+
+    public static Object retrieveData(EnumAbilityData dataType, ItemStack item, int index) {
+        if(index > 5) {
+            throw new NullPointerException("Ability index can't be higher than 5!");
+        }
+
+        net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+        NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+        NBTTagCompound attributes = (tag.getCompound("ExtraAttributes") != null ? tag.getCompound("ExtraAttributes") : new NBTTagCompound());
+        NBTTagCompound ability = (attributes.getCompound("Abilities") != null ? attributes.getCompound("Abilities") : new NBTTagCompound());
+        NBTTagCompound abilitySlot = (ability.getCompound("Ability_" + index) != null ? ability.getCompound("Ability_" + index) : new NBTTagCompound());
+
+        return abilitySlot.getString(dataType.getA());
+    }
+
+    public static boolean hasAbility(ItemStack item, int index) {
         if(index > 5)
             throw new NullPointerException("Ability index can't be higher than 5!");
         net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
@@ -59,7 +113,7 @@ public class AbilityData {
         tag.set("ExtraAttributes", attributes);
         nmsItem.setTag(tag);
 
-        return ItemUtilities.storeIntInItem(CraftItemStack.asBukkitCopy(nmsItem), 1, "hasAbility");
+        return NBTUtil.setInteger(CraftItemStack.asBukkitCopy(nmsItem), 1, "hasAbility");
     }
 
     public static Object retrieveFunctionData(EnumFunctionsData dataType, ItemStack item, int index, int count) {
@@ -163,13 +217,26 @@ public class AbilityData {
         return null;
     }
 
+    public static int getAbilityAmount(ItemStack item) {
+        if(item!=null) {
+            if(item.hasItemMeta()) {
+                net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+                NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+                NBTTagCompound attributes = (tag.getCompound("ExtraAttributes") != null ? tag.getCompound("ExtraAttributes") : new NBTTagCompound());
+                NBTTagCompound ability = (attributes.getCompound("Abilities") != null ? attributes.getCompound("Abilities") : new NBTTagCompound());
+                return ability.c().size();
+            }
+        }
+        return 0;
+    }
+
     public static List<ItemStack> ListOfParticles(){
         List<ItemStack> array = new ArrayList<>();
         for(Particles value : Particles.values()) {
             if(value.equals(Particles.BLOCK_CRACK)||value.equals(Particles.ITEM_CRACK)||value.equals(Particles.BLOCK_DUST)) {
 
             } else {
-                array.add(IUtil.makeColorfulItem(value.getB(),"&7Particle: &a" + value.name(),1,0,"\n&eClick to set!"));
+                array.add(StackUtils.makeColorfulItem(value.getB(),"&7Particle: &a" + value.name(),1,0,"\n&eClick to set!"));
             }
         }
         return array;
@@ -184,7 +251,7 @@ public class AbilityData {
         return finally2;
     }
     public static Float floatFromFunction(ItemStack item, EnumFunctionsData functionType, int index, int count, float defaultValue) {
-        if (ItemUtilities.isFloat(AbilityData.retrieveFunctionData(functionType, item, index, count).toString())) {
+        if (NumUtils.isFloat(AbilityData.retrieveFunctionData(functionType, item, index, count).toString())) {
             return Float.parseFloat(AbilityData.retrieveFunctionData(functionType, item, index, count).toString());
         }
         return defaultValue;
@@ -193,7 +260,7 @@ public class AbilityData {
         if(AbilityData.retrieveFunctionData(functionType, item, index, count).toString().equals("")){
             return defaultValue;
         }
-        if (ItemUtilities.isInteger(AbilityData.retrieveFunctionData(functionType, item, index, count).toString())) {
+        if (NumUtils.isInt(AbilityData.retrieveFunctionData(functionType, item, index, count).toString())) {
             return Integer.parseInt(AbilityData.retrieveFunctionData(functionType, item, index, count).toString());
         }
         return defaultValue;
@@ -214,5 +281,5 @@ public class AbilityData {
             return defaultValue;
         }
         return AbilityData.retrieveFunctionData(functionType, item, index, count).toString();
-    }*/
+    }
 }

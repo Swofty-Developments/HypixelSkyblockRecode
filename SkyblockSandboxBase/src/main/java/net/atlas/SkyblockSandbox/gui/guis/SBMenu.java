@@ -1,13 +1,13 @@
 package net.atlas.SkyblockSandbox.gui.guis;
 
-import net.atlas.SkyblockSandbox.gui.SBGUI;
+import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.text.DecimalFormat;
 import java.util.Arrays;
 
-public class SBMenu extends SBGUI {
+public class SBMenu extends NormalGUI {
     public SBPlayer owner;
     public SBMenu(SBPlayer owner) {
         super(owner);

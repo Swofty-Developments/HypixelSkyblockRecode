@@ -1,17 +1,18 @@
 package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator;
 
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemCreator;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemCreatorPage;
-import net.maploop.items.Items;
-import net.maploop.items.command.commands.itemCreator.Command_CreateItem;
-import net.maploop.items.gui.AnvilGUI;
-import net.maploop.items.gui.PaginatedGUI;
-import net.maploop.items.gui.PlayerMenuUtility;
-import net.maploop.items.util.IUtil;
-import net.maploop.items.util.NBTUtil;
+import dev.triumphteam.gui.builder.item.ItemBuilder;
+import net.atlas.SkyblockSandbox.SBX;
+import net.atlas.SkyblockSandbox.gui.AnvilGUI;
+import net.atlas.SkyblockSandbox.gui.PaginatedGUI;
+import net.atlas.SkyblockSandbox.item.SBItemStack;
+import net.atlas.SkyblockSandbox.player.SBPlayer;
+import net.atlas.SkyblockSandbox.util.NBTUtil;
+import net.atlas.SkyblockSandbox.util.SUtil;
+import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -19,30 +20,28 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class SetAbilityDescriptionMenu extends PaginatedGUI {
     private final int indexx;
 
-    public SetAbilityDescriptionMenu(PlayerMenuUtility playerMenuUtility,int indexx) {
-        super(playerMenuUtility);
+    public SetAbilityDescriptionMenu(SBPlayer owner, int indexx) {
+        super(owner);
         this.indexx = indexx;
     }
 
     @Override
     public String getTitle() {
-        return "Set item lore";
+        return "Set ability description line";
     }
 
     @Override
-    public int getSize() {
-        return 54;
+    public int getRows() {
+        return 6;
     }
 
     @Override
-    public int getMaxItemsPerPage() {
+    public int getPageSize() {
         return 28;
     }
 
@@ -52,66 +51,72 @@ public class SetAbilityDescriptionMenu extends PaginatedGUI {
         Player p = (Player) event.getWhoClicked();
         switch (event.getSlot()) {
             case 52:
-                AnvilGUI anvilGUI = new AnvilGUI(p, new AnvilGUI.AnvilClickEventHandler() {
-                    @Override
-                    public void onAnvilClick(AnvilGUI.AnvilClickEvent event) {
-                        if(event.getSlot().equals(AnvilGUI.AnvilSlot.OUTPUT)) {
-                            event.setWillClose(true);
-                            event.setWillDestroy(true);
+                AnvilGUI anvilGUI = new AnvilGUI(p, event1 -> {
+                    if(event1.getSlot().equals(AnvilGUI.AnvilSlot.OUTPUT)) {
+                        event1.setWillClose(true);
+                        event1.setWillDestroy(true);
 
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
-                                    Command_CreateItem.storedItems.put(playerMenuUtility.getOwner().getUniqueId(),NBTUtil.addAbilityDescriptionLine(Command_CreateItem.storedItems.get(playerMenuUtility.getOwner().getUniqueId()),event.getName(),indexx));
-                                    Command_CreateItem.storedItems.put(playerMenuUtility.getOwner().getUniqueId(),NBTUtil.refreshLore(Command_CreateItem.storedItems.get(playerMenuUtility.getOwner().getUniqueId())));
-                                    p.setItemInHand(Command_CreateItem.storedItems.get(playerMenuUtility.getOwner().getUniqueId()));
-                                    new SetAbilityDescriptionMenu(playerMenuUtility,indexx).open();
-                                }
-                            }.runTaskLater(Items.getInstance(), 1);
-                        }
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                SBItemStack p1 = new SBItemStack(getOwner().getItemInHand());
+                                ItemStack i = p1.addAbilityDescriptionLine(getOwner().getItemInHand(), SUtil.colorize(event1.getName()),indexx);
+                                p1 = new SBItemStack(i);
+                                i = p1.refreshLore();
+                                getOwner().setItemInHand(i);
+                                new SetAbilityDescriptionMenu(getOwner(),indexx).open();
+                            }
+                        }.runTaskLater(SBX.getInstance(), 1);
                     }
                 });
-                anvilGUI.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, makeItem(Material.PAPER, "Enter Lore Line", 1, 0, "§a^^^^^\n§7Enter a lore line in the\n§7text box!"));
+                anvilGUI.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, makeColorfulItem(Material.PAPER, "Enter Lore Line", 1, 0, "§a^^^^^","§7Enter a lore line in the","§7text box!"));
                 anvilGUI.open();
                 break;
             case 45:
-                if(page==0) {
-                    new ItemCreator(owner, ItemCreatorPage.ABILITY_DESCRIPTION_PICKER).open();
+                if(getGui().getPrevPageNum()==1&&getGui().getCurrentPageNum()==1) {
+                    new AbilityDescriptionPicker(getOwner()).open();
                 }
+                break;
             default:
                 if(event.getCurrentItem().getType().equals(Material.WOOL)) {
                     if(event.getClick()== ClickType.LEFT) {
                         ItemStack i = event.getCurrentItem();
                         AnvilGUI anvilGUI2 = new AnvilGUI(p, new AnvilGUI.AnvilClickEventHandler() {
                             @Override
-                            public void onAnvilClick(AnvilGUI.AnvilClickEvent event) {
-                                if(event.getSlot().equals(AnvilGUI.AnvilSlot.OUTPUT)) {
-                                    event.setWillClose(true);
-                                    event.setWillDestroy(true);
+                            public void onAnvilClick(AnvilGUI.AnvilClickEvent event2) {
+                                if(event2.getSlot().equals(AnvilGUI.AnvilSlot.OUTPUT)) {
+                                    event2.setWillClose(true);
+                                    event2.setWillDestroy(true);
 
                                     new BukkitRunnable() {
                                         @Override
                                         public void run() {
-                                            Command_CreateItem.storedItems.put(playerMenuUtility.getOwner().getUniqueId(),NBTUtil.setAbilityDescriptionLine(Command_CreateItem.storedItems.get(playerMenuUtility.getOwner().getUniqueId()),event.getName(),indexx,NBTUtil.getInteger(i,"Line")));
-                                            Command_CreateItem.storedItems.put(playerMenuUtility.getOwner().getUniqueId(),NBTUtil.refreshLore(Command_CreateItem.storedItems.get(playerMenuUtility.getOwner().getUniqueId())));
-                                            p.setItemInHand(Command_CreateItem.storedItems.get(playerMenuUtility.getOwner().getUniqueId()));
-                                            new SetAbilityDescriptionMenu(playerMenuUtility,indexx).open();
+                                            SBItemStack p1 = new SBItemStack(getOwner().getItemInHand());
+                                            SBItemStack p2 = new SBItemStack(event.getCurrentItem());
+                                            ItemStack i = p1.setAbilDescriptLine(SUtil.colorize(event2.getName()),indexx, p2.getInteger(p1.asBukkitItem(),"Line"));
+                                            p1 = new SBItemStack(i);
+                                            i = p1.refreshLore();
+                                            getOwner().setItemInHand(i);
+                                            new SetAbilityDescriptionMenu(getOwner(),indexx).open();
                                         }
-                                    }.runTaskLater(Items.getInstance(), 1);
+                                    }.runTaskLater(SBX.getInstance(), 1);
                                 }
                             }
                         });
-                        anvilGUI2.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, makeItem(Material.PAPER, "Enter Lore Line", 1, 0, "§a^^^^^\n§7Enter a lore line in the\n§7text box!"));
+                        anvilGUI2.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, makeColorfulItem(Material.PAPER, "Enter Lore Line", 1, 0, "§a^^^^^","§7Enter a lore line in the","§7text box!"));
                         anvilGUI2.open();
                         break;
                     } else {
                         if(event.getClick()==ClickType.MIDDLE) {
                             ItemStack i = event.getCurrentItem();
 
-                            Command_CreateItem.storedItems.put(playerMenuUtility.getOwner().getUniqueId(),NBTUtil.removeAbilityDescriptionLine(Command_CreateItem.storedItems.get(playerMenuUtility.getOwner().getUniqueId()),indexx,NBTUtil.getInteger(i,"Line")));
-                            Command_CreateItem.storedItems.put(playerMenuUtility.getOwner().getUniqueId(),NBTUtil.refreshLore(Command_CreateItem.storedItems.get(playerMenuUtility.getOwner().getUniqueId())));
-                            p.setItemInHand(Command_CreateItem.storedItems.get(playerMenuUtility.getOwner().getUniqueId()));
-                            new SetAbilityDescriptionMenu(playerMenuUtility,indexx).open();
+                            SBItemStack p1 = new SBItemStack(getOwner().getItemInHand());
+                            i = p1.removeAbilityDescriptionLine(p1.asBukkitItem(),indexx, p1.getInteger(i,"Line"));
+                            p1 = new SBItemStack(i);
+                            i = p1.refreshLore();
+                            getOwner().setItemInHand(i);
+                            new SetAbilityDescriptionMenu(getOwner(),indexx).open();
+                            p.playSound(p.getLocation(), Sound.CAT_MEOW,1,2);
                             break;
                         }
                     }
@@ -121,49 +126,49 @@ public class SetAbilityDescriptionMenu extends PaginatedGUI {
 
     @Override
     public void setItems() {
-        addMenuBorder();
+        getGui().getFiller().fillBorder(ItemBuilder.from(super.FILLER_GLASS).name(Component.text(SUtil.colorize("&7 "))).asGuiItem());
+        
+        SBItemStack i = new SBItemStack(getOwner().getItemInHand());
+        List<String> lore = i.getAbilityDescription(getOwner().getItemInHand(),indexx);
 
-        List<String> lore = NBTUtil.getAbilityDescription(Command_CreateItem.storedItems.get(playerMenuUtility.getOwner().getUniqueId()),indexx);
+        ItemStack next = makeColorfulItem(Material.ARROW, ChatColor.GREEN + "Next Page", 1, 0, "§7Go to the next page.");
+        ItemStack prev = makeColorfulItem(Material.ARROW, ChatColor.GREEN + "Previous Page", 1, 0, "§7Go to the previous page.");
+        setItem(53, next);
+        setItem(52,makeColorfulItem(Material.BOOK_AND_QUILL,ChatColor.GREEN + "Add lore line",1,0,ChatColor.GRAY + "Click to add a lore line."));
 
-        ItemStack next = makeItem(Material.ARROW, ChatColor.GREEN + "Next Page", 1, 0, "§7Go to the next page.");
-        ItemStack prev = makeItem(Material.ARROW, ChatColor.GREEN + "Previous Page", 1, 0, "§7Go to the previous page.");
-        inventory.setItem(53, next);
-        inventory.setItem(52,makeItem(Material.BOOK_AND_QUILL,ChatColor.GREEN + "Add lore line",1,0,ChatColor.GRAY + "Click to add a lore line."));
-        inventory.setItem(4,Command_CreateItem.storedItems.get(playerMenuUtility.getOwner().getUniqueId()));
-
-        if(page > 0) {
-            inventory.setItem(45, prev);
+        if(getGui().getCurrentPageNum() > 1) {
+            setItem(45, prev);
         } else {
-            inventory.setItem(45, prev);
-        }
-        for(int i = 0;i<lore.size()/maxItemsPerPage;i++) {
-            if(!((index + 1) >= lore.size())) {
-                page = page + 1;
-                super.open();
-            } else {
-                break;
-            }
+            setItem(45, prev);
         }
 
-
-
-        ItemStack close = makeItem(Material.BARRIER, "§cClose", 1, 0);
-        inventory.setItem(49, close);
+        ItemStack close = makeColorfulItem(Material.BARRIER, "§cClose", 1, 0);
+        setItem(49, close);
 
 
         if(!lore.isEmpty()) {
-            for(int i = 0; i < getMaxItemsPerPage(); i++) {
-                index = getMaxItemsPerPage() * page + i;
-                if(index >= lore.size()) break;
+            for(String s:lore) {
                 ItemStack loreItem = new ItemStack(Material.WOOL,1,DyeColor.LIME.getData());
                 ItemMeta meta = loreItem.getItemMeta();
-                meta.setDisplayName(IUtil.colorize("&aLine #" + index));
-                meta.setLore(Arrays.asList(lore.get(index), IUtil.colorize("\n&eLeft-Click to edit!\n\n&eRight-Click to edit in chat!\n&7or if you don't have enough space\n&7and want to add special &aSymbols&7.\n\n&bMiddle-Click to remove!")));
+                meta.setDisplayName(SUtil.colorize("&aLine #" + lore.indexOf(s)));
+                String newLore = lore.get(lore.indexOf(s));
+                List<String> finalList = new ArrayList<>();
+                finalList.add(newLore);
+
+                for(String b:SUtil.colorize("","&eLeft-Click to edit!","","&eRight-Click to edit in chat!","&7or if you don't have enough space","&7and want to add special &aSymbols&7.","","&bMiddle-Click to remove!")) {
+                    finalList.add(b);
+                }
+                meta.setLore(finalList);
                 loreItem.setItemMeta(meta);
                 loreItem = NBTUtil.setString(loreItem, UUID.randomUUID().toString(),"UUID");
-                loreItem = NBTUtil.setInteger(loreItem, index,"Line");
-                inventory.addItem(loreItem);
+                loreItem = NBTUtil.setInteger(loreItem, lore.indexOf(s),"Line");
+                getGui().addItem(ItemBuilder.from(loreItem).asGuiItem());
             }
         }
+    }
+
+    @Override
+    public boolean setClickActions() {
+        return false;
     }
 }

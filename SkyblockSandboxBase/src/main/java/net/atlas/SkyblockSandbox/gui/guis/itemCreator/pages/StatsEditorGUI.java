@@ -2,17 +2,13 @@ package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages;
 
 import com.google.common.base.Enums;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
-import dev.triumphteam.gui.guis.Gui;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.gui.AnvilGUI;
-import net.atlas.SkyblockSandbox.gui.SBGUI;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemCreator;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemCreatorPage;
+import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.NumUtils;
-import net.kyori.adventure.text.Component;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import org.bukkit.ChatColor;
@@ -27,7 +23,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
-public class StatsEditorGUI extends SBGUI {
+public class StatsEditorGUI extends NormalGUI {
 
     public StatsEditorGUI(SBPlayer owner) {
         super(owner);
@@ -153,7 +149,7 @@ public class StatsEditorGUI extends SBGUI {
                         new BukkitRunnable() {
                             @Override
                             public void run() {
-                                new ItemCreator(player,ItemCreatorPage.STATS_EDITOR).open();
+                                new StatsEditorGUI(getOwner()).open();
                             }
                         }.runTaskLater(SBX.getInstance(), 2);
                     }

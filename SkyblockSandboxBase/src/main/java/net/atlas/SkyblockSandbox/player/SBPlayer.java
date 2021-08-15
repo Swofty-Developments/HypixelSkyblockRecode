@@ -8,7 +8,6 @@ import net.atlas.SkyblockSandbox.sound.Jingle;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import org.bukkit.Material;
-import org.bukkit.block.SkullOwner;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 

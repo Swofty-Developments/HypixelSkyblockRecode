@@ -1,8 +1,7 @@
 package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator;
 
-import net.atlas.SkyblockSandbox.gui.SBGUI;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemCreator;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemCreatorPage;
+import net.atlas.SkyblockSandbox.gui.NormalGUI;
+import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.ItemCreatorGUIMain;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.item.ability.AbilityData;
 import net.atlas.SkyblockSandbox.item.ability.EnumAbilityData;
@@ -17,7 +16,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 
-public class AbilityEditorGUI extends SBGUI {
+public class AbilityEditorGUI extends NormalGUI {
 
     public AbilityEditorGUI(SBPlayer owner) {
         super(owner);
@@ -30,7 +29,7 @@ public class AbilityEditorGUI extends SBGUI {
 
         switch (event.getCurrentItem().getType()) {
             case ARROW:
-                new ItemCreator(player, ItemCreatorPage.ABILITY_EDITOR).open();
+                new AbilityEditorGUI(getOwner()).open();
                 break;
             case WOOD_BUTTON: {
                 if (event.getClick().equals(ClickType.RIGHT)) {
@@ -71,20 +70,20 @@ public class AbilityEditorGUI extends SBGUI {
 
                 if (event.getClick().isLeftClick()) {
                     owner.playSound(owner.getLocation(), Sound.ITEM_PICKUP, 2, 1);
-                    new ItemCreator(owner, ItemCreatorPage.ABILITY_CREATOR_GUI_MAIN, finalI + 1).open();
+                    new AbilityCreatorGUI(owner,finalI+1).open();
                 } else {
                     if (event.getClick().isRightClick()) {
                         if (event.getCurrentItem().getType().equals(Material.WOOD_BUTTON)) {
                         } else {
                             owner.setItemInHand(it.removeAbil(it, finalI + 1));
-                            new ItemCreator(owner, ItemCreatorPage.ABILITY_EDITOR).open();
+                            new AbilityEditorGUI(owner).open();
                             owner.playSound(owner.getLocation(), Sound.HORSE_ARMOR, 1, 1);
                         }
                     }
                 }
             });
         }
-        setAction(31, event -> new ItemCreator(getOwner(), ItemCreatorPage.ABILITY_EDITOR).open());
+        setAction(31, event -> new ItemCreatorGUIMain(owner).open());
         return true;
     }
 

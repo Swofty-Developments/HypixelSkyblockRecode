@@ -2,9 +2,7 @@ package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator;
 
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.gui.AnvilGUI;
-import net.atlas.SkyblockSandbox.gui.SBGUI;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemCreator;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemCreatorPage;
+import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.item.ability.EnumAbilityData;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
@@ -21,13 +19,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class AbilityCreatorGUI extends SBGUI {
+public class AbilityCreatorGUI extends NormalGUI {
     private final int index;
 
     public AbilityCreatorGUI(SBPlayer owner, int index) {
         super(owner);
         this.index = index;
-
     }
 
     @Override
@@ -37,7 +34,7 @@ public class AbilityCreatorGUI extends SBGUI {
 
         switch (event.getCurrentItem().getType()) {
             case ARROW:
-                new ItemCreator(new SBPlayer(player),ItemCreatorPage.ABILITY_EDITOR);
+                new AbilityEditorGUI(getOwner()).open();
                 break;
             case NAME_TAG: {
                 AnvilGUI gui = new AnvilGUI(player, event12 -> {
@@ -53,7 +50,7 @@ public class AbilityCreatorGUI extends SBGUI {
                         new BukkitRunnable() {
                             @Override
                             public void run() {
-                                new ItemCreator(new SBPlayer(player),ItemCreatorPage.ABILITY_CREATOR_GUI_MAIN).open();
+                                new AbilityCreatorGUI(getOwner(),index).open();
                             }
                         }.runTaskLater(SBX.getInstance(), 2);
                     }
@@ -70,7 +67,7 @@ public class AbilityCreatorGUI extends SBGUI {
                         Integer p = Integer.parseInt(event1.getName());
                     } catch (NumberFormatException ignored) {
                         player.sendMessage("§cThat's not a valid number!");
-                        new ItemCreator(new SBPlayer(player),ItemCreatorPage.ABILITY_CREATOR_GUI_MAIN).open();
+                        new AbilityCreatorGUI(getOwner(),index).open();
                         return;
                     }
                     if(Integer.parseInt(event1.getName()) > 600) {
@@ -101,7 +98,7 @@ public class AbilityCreatorGUI extends SBGUI {
                 break;
             }
             case HOPPER: {
-                new ItemCreator(player,ItemCreatorPage.BASE_ABILITIES,index).open();
+                new BaseAbilitiesGUI(getOwner(),index).open();
                 break;
             }
             case EYE_OF_ENDER: {
@@ -191,7 +188,7 @@ public class AbilityCreatorGUI extends SBGUI {
             }
             case BOOK_AND_QUILL: {
                 if(event.getSlot()==30) {
-                    new ItemCreator(player,ItemCreatorPage.ABILITY_DESCRIPTION_PICKER,index).open();
+                    new AbilityDescriptionPicker(getOwner()).open();
                 }
             }
         }
