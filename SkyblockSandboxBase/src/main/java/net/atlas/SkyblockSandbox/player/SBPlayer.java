@@ -1,0 +1,245 @@
+package net.atlas.SkyblockSandbox.player;
+
+import lombok.Setter;
+import net.atlas.SkyblockSandbox.item.SBItemStack;
+import net.atlas.SkyblockSandbox.item.SkyblockItem;
+import net.atlas.SkyblockSandbox.player.skills.SkillType;
+import net.atlas.SkyblockSandbox.sound.Jingle;
+import net.atlas.SkyblockSandbox.util.NBTUtil;
+import net.atlas.SkyblockSandbox.util.SUtil;
+import org.bukkit.Material;
+import org.bukkit.block.SkullOwner;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+import static net.atlas.SkyblockSandbox.SBX.cachedSkills;
+import static net.atlas.SkyblockSandbox.SBX.isSoulCryActive;
+import static net.atlas.SkyblockSandbox.listener.sbEvents.PlayerJoin.maxStats;
+import static net.atlas.SkyblockSandbox.listener.sbEvents.PlayerJoin.bonusStats;
+import static net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat.HEALTH;
+
+
+@Setter
+public class SBPlayer extends PluginPlayer {
+
+    static SBPlayer sbPlayer;
+
+    public SBPlayer(Player player) {
+        super(player);
+        sbPlayer = this;
+    }
+
+    public double getStat(PlayerStat stat) {
+        if(!bonusStats.containsKey(sbPlayer.getUniqueId())) {
+            if(!bonusStats.get(sbPlayer.getUniqueId()).containsKey(stat)) {
+                HashMap<PlayerStat,Double> temp = new HashMap<>(bonusStats.get(sbPlayer.getUniqueId()));
+                temp.put(stat,0D);
+                bonusStats.put(sbPlayer.getUniqueId(),temp);
+            }
+        }
+        return bonusStats.get(sbPlayer.getUniqueId()).get(stat);
+    }
+
+    public double getMaxStat(PlayerStat stat) {
+        if (!maxStats.containsKey(sbPlayer.getUniqueId())) {
+            if(!maxStats.get(sbPlayer.getUniqueId()).containsKey(stat)) {
+                HashMap<PlayerStat, Double> temp = new HashMap<>(maxStats.get(sbPlayer.getUniqueId()));
+                temp.put(stat, 0D);
+                maxStats.put(sbPlayer.getUniqueId(), temp);
+            }
+        }
+        return maxStats.get(sbPlayer.getUniqueId()).get(stat);
+    }
+
+    public void setStat(PlayerStat stat, double v) {
+        if (getMaxStat(stat) < v) {
+            HashMap<PlayerStat, Double> updatedStat = new HashMap<>(bonusStats.get(sbPlayer.getUniqueId()));
+            updatedStat.put(stat, getMaxStat(stat));
+            bonusStats.put(sbPlayer.getUniqueId(), updatedStat);
+        } else {
+            HashMap<PlayerStat, Double> updatedStat = new HashMap<>(bonusStats.get(sbPlayer.getUniqueId()));
+            updatedStat.put(stat, v);
+            bonusStats.put(sbPlayer.getUniqueId(), updatedStat);
+        }
+
+    }
+
+    public void giveItem(SkyblockItem item) {
+        if (hasSpace()) {
+            sbPlayer.getInventory().addItem(item.item().asBukkitItem());
+            sbPlayer.sendMessage(SUtil.colorize("&aSuccessfully gave &e" + item));
+        }
+    }
+
+    public void giveItem(SBItemStack item) {
+        if (hasSpace()) {
+            sbPlayer.getInventory().addItem(item.asBukkitItem());
+            sbPlayer.sendMessage(SUtil.colorize("&aSuccessfully gave &e" + item.getItemID()));
+        }
+    }
+
+    public void setItemInHand(SkyblockItem i) {
+        sbPlayer.getPlayer().setItemInHand(i.item().asBukkitItem());
+    }
+
+    public boolean hasSpace() {
+        for (ItemStack i : sbPlayer.getInventory().getContents()) {
+            if (i == null || i.getType().equals(Material.AIR)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void updateStats() {
+        HashMap<PlayerStat, Double> map = NBTUtil.getAllStats(sbPlayer);
+
+        for (PlayerStat s : PlayerStat.values()) {
+            double stat = map.get(s);
+            if (getStat(s) < getMaxStat(s) && !s.isRegen()) {
+                setStat(s, getMaxStat(s));
+            }
+            if (getStat(s) > getMaxStat(s)) {
+                if (s.isRegen()) {
+                    setStat(s, getMaxStat(s));
+                }
+            }
+            setMaxStat(s, stat);
+            if (isSoulCryActive.containsKey(sbPlayer.getUniqueId())) {
+                if (isSoulCryActive.get(sbPlayer.getUniqueId())) {
+                    if (s.equals(PlayerStat.FEROCITY)) {
+                        setMaxStat(s, stat + 400);
+                    }
+                }
+            }
+
+
+        }
+
+        if(sbPlayer.getMaxStat(HEALTH)>100) {
+            double newHealth;
+            double oldrng = (sbPlayer.getMaxStat(SBPlayer.PlayerStat.HEALTH) - 0);
+            if (oldrng == 0)
+                newHealth = 0;
+            else {
+                double newRng = (40 - 0);
+                newHealth = Math.floor(((sbPlayer.getMaxStat(SBPlayer.PlayerStat.HEALTH) - 0) * newRng) / oldrng);
+            }
+            getPlayer().setMaxHealth(newHealth);
+        }
+        //maxStats.put(sbPlayer.getUniqueId(),map);
+    }
+
+    public void doRegenStats() {
+        HashMap<PlayerStat, Double> map = NBTUtil.getAllStats(sbPlayer);
+        if (getStat(PlayerStat.INTELLIGENCE) < getMaxStat(PlayerStat.INTELLIGENCE)) {
+            double newintl = getStat(PlayerStat.INTELLIGENCE) + (getMaxStat(PlayerStat.INTELLIGENCE) * 0.1);
+            if (newintl > getMaxStat(PlayerStat.INTELLIGENCE)) {
+                newintl = getMaxStat(PlayerStat.INTELLIGENCE);
+            }
+            map.put(PlayerStat.INTELLIGENCE, newintl);
+            bonusStats.put(sbPlayer.getUniqueId(), map);
+        }
+        if (getStat(PlayerStat.HEALTH) < getMaxStat(PlayerStat.HEALTH)) {
+            double newhlth = getStat(PlayerStat.HEALTH) + (getMaxStat(PlayerStat.HEALTH) * 0.01 + 1.5);
+            if (newhlth > getMaxStat(PlayerStat.HEALTH)) {
+                newhlth = getMaxStat(PlayerStat.HEALTH);
+            }
+            map.put(PlayerStat.HEALTH, newhlth);
+            bonusStats.put(sbPlayer.getUniqueId(), map);
+        }
+    }
+
+    public void setAllStats(HashMap<UUID, HashMap<PlayerStat, Double>> stats, PlayerStat... ignore) {
+        for (PlayerStat s : stats.get(sbPlayer.getUniqueId()).keySet()) {
+            for (PlayerStat b : ignore) {
+                if (s == b) {
+                    return;
+                }
+            }
+            setCurrentAndMaxStat(s, stats.get(sbPlayer.getUniqueId()).get(s));
+        }
+    }
+
+    public void setCurrentAndMaxStat(PlayerStat stat, double v) {
+        setMaxStat(stat, v);
+        setStat(stat, v);
+    }
+
+    public void setMaxStat(PlayerStat stat, double v) {
+        HashMap<PlayerStat, Double> updatedStat = new HashMap<>(maxStats.get(sbPlayer.getUniqueId()));
+        updatedStat.put(stat, v);
+        maxStats.put(sbPlayer.getUniqueId(), updatedStat);
+    }
+
+    public void setOverflowStat(PlayerStat stat, double v) {
+        HashMap<PlayerStat, Double> updatedStat = new HashMap<>(bonusStats.get(sbPlayer.getUniqueId()));
+        updatedStat.put(stat, v);
+        bonusStats.put(sbPlayer.getUniqueId(), updatedStat);
+    }
+
+    public void sendBarMessage(String message) {
+        SUtil.sendActionText(sbPlayer, SUtil.colorize(message));
+    }
+
+    public void playJingle(Jingle j) {
+        j.send(sbPlayer.getPlayer());
+    }
+
+    public double getCurrentSkillExp(SkillType type) {
+        return cachedSkills.get(sbPlayer.getUniqueId()).get(type);
+    }
+
+    public void addSkillXP(SkillType type, double amt) {
+        HashMap<SkillType, Double> map;
+        if(cachedSkills.containsKey(sbPlayer.getUniqueId())) {
+            map = new HashMap<>(cachedSkills.get(sbPlayer.getUniqueId()));
+        } else {
+            map = new HashMap<>();
+        }
+        if(cachedSkills.containsKey(sbPlayer.getUniqueId())) {
+            map.put(type,map.get(type)+amt);
+        } else {
+            map.put(type,amt);
+        }
+        cachedSkills.put(sbPlayer.getUniqueId(),map);
+
+
+    }
+
+    public enum PlayerStat {
+        HEALTH("health", 100, true),
+        DAMAGE("damage", 0, false),
+        STRENGTH("strength", 0, false),
+        INTELLIGENCE("intelligence", 100, true),
+        DEFENSE("defense", 0, false),
+        CRIT_DAMAGE("crit_damage", 50, false),
+        SPEED("speed", 100, false),
+        FEROCITY("ferocity", 0, false),
+        ATTACK_SPEED("attack_speed", 0, false),
+        CRIT_CHANCE("crit_chance", 30, false);
+
+        private String name;
+        private double base;
+        private boolean isRegen;
+
+        PlayerStat(String name, double base, boolean isRegen) {
+            this.name = name;
+            this.base = base;
+            this.isRegen = isRegen;
+        }
+
+        public double getBase() {
+            return base;
+        }
+
+        public boolean isRegen() {
+            return isRegen;
+        }
+    }
+
+}
