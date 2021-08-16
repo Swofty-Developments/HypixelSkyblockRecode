@@ -5,12 +5,14 @@ import net.atlas.SkyblockSandbox.gui.AnvilGUI;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.AbilityEditorGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
+import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -52,6 +54,8 @@ public class ItemCreatorGUIMain extends NormalGUI {
 
                     meta.setDisplayName(SUtil.colorize(event1.getName()));
                     player.getItemInHand().setItemMeta(meta);
+                    ItemStack i = NBTUtil.setString(player.getItemInHand(),ChatColor.stripColor(SUtil.colorize(event1.getName())),"item-name");
+                    player.setItemInHand(i);
 
                     new BukkitRunnable() {
                         @Override

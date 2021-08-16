@@ -74,8 +74,13 @@ public class SetAbilityDescriptionMenu extends PaginatedGUI {
                 break;
             case 45:
                 if(getGui().getPrevPageNum()==1&&getGui().getCurrentPageNum()==1) {
-                    new AbilityDescriptionPicker(getOwner()).open();
+                    new AbilityCreatorGUI(getOwner(),indexx).open();
+                }  else {
+                    getGui().previous();
                 }
+                break;
+            case 53:
+                getGui().next();
                 break;
             default:
                 if(event.getCurrentItem().getType().equals(Material.WOOL)) {

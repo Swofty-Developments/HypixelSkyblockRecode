@@ -86,8 +86,8 @@ public class ProfileViewer extends NormalGUI {
                             "&aDefense &r" + format.format(pl.getMaxStat(SBPlayer.PlayerStat.DEFENSE)),
                             "&cStrength &r" + format.format(pl.getMaxStat(SBPlayer.PlayerStat.STRENGTH)),
                             "&rSpeed &r" + format.format(pl.getMaxStat(SBPlayer.PlayerStat.SPEED)),
-                            "&9Crit Chance &r" + format.format(pl.getMaxStat(SBPlayer.PlayerStat.CRIT_CHANCE) + "%"),
-                            "&9Crit Damage &r" + format.format(pl.getMaxStat(SBPlayer.PlayerStat.CRIT_DAMAGE) + "%"),
+                            "&9Crit Chance &r" + format.format(pl.getMaxStat(SBPlayer.PlayerStat.CRIT_CHANCE)) + "%",
+                            "&9Crit Damage &r" + format.format(pl.getMaxStat(SBPlayer.PlayerStat.CRIT_DAMAGE)) + "%",
                             "&bIntelligence &r" + format.format(pl.getMaxStat(SBPlayer.PlayerStat.INTELLIGENCE)),
                             "&eBonus Attack Speed &r" + format.format(pl.getMaxStat(SBPlayer.PlayerStat.ATTACK_SPEED)) + "%",
                             "&cFerocity &r" + format.format(pl.getMaxStat(SBPlayer.PlayerStat.FEROCITY)))));

@@ -28,21 +28,19 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
         HashMap<SBPlayer.PlayerStat,Double> empty = new HashMap<>();
         for (SBPlayer.PlayerStat s : SBPlayer.PlayerStat.values()) {
             double tempStat = NBTUtil.getAllStats(p).get(s);
-            maxStat.put(s,s.getBase() + tempStat);
+            maxStat.put(s,tempStat);
             empty.put(s,0D);
         }
         maxStats.put(p.getUniqueId(), maxStat);
-        //currStats.put(p.getUniqueId(), maxStat);
         bonusStats.put(p.getUniqueId(),empty);
         SBX.getInstance().coins.loadCoins(p.getPlayer());
         DragonScoreboard scoreboard = new DragonScoreboard(SBX.getInstance());
         scoreboard.setScoreboard(p.getPlayer());
-
-        //p.setStat(HEALTH,p.getMaxStat(HEALTH));
-        //p.setStat(INTELLIGENCE, p.getMaxStat(INTELLIGENCE));
         for(SBPlayer.PlayerStat s: SBPlayer.PlayerStat.values()) {
             p.setStat(s,p.getMaxStat(s));
         }
+        p.updateStats();
+
         if(p.getMaxStat(HEALTH)>100) {
             double newHealth;
             double oldrng = (p.getMaxStat(SBPlayer.PlayerStat.HEALTH) - 0);
@@ -54,6 +52,8 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
             }
             p.setMaxHealth(newHealth);
             p.setHealth(newHealth);
+        } else {
+            p.setMaxHealth(20);
         }
         for(SkillType t:SkillType.values()) {
             p.addSkillXP(t,0);

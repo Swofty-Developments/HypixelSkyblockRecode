@@ -41,7 +41,11 @@ public abstract class PaginatedGUI extends SBGUI{
 
     public abstract int getPageSize();
 
-    public abstract void setItems();
+    public void updateItems() {
+        setItems();
+        getGui().update();
+        getGui().open(getOwner());
+    }
 
     public abstract boolean setClickActions();
 
@@ -58,10 +62,11 @@ public abstract class PaginatedGUI extends SBGUI{
                     Logger.logError(this.getClass(), "SBGUI: the Gui title cannot be null!");
                 } else {
                     this.gui = Gui.paginated()
-                            .title(Component.text(getTitle()))
                             .rows(getRows())
+                            .title(Component.text("null"))
                             .pageSize(getPageSize())
                             .create();
+                    gui.updateTitle(getTitle());
                     setItems();
                     if (!setClickActions()) {
                         gui.setDefaultClickAction(this::handleMenu);

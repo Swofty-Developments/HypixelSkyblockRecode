@@ -1,5 +1,6 @@
 package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator;
 
+import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.item.ability.AbilityData;
 import net.atlas.SkyblockSandbox.item.ability.functions.EnumFunctionsData;
@@ -10,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class HeadChooserGUI extends NormalGUI {
     private final int index2;
@@ -64,7 +66,12 @@ public class HeadChooserGUI extends NormalGUI {
                     new FunctionsEditorGUI(getOwner(),"Head Shooter Function", index2, count, update, headTexture).open();
                 } else if (event.getClick().isRightClick()){
                     headTexture = null;
-                    setItems();
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            updateItems();
+                        }
+                    }.runTaskLater(SBX.getInstance(), 2);
                 }
             }
         } else {
@@ -72,7 +79,12 @@ public class HeadChooserGUI extends NormalGUI {
                 ItemStack skull = event.getCurrentItem();
                 SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
                 headTexture = StackUtils.textureFromSkullMeta(skullMeta, skull);
-                setItems();
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        updateItems();
+                    }
+                }.runTaskLater(SBX.getInstance(), 2);
             }
         }
     }

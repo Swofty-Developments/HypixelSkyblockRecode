@@ -20,6 +20,7 @@ import static net.atlas.SkyblockSandbox.SBX.isSoulCryActive;
 import static net.atlas.SkyblockSandbox.listener.sbEvents.PlayerJoin.maxStats;
 import static net.atlas.SkyblockSandbox.listener.sbEvents.PlayerJoin.bonusStats;
 import static net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat.HEALTH;
+import static net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat.INTELLIGENCE;
 
 
 @Setter
@@ -102,12 +103,12 @@ public class SBPlayer extends PluginPlayer {
             if (getStat(s) < getMaxStat(s) && !s.isRegen()) {
                 setStat(s, getMaxStat(s));
             }
+            setMaxStat(s, stat);
             if (getStat(s) > getMaxStat(s)) {
                 if (s.isRegen()) {
                     setStat(s, getMaxStat(s));
                 }
             }
-            setMaxStat(s, stat);
             if (isSoulCryActive.containsKey(sbPlayer.getUniqueId())) {
                 if (isSoulCryActive.get(sbPlayer.getUniqueId())) {
                     if (s.equals(PlayerStat.FEROCITY)) {
@@ -120,15 +121,37 @@ public class SBPlayer extends PluginPlayer {
         }
 
         if(sbPlayer.getMaxStat(HEALTH)>100) {
-            double newHealth;
+            double newHealth = 0;
             double oldrng = (sbPlayer.getMaxStat(SBPlayer.PlayerStat.HEALTH) - 0);
-            if (oldrng == 0)
+            if (oldrng == 0) {
                 newHealth = 0;
-            else {
-                double newRng = (40 - 0);
-                newHealth = Math.floor(((sbPlayer.getMaxStat(SBPlayer.PlayerStat.HEALTH) - 0) * newRng) / oldrng);
+            } else {
+                if(sbPlayer.getMaxStat(HEALTH)<=200) {
+                    newHealth = (sbPlayer.getMaxStat(HEALTH))/5;
+                } else {
+                    double newRng = (40 - 0);
+                    newHealth = Math.floor(((sbPlayer.getMaxStat(SBPlayer.PlayerStat.HEALTH) - 0) * newRng) / oldrng);
+
+                }
             }
-            getPlayer().setMaxHealth(newHealth);
+            getPlayer().setMaxHealth(Math.floor(newHealth));
+        } else {
+            getPlayer().setMaxHealth(20);
+        }
+
+        double newHealth;
+        double oldrng = (sbPlayer.getMaxStat(SBPlayer.PlayerStat.HEALTH) - 0);
+        if (oldrng == 0)
+            newHealth = 0;
+        else {
+            double newRng = 20;
+            if (sbPlayer.getMaxStat(SBPlayer.PlayerStat.HEALTH) >= 100 && sbPlayer.getMaxStat(HEALTH)<=200) {
+                newRng = (sbPlayer.getMaxStat(HEALTH)/5 - 0);
+            } else {
+                newRng = (40-0);
+            }
+            newHealth = Math.floor(((sbPlayer.getStat(SBPlayer.PlayerStat.HEALTH) - 0) * newRng) / oldrng);
+            sbPlayer.setHealth(Math.floor(newHealth));
         }
         //maxStats.put(sbPlayer.getUniqueId(),map);
     }
@@ -140,16 +163,14 @@ public class SBPlayer extends PluginPlayer {
             if (newintl > getMaxStat(PlayerStat.INTELLIGENCE)) {
                 newintl = getMaxStat(PlayerStat.INTELLIGENCE);
             }
-            map.put(PlayerStat.INTELLIGENCE, newintl);
-            bonusStats.put(sbPlayer.getUniqueId(), map);
+            setStat(INTELLIGENCE,newintl);
         }
         if (getStat(PlayerStat.HEALTH) < getMaxStat(PlayerStat.HEALTH)) {
             double newhlth = getStat(PlayerStat.HEALTH) + (getMaxStat(PlayerStat.HEALTH) * 0.01 + 1.5);
             if (newhlth > getMaxStat(PlayerStat.HEALTH)) {
                 newhlth = getMaxStat(PlayerStat.HEALTH);
             }
-            map.put(PlayerStat.HEALTH, newhlth);
-            bonusStats.put(sbPlayer.getUniqueId(), map);
+            setStat(HEALTH,newhlth);
         }
     }
 

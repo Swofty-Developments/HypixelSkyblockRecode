@@ -16,6 +16,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_8_R3.util.UnsafeList;
 import org.bukkit.entity.Enderman;
@@ -37,20 +38,6 @@ public class NoTeleportEnderman extends EntityEnderman {
     static {
         b = (new AttributeModifier(a, "Attacking speed boost", 0.15000000596046448D, 0)).a(false);
         c = Sets.newIdentityHashSet();
-        c.add(Blocks.GRASS);
-        c.add(Blocks.DIRT);
-        c.add(Blocks.SAND);
-        c.add(Blocks.GRAVEL);
-        c.add(Blocks.YELLOW_FLOWER);
-        c.add(Blocks.RED_FLOWER);
-        c.add(Blocks.BROWN_MUSHROOM);
-        c.add(Blocks.RED_MUSHROOM);
-        c.add(Blocks.TNT);
-        c.add(Blocks.CACTUS);
-        c.add(Blocks.CLAY);
-        c.add(Blocks.PUMPKIN);
-        c.add(Blocks.MELON_BLOCK);
-        c.add(Blocks.MYCELIUM);
     }
 
     public NoTeleportEnderman(World world) {
@@ -561,6 +548,9 @@ public class NoTeleportEnderman extends EntityEnderman {
         new BukkitRunnable() {
             @Override
             public void run() {
+                if(!(customEnt.getGoalTarget() instanceof EntityPlayer)) {
+                    customEnt.setGoalTarget(((CraftPlayer) p.getPlayer()).getHandle());
+                }
                 if (customEnt.getBukkitEntity().isDead()) {
                     this.cancel();
                 }

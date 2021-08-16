@@ -1,6 +1,7 @@
 package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator;
 
 import dev.triumphteam.gui.guis.Gui;
+import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.item.ability.AbilityData;
 import net.atlas.SkyblockSandbox.item.ability.functions.EnumFunctionsData;
@@ -9,6 +10,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class ProjectileChooserGUI extends NormalGUI {
     private final int index2;
@@ -33,34 +35,35 @@ public class ProjectileChooserGUI extends NormalGUI {
             if(event.getSlot() == 13) {
                 if(event.getClick().isLeftClick()) {
                     player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.NAME, count, "Projectile Shooter Function"));
-                    if (AbilityData.hasFunctionData(player.getItemInHand(), index2, count, EnumFunctionsData.ID) && (AbilityData.hasFunctionData(player.getItemInHand(), index2, count, EnumFunctionsData.PROJECTILE_SHOOTER_TYPE))) {
-                        player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.NAME, index2, "Projectile Shooter Function"));
-                        if(projectileMat == null) {
-                            getOwner().setItemInHand(AbilityData.setFunctionData(getOwner().getItemInHand(), index2, EnumFunctionsData.PROJECTILE_SHOOTER_TYPE, count, ""));
-                        } else {
-                            getOwner().setItemInHand(AbilityData.setFunctionData(getOwner().getItemInHand(), index2, EnumFunctionsData.PROJECTILE_SHOOTER_TYPE, count, projectileMat));
-                        }
-
-                    } else {
+                    if (!AbilityData.hasFunctionData(player.getItemInHand(), index2, count, EnumFunctionsData.ID) || (!AbilityData.hasFunctionData(player.getItemInHand(), index2, count, EnumFunctionsData.PROJECTILE_SHOOTER_TYPE))) {
                         player.setItemInHand(AbilityData.removeFunction(player.getItemInHand(), index2, count, player));
-                        player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.NAME, index2, "Projectile Shooter Function"));
-                        if(projectileMat == null) {
-                            getOwner().setItemInHand(AbilityData.setFunctionData(getOwner().getItemInHand(), index2, EnumFunctionsData.PROJECTILE_SHOOTER_TYPE, count, ""));
-                        } else {
-                            getOwner().setItemInHand(AbilityData.setFunctionData(getOwner().getItemInHand(), index2, EnumFunctionsData.PROJECTILE_SHOOTER_TYPE, count, projectileMat));
-
-                        }
+                    }
+                    player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.NAME, index2, "Projectile Shooter Function"));
+                    if(projectileMat == null) {
+                        getOwner().setItemInHand(AbilityData.setFunctionData(getOwner().getItemInHand(), index2, EnumFunctionsData.PROJECTILE_SHOOTER_TYPE, count, ""));
+                    } else {
+                        getOwner().setItemInHand(AbilityData.setFunctionData(getOwner().getItemInHand(), index2, EnumFunctionsData.PROJECTILE_SHOOTER_TYPE, count, projectileMat));
                     }
                     new FunctionsEditorGUI(getOwner(),"Projectile Shooter Function", index2, count, update, projectileMat).open();
                 } else if (event.getClick().isRightClick()){
                     projectileMat = null;
-                    setItems();
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            updateItems();
+                        }
+                    }.runTaskLater(SBX.getInstance(), 2);
                 }
             }
         } else {
             if (!event.getCurrentItem().getType().equals(Material.AIR) && !event.getCurrentItem().getType().equals(Material.SKULL) && !event.getCurrentItem().getType().equals(Material.SKULL_ITEM)) {
                 projectileMat = event.getCurrentItem().getType();
-                setItems();
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        updateItems();
+                    }
+                }.runTaskLater(SBX.getInstance(), 2);
             }
         }
     }

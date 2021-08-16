@@ -38,15 +38,14 @@ public class StatsEditorGUI extends NormalGUI {
     @Override
     public boolean setClickActions() {
 
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 7; i++) {
             int finalI = i;
             setAction(i + 10, event -> {
                 AnvilGUI gui = setstatGUI(Objects.requireNonNull(Objects.requireNonNull(Enums.getIfPresent(SBPlayer.PlayerStat.class, NBTUtil.getGenericString(Objects.requireNonNull(getGui().getGuiItem(finalI + 10)).getItemStack(), "Stat"))).orNull()),getOwner().getPlayer());
             });
         }
-        setAction(16, event -> {
-            Player player = (Player) event.getWhoClicked();
-            AnvilGUI gui = setstatGUI(SBPlayer.PlayerStat.CRIT_DAMAGE,player);
+        setAction(31,event -> {
+            new ItemCreatorGUIMain(getOwner()).open();
         });
         return true;
     }
@@ -119,7 +118,7 @@ public class StatsEditorGUI extends NormalGUI {
                         SBItemStack it = new SBItemStack(is);
                         ItemStack i = it.setInteger(is, strength, SBPlayer.PlayerStat.HEALTH.name());
                         player.setItemInHand(i);
-                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aAdded %%" + stat.name().toLowerCase() + "%%" + stat.name().toLowerCase() + "%% to the item in your hand!".replace("%%" + stat.name().toLowerCase() + "%%", event1.getName())));
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aAdded " + event1.getName() + " " + stat.name().toLowerCase() + " to the item in your hand!"));
                     } else {
                         new_lore = new ArrayList<>();
                         Iterator<String> var12 = player.getItemInHand().getItemMeta().getLore().iterator();
@@ -144,18 +143,17 @@ public class StatsEditorGUI extends NormalGUI {
                         SBItemStack it = new SBItemStack(is);
                         ItemStack i = it.setInteger(is, strength, stat.name());
                         player.setItemInHand(i);
-                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aAdded %%" + stat.name().toLowerCase() + "%% " + stat.name().toLowerCase() + " to the item in your hand!".replace("%%" + stat.name().toLowerCase() + "%%", event1.getName())));
-
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                new StatsEditorGUI(getOwner()).open();
-                            }
-                        }.runTaskLater(SBX.getInstance(), 2);
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aAdded " + event1.getName() + " " + stat.name().toLowerCase() + " to the item in your hand!"));
                     }
                 } else {
                     invalidNumberError(event1, player);
                 }
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        new StatsEditorGUI(getOwner()).open();
+                    }
+                }.runTaskLater(SBX.getInstance(), 1);
             });
 
             gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, makeColorfulItem(Material.PAPER, "Enter value", 1, 0));

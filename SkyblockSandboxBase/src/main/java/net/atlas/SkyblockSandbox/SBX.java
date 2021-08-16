@@ -51,8 +51,8 @@ public class SBX extends JavaPlugin {
     public static HashMap<String, ItemStack> storedItem = new HashMap<>();
     public static HashMap<UUID, HashMap<Slayers, HashMap<SlayerTier, Double>>> activeSlayers = new HashMap<>();
     public static HashMap<UUID, HashMap<SkillType, Double>> cachedSkills = new HashMap<>();
-    public static SkillEXPGainEvent prevSkillEvent;
-    public static SkillEXPGainEvent cachedEvent;
+    public static HashMap<UUID, SkillEXPGainEvent> prevSkillEvent = new HashMap<>();
+    public static HashMap<UUID, SkillEXPGainEvent> cachedEvent = new HashMap<>();
 
     private static SBX instance;
     SkyblockCommandFramework framework;
@@ -67,7 +67,7 @@ public class SBX extends JavaPlugin {
         instance = this;
         framework = new SkyblockCommandFramework(this);
         mongoStats = new MongoCoins();
-        //mongoStats.connect();
+        mongoStats.connect();
         coins = new Coins();
 
         registerListeners();
@@ -110,30 +110,12 @@ public class SBX extends JavaPlugin {
     }
 
     void startOnlineRunnables() {
-        new BukkitRunnable() {
-            int i = 0;
-
-            @Override
-            public void run() {
-                if (Bukkit.getOnlinePlayers().size() > 0) {
-                    for (Player p : Bukkit.getOnlinePlayers()) {
-                        i++;
-                        SBPlayer sbPlayer = new SBPlayer(p);
-                        sbPlayer.updateStats();
-                        if (i == 4) {
-                            i = 0;
-                            sbPlayer.doRegenStats();
-                        }
-                    }
-                }
-            }
-        }.runTaskTimer(this, 0L, 5L);
         BukkitTask runnable = new BukkitRunnable() {
             @Override
             public void run() {
-                if(!holoMap2.isEmpty()) {
-                    HashMap<Integer, HashMap<Entity,EntityArmorStand>> holoMapClone = new HashMap<>(holoMap2);
-                    for (int x:holoMapClone.keySet()) {
+                if (!holoMap2.isEmpty()) {
+                    HashMap<Integer, HashMap<Entity, EntityArmorStand>> holoMapClone = new HashMap<>(holoMap2);
+                    for (int x : holoMapClone.keySet()) {
                         Entity entity = holoMap2.get(x).keySet().stream().findFirst().orElse(null);
                         EntityArmorStand stand = holoMap2.get(x).get(entity);
                         assert entity != null;
@@ -187,9 +169,20 @@ public class SBX extends JavaPlugin {
         new BukkitRunnable() {
             @Override
             public void run() {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    SBPlayer sbPlayer = new SBPlayer(p);
+                    sbPlayer.updateStats();
+                }
+            }
+        }.runTaskTimer(SBX.getInstance(),0L,5L);
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
                 if (Bukkit.getOnlinePlayers().size() > 0) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         SBPlayer sbPlayer = new SBPlayer(p);
+                        sbPlayer.doRegenStats();
                         sbPlayer.sendBarMessage(getStatMessage(sbPlayer));
                     }
                 }
@@ -200,11 +193,13 @@ public class SBX extends JavaPlugin {
     public static String getStatMessage(SBPlayer p) {
         DecimalFormat f = new DecimalFormat("#");
         String middlemsg = "";
-        if (prevSkillEvent != null && cachedEvent != prevSkillEvent) {
-            cachedEvent = prevSkillEvent;
-            middlemsg = SUtil.colorize(" &3+" + prevSkillEvent.getExpAmt() + " " + prevSkillEvent.getSkill().getName() + " (" + p.getCurrentSkillExp(prevSkillEvent.getSkill()) + "/" + prevSkillEvent.getSkill().getTotalXP() + ")");
+        if (prevSkillEvent.containsKey(p.getUniqueId()) && cachedEvent.containsKey(p.getUniqueId())) {
+            if (prevSkillEvent.get(p.getUniqueId()) != null && cachedEvent.get(p.getUniqueId()) != prevSkillEvent.get(p.getUniqueId())) {
+                cachedEvent.put(p.getUniqueId(), prevSkillEvent.get(p.getUniqueId()));
+                middlemsg = SUtil.colorize(" &3+" + prevSkillEvent.get(p.getUniqueId()).getExpAmt() + " " + prevSkillEvent.get(p.getUniqueId()).getSkill().getName() + " (" + p.getCurrentSkillExp(prevSkillEvent.get(p.getUniqueId()).getSkill()) + "/" + prevSkillEvent.get(p.getUniqueId()).getSkill().getTotalXP() + ")");
+            }
         }
-        return SUtil.colorize("&c" + f.format(p.getStat(SBPlayer.PlayerStat.HEALTH)) + "/" + f.format(p.getMaxStat(SBPlayer.PlayerStat.HEALTH)) + middlemsg + " &b" + f.format(p.getStat(SBPlayer.PlayerStat.INTELLIGENCE)) + "/" + f.format(p.getMaxStat(SBPlayer.PlayerStat.INTELLIGENCE)));
+        return SUtil.colorize("&c" + f.format(p.getStat(SBPlayer.PlayerStat.HEALTH)) + "/" + f.format(p.getMaxStat(SBPlayer.PlayerStat.HEALTH)) + "❤ Health " + middlemsg + " &b" + f.format(p.getStat(SBPlayer.PlayerStat.INTELLIGENCE)) + "/" + f.format(p.getMaxStat(SBPlayer.PlayerStat.INTELLIGENCE)) + "✎ Mana");
     }
 
     public static String getStatMessage(SBPlayer p, ManaEvent e) {

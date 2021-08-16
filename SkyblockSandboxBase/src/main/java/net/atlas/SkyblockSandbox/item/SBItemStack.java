@@ -20,12 +20,15 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
+import java.text.StringCharacterIterator;
 import java.util.*;
 
+import static net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.RaritiesGUI.masterStarKey;
+import static net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.RaritiesGUI.starKey;
 import static net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat.*;
 
 public class SBItemStack extends ItemStack {
-     String[] statsformat = {"Gear_Score", "Damage", "Strength", "Crit_Damage", "Attack_Speed", "blank", "Mining_Speed", "Intelligence", "Speed", "Ferocity", "blank"};
+    String[] statsformat = {"Gear_Score", "Damage", "Strength","Crit_Chance", "Crit_Damage", "Attack_Speed", "blank","Health","Defense", "Intelligence", "Speed", "Ferocity", "Mining_Speed","Mining_Fortune","Pristine","blank"};
 
     private ItemStack stack;
     private String itemID;
@@ -34,105 +37,105 @@ public class SBItemStack extends ItemStack {
         this.stack = stack;
     }
 
-    public SBItemStack(String name, Material mat,int durability,boolean stackable,boolean reforgeable,double damage,double strength,double intelligence,double ferocity,double health,double attack_speed,double defense) {
-        stack = new ItemStack(mat,1);
-        setName(stack,name);
-        setDurability(stack,durability);
-        stack = setStat(stack,DAMAGE,damage);
-        stack = setStat(stack,STRENGTH,strength);
-        stack = setStat(stack,INTELLIGENCE,intelligence);
-        stack = setStat(stack,FEROCITY,ferocity);
-        stack = setStat(stack,ATTACK_SPEED,attack_speed);
-        stack = setStat(stack,DEFENSE,defense);
-        if(!stackable) {
-            stack = setString(stack,UUID.randomUUID().toString(),"UUID");
+    public SBItemStack(String name, Material mat, int durability, boolean stackable, boolean reforgeable, double damage, double strength, double intelligence, double ferocity, double health, double attack_speed, double defense) {
+        stack = new ItemStack(mat, 1);
+        setName(stack, name);
+        setDurability(stack, durability);
+        stack = setStat(stack, DAMAGE, damage);
+        stack = setStat(stack, STRENGTH, strength);
+        stack = setStat(stack, INTELLIGENCE, intelligence);
+        stack = setStat(stack, FEROCITY, ferocity);
+        stack = setStat(stack, ATTACK_SPEED, attack_speed);
+        stack = setStat(stack, DEFENSE, defense);
+        if (!stackable) {
+            stack = setString(stack, UUID.randomUUID().toString(), "UUID");
         }
-        stack = setString(stack,Boolean.toString(reforgeable),"reforgeable");
+        stack = setString(stack, Boolean.toString(reforgeable), "reforgeable");
 
     }
 
-    public SBItemStack(String name, Material mat,int durability,boolean stackable,boolean reforgeable,String url, Rarity rarity, double damage, double strength, double intelligence, double ferocity, double crit_chance, double crit_damage, double health, double attack_speed,double defense) {
-        stack = new ItemStack(mat,1);
-        setName(stack,rarity.getColor() + name);
-        setDurability(stack,durability);
-        stack = setString(stack,rarity.getName(),"RARITY");
-        stack = setStat(stack,DAMAGE,damage);
-        stack = setStat(stack,STRENGTH,strength);
-        stack = setStat(stack,INTELLIGENCE,intelligence);
-        stack = setStat(stack,FEROCITY,ferocity);
-        stack = setStat(stack,CRIT_CHANCE,crit_chance);
-        stack = setStat(stack,CRIT_DAMAGE,crit_damage);
-        stack = setStat(stack,HEALTH,health);
-        stack = setStat(stack,ATTACK_SPEED,attack_speed);
-        stack = setStat(stack,DEFENSE,defense);
-        if(!stackable) {
-            stack = setString(stack,UUID.randomUUID().toString(),"UUID");
+    public SBItemStack(String name, Material mat, int durability, boolean stackable, boolean reforgeable, String url, Rarity rarity, double damage, double strength, double intelligence, double ferocity, double crit_chance, double crit_damage, double health, double attack_speed, double defense) {
+        stack = new ItemStack(mat, 1);
+        setName(stack, rarity.getColor() + name);
+        setDurability(stack, durability);
+        stack = setString(stack, rarity.getName(), "RARITY");
+        stack = setStat(stack, DAMAGE, damage);
+        stack = setStat(stack, STRENGTH, strength);
+        stack = setStat(stack, INTELLIGENCE, intelligence);
+        stack = setStat(stack, FEROCITY, ferocity);
+        stack = setStat(stack, CRIT_CHANCE, crit_chance);
+        stack = setStat(stack, CRIT_DAMAGE, crit_damage);
+        stack = setStat(stack, HEALTH, health);
+        stack = setStat(stack, ATTACK_SPEED, attack_speed);
+        stack = setStat(stack, DEFENSE, defense);
+        if (!stackable) {
+            stack = setString(stack, UUID.randomUUID().toString(), "UUID");
         }
-        stack = setString(stack,Boolean.toString(reforgeable),"reforgeable");
-        this.itemID = name.toUpperCase().replace(' ','_');
-        stack = setString(stack,this.itemID,"ID");
-        applyTexture(stack,url);
+        stack = setString(stack, Boolean.toString(reforgeable), "reforgeable");
+        this.itemID = name.toUpperCase().replace(' ', '_');
+        stack = setString(stack, this.itemID, "ID");
+        applyTexture(stack, url);
 
     }
 
-    public SBItemStack(String name,String itemID, Material mat,int durability,boolean stackable,boolean reforgeable,String url, Rarity rarity, double damage, double strength, double intelligence, double ferocity, double crit_chance, double crit_damage, double health, double attack_speed,double defense) {
-        stack = new ItemStack(mat,1);
-        setName(stack,rarity.getColor() + name);
-        setDurability(stack,durability);
-        stack = setString(stack,rarity.getName(),"RARITY");
-        stack = setStat(stack,DAMAGE,damage);
-        stack = setStat(stack,STRENGTH,strength);
-        stack = setStat(stack,INTELLIGENCE,intelligence);
-        stack = setStat(stack,FEROCITY,ferocity);
-        stack = setStat(stack,CRIT_CHANCE,crit_chance);
-        stack = setStat(stack,CRIT_DAMAGE,crit_damage);
-        stack = setStat(stack,HEALTH,health);
-        stack = setStat(stack,ATTACK_SPEED,attack_speed);
-        stack = setStat(stack,DEFENSE,defense);
-        if(!stackable) {
-            stack = setString(stack,UUID.randomUUID().toString(),"UUID");
+    public SBItemStack(String name, String itemID, Material mat, int durability, boolean stackable, boolean reforgeable, String url, Rarity rarity, double damage, double strength, double intelligence, double ferocity, double crit_chance, double crit_damage, double health, double attack_speed, double defense) {
+        stack = new ItemStack(mat, 1);
+        setName(stack, rarity.getColor() + name);
+        setDurability(stack, durability);
+        stack = setString(stack, rarity.getName(), "RARITY");
+        stack = setStat(stack, DAMAGE, damage);
+        stack = setStat(stack, STRENGTH, strength);
+        stack = setStat(stack, INTELLIGENCE, intelligence);
+        stack = setStat(stack, FEROCITY, ferocity);
+        stack = setStat(stack, CRIT_CHANCE, crit_chance);
+        stack = setStat(stack, CRIT_DAMAGE, crit_damage);
+        stack = setStat(stack, HEALTH, health);
+        stack = setStat(stack, ATTACK_SPEED, attack_speed);
+        stack = setStat(stack, DEFENSE, defense);
+        if (!stackable) {
+            stack = setString(stack, UUID.randomUUID().toString(), "UUID");
         }
-        stack = setString(stack,Boolean.toString(reforgeable),"reforgeable");
+        stack = setString(stack, Boolean.toString(reforgeable), "reforgeable");
         this.itemID = itemID;
-        stack = setString(stack,this.itemID,"ID");
-        applyTexture(stack,url);
+        stack = setString(stack, this.itemID, "ID");
+        applyTexture(stack, url);
 
     }
 
-    public SBItemStack(String name, String itemID, Material mat,int durability,boolean stackable,boolean reforgeable, Ability ability, ItemType type, Rarity rarity, double damage, double strength, double intelligence, double ferocity, double crit_chance, double crit_damage, double health, double attack_speed,double defense) {
-        stack = new ItemStack(mat,1);
-        setName(stack,rarity.getColor() + name);
-        setDurability(stack,durability);
-        if(ability!=null) {
-            stack = setAbility(stack,ability, 1);
+    public SBItemStack(String name, String itemID, Material mat, int durability, boolean stackable, boolean reforgeable, Ability ability, ItemType type, Rarity rarity, double damage, double strength, double intelligence, double ferocity, double crit_chance, double crit_damage, double health, double attack_speed, double defense) {
+        stack = new ItemStack(mat, 1);
+        setName(stack, rarity.getColor() + name);
+        setDurability(stack, durability);
+        if (ability != null) {
+            stack = setAbility(stack, ability, 1);
         }
-        stack = setString(stack,rarity.getName(),"RARITY");
-        stack = setStat(stack,DAMAGE,damage);
-        stack = setStat(stack,STRENGTH,strength);
-        stack = setStat(stack,INTELLIGENCE,intelligence);
-        stack = setStat(stack,FEROCITY,ferocity);
-        stack = setStat(stack,CRIT_CHANCE,crit_chance);
-        stack = setStat(stack,CRIT_DAMAGE,crit_damage);
-        stack = setStat(stack,HEALTH,health);
-        stack = setStat(stack,ATTACK_SPEED,attack_speed);
-        stack = setStat(stack,DEFENSE,defense);
-        if(!stackable) {
-            stack = setString(stack,UUID.randomUUID().toString(),"UUID");
+        stack = setString(stack, rarity.getName(), "RARITY");
+        stack = setStat(stack, DAMAGE, damage);
+        stack = setStat(stack, STRENGTH, strength);
+        stack = setStat(stack, INTELLIGENCE, intelligence);
+        stack = setStat(stack, FEROCITY, ferocity);
+        stack = setStat(stack, CRIT_CHANCE, crit_chance);
+        stack = setStat(stack, CRIT_DAMAGE, crit_damage);
+        stack = setStat(stack, HEALTH, health);
+        stack = setStat(stack, ATTACK_SPEED, attack_speed);
+        stack = setStat(stack, DEFENSE, defense);
+        if (!stackable) {
+            stack = setString(stack, UUID.randomUUID().toString(), "UUID");
         }
-        stack = setString(stack,Boolean.toString(reforgeable),"reforgeable");
+        stack = setString(stack, Boolean.toString(reforgeable), "reforgeable");
         this.itemID = itemID;
-        stack = setString(stack,this.itemID,"ID");
+        stack = setString(stack, this.itemID, "ID");
 
     }
 
     public SBItemStack(String name, Material mat, int amount) {
-        stack = new ItemStack(mat,amount);
-        setName(stack, name);
+        stack = new ItemStack(mat, amount);
+        stack = setName(stack, name);
     }
 
-    public SBItemStack(String name, Material mat,int amount,byte dmg) {
-        stack = new ItemStack(mat,amount,dmg);
-        setName(stack,name);
+    public SBItemStack(String name, Material mat, int amount, byte dmg) {
+        stack = new ItemStack(mat, amount, dmg);
+        stack = setName(stack, name);
     }
 
     public ItemStack refreshLore() {
@@ -147,6 +150,7 @@ public class SBItemStack extends ItemStack {
 
                 int i = 0;
                 for (String s : statsformat) {
+
                     i++;
                     if (s.equals("blank")) {
                         newLore.add("");
@@ -221,8 +225,8 @@ public class SBItemStack extends ItemStack {
 
                 if (hasAbility()) {
 
-                    for (int b = 1; b <getAbilAmount() + 1; b++) {
-                        abilityNames.put((String) getAbilData(EnumAbilityData.NAME, b), (String) getAbilData(EnumAbilityData.MANA_COST,b));
+                    for (int b = 1; b < getAbilAmount() + 1; b++) {
+                        abilityNames.put((String) getAbilData(EnumAbilityData.NAME, b), (String) getAbilData(EnumAbilityData.MANA_COST, b));
                         abilityType.add((String) getAbilData(EnumAbilityData.FUNCTION, b));
                     }
                     int j = 1;
@@ -271,7 +275,33 @@ public class SBItemStack extends ItemStack {
                 } else {
                     newLore.add(rarity.getColor() + "" + ChatColor.BOLD + rarity.name());
                 }
-                meta.setDisplayName(rarity.getColor() + ChatColor.stripColor(meta.getDisplayName()));
+                int starAmt = NBTUtil.getInteger(stack, starKey);
+                int masterStarAmt = NBTUtil.getInteger(stack, masterStarKey);
+                if (masterStarAmt > starAmt) {
+                    masterStarAmt = starAmt;
+                }
+                stack.setItemMeta(meta);
+                if(starAmt==0 && masterStarAmt==0) {
+                    if(ChatColor.stripColor(meta.getDisplayName())==null || ChatColor.stripColor(meta.getDisplayName()).isEmpty()) {
+                        stack = NBTUtil.setString(stack,"null","item-name");
+                    } else {
+                        stack = NBTUtil.setString(stack,ChatColor.stripColor(meta.getDisplayName()),"item-name");
+                    }
+
+                }
+                StringBuilder builder = new StringBuilder();
+                for (int b = 0; b < starAmt; b++) {
+                    if(masterStarAmt>=b+1) {
+                        builder.append("§c✪");
+                    } else {
+                        builder.append("§6✪");
+                    }
+                }
+                if(starAmt!=0||masterStarAmt!=0) {
+                    builder.append(" ");
+                }
+                meta = stack.getItemMeta();
+                meta.setDisplayName(builder.toString() + rarity.getColor() + NBTUtil.getString(stack,"item-name"));
                 meta.setLore(newLore);
                 stack.setItemMeta(meta);
                 return stack;
@@ -300,7 +330,7 @@ public class SBItemStack extends ItemStack {
 
     public double getStat(PlayerStat stat) {
         if (stack != null) {
-            if(stack.hasItemMeta()) {
+            if (stack.hasItemMeta()) {
                 net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
                 NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
                 NBTTagCompound data = tag.getCompound("ExtraAttributes");
@@ -312,9 +342,9 @@ public class SBItemStack extends ItemStack {
         return 0;
     }
 
-    public ItemStack setStat(ItemStack stack,PlayerStat stat,Double v) {
+    public ItemStack setStat(ItemStack stack, PlayerStat stat, Double v) {
         if (stack != null) {
-            if(stack.hasItemMeta()) {
+            if (stack.hasItemMeta()) {
                 net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
                 NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
                 NBTTagCompound data = tag.getCompound("ExtraAttributes");
@@ -322,8 +352,8 @@ public class SBItemStack extends ItemStack {
                     data = new NBTTagCompound();
                 }
 
-                data.setInt(stat.name(),v.intValue());
-                tag.set("ExtraAttributes",data);
+                data.setInt(stat.name(), v.intValue());
+                tag.set("ExtraAttributes", data);
                 nmsItem.setTag(tag);
                 this.stack = CraftItemStack.asBukkitCopy(nmsItem);
                 return this.stack;
@@ -332,9 +362,9 @@ public class SBItemStack extends ItemStack {
         return null;
     }
 
-    public ItemStack setInteger(ItemStack stack,int v,String key) {
+    public ItemStack setInteger(ItemStack stack, int v, String key) {
         if (stack != null) {
-            if(stack.hasItemMeta()) {
+            if (stack.hasItemMeta()) {
                 net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
                 NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
                 NBTTagCompound data = tag.getCompound("ExtraAttributes");
@@ -342,8 +372,8 @@ public class SBItemStack extends ItemStack {
                     data = new NBTTagCompound();
                 }
 
-                data.setInt(key,v);
-                tag.set("ExtraAttributes",data);
+                data.setInt(key, v);
+                tag.set("ExtraAttributes", data);
                 nmsItem.setTag(tag);
                 this.stack = CraftItemStack.asBukkitCopy(nmsItem);
                 return this.stack;
@@ -352,9 +382,9 @@ public class SBItemStack extends ItemStack {
         return null;
     }
 
-    public Integer getInteger(ItemStack stack,String key) {
+    public Integer getInteger(ItemStack stack, String key) {
         if (stack != null) {
-            if(stack.hasItemMeta()) {
+            if (stack.hasItemMeta()) {
                 net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
                 NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
                 NBTTagCompound data = tag.getCompound("ExtraAttributes");
@@ -368,9 +398,9 @@ public class SBItemStack extends ItemStack {
         return 0;
     }
 
-    public ItemStack setString(ItemStack stack,String msg,String key) {
+    public ItemStack setString(ItemStack stack, String msg, String key) {
         if (stack != null) {
-            if(stack.hasItemMeta()) {
+            if (stack.hasItemMeta()) {
                 net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
                 NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
                 NBTTagCompound data = tag.getCompound("ExtraAttributes");
@@ -378,8 +408,8 @@ public class SBItemStack extends ItemStack {
                     data = new NBTTagCompound();
                 }
 
-                data.setString(key,msg);
-                tag.set("ExtraAttributes",data);
+                data.setString(key, msg);
+                tag.set("ExtraAttributes", data);
                 nmsItem.setTag(tag);
                 this.stack = CraftItemStack.asBukkitCopy(nmsItem);
                 return this.stack;
@@ -388,9 +418,9 @@ public class SBItemStack extends ItemStack {
         return null;
     }
 
-    public String getString(ItemStack stack,String key) {
+    public String getString(ItemStack stack, String key) {
         if (stack != null) {
-            if(stack.hasItemMeta()) {
+            if (stack.hasItemMeta()) {
                 net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
                 NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
                 NBTTagCompound data = tag.getCompound("ExtraAttributes");
@@ -404,8 +434,8 @@ public class SBItemStack extends ItemStack {
         return "";
     }
 
-    public ItemStack setAbilData(ItemStack stack,EnumAbilityData dataType, Object data, int index) {
-        if(index > 5)
+    public ItemStack setAbilData(ItemStack stack, EnumAbilityData dataType, Object data, int index) {
+        if (index > 5)
             throw new NullPointerException("Ability index can't be higher than 5!");
 
         net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
@@ -423,14 +453,14 @@ public class SBItemStack extends ItemStack {
         nmsItem.setTag(tag);
 
         stack = CraftItemStack.asBukkitCopy(nmsItem);
-        stack = setInteger(stack,1,"hasAbility");
+        stack = setInteger(stack, 1, "hasAbility");
         this.stack = stack;
 
         return stack;
     }
 
-    public ItemStack removeAbil(ItemStack stack,int index) {
-        if(index > 5)
+    public ItemStack removeAbil(ItemStack stack, int index) {
+        if (index > 5)
             throw new NullPointerException("Ability index can't be higher than 5!");
 
         net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
@@ -445,14 +475,14 @@ public class SBItemStack extends ItemStack {
         nmsItem.setTag(tag);
 
         stack = CraftItemStack.asBukkitCopy(nmsItem);
-        stack = setInteger(stack,1,"hasAbility");
+        stack = setInteger(stack, 1, "hasAbility");
         this.stack = stack;
 
         return stack;
     }
 
     public Object getAbilData(EnumAbilityData dataType, int index) {
-        if(index > 5) {
+        if (index > 5) {
             throw new NullPointerException("Ability index can't be higher than 5!");
         }
 
@@ -466,27 +496,27 @@ public class SBItemStack extends ItemStack {
     }
 
     public ItemStack setAbility(ItemStack item, AbilityType type, String name, double manaCost, List<String> description, int index) {
-        item = setAbilData(item,EnumAbilityData.NAME, name, index);
-        item = setAbilData(item,EnumAbilityData.MANA_COST, manaCost, index);
-        item = setAbilData(item,EnumAbilityData.FUNCTION, type.getText(), index);
+        item = setAbilData(item, EnumAbilityData.NAME, name, index);
+        item = setAbilData(item, EnumAbilityData.MANA_COST, manaCost, index);
+        item = setAbilData(item, EnumAbilityData.FUNCTION, type.getText(), index);
         for (String s : description) {
-            item = addAbilityDescriptionLine(item,s, index);
+            item = addAbilityDescriptionLine(item, s, index);
         }
         return item;
     }
 
-    public ItemStack setAbility(ItemStack item,Ability ability, int index) {
-        item=setAbilData(item,EnumAbilityData.NAME,ability.getAbilityName(), index);
-        item=setAbilData(item,EnumAbilityData.MANA_COST, ability.getManaCost(), index);
-        item=setAbilData(item,EnumAbilityData.FUNCTION, ability.getAbilityType().getText(), index);
+    public ItemStack setAbility(ItemStack item, Ability ability, int index) {
+        item = setAbilData(item, EnumAbilityData.NAME, ability.getAbilityName(), index);
+        item = setAbilData(item, EnumAbilityData.MANA_COST, ability.getManaCost(), index);
+        item = setAbilData(item, EnumAbilityData.FUNCTION, ability.getAbilityType().getText(), index);
         for (String s : ability.getAbilDescription()) {
-            item=addAbilityDescriptionLine(item,s, index);
+            item = addAbilityDescriptionLine(item, s, index);
         }
         this.stack = item;
         return item;
     }
 
-    public ItemStack addAbilityDescriptionLine(ItemStack item,String line, int index) {
+    public ItemStack addAbilityDescriptionLine(ItemStack item, String line, int index) {
         line = ChatColor.translateAlternateColorCodes('&', line);
         if (item != null) {
             net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
@@ -576,8 +606,8 @@ public class SBItemStack extends ItemStack {
     }
 
     public int getAbilAmount() {
-        if(this.stack!=null) {
-            if(this.stack.hasItemMeta()) {
+        if (this.stack != null) {
+            if (this.stack.hasItemMeta()) {
                 net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(this.stack);
                 NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
                 NBTTagCompound attributes = (tag.getCompound("ExtraAttributes") != null ? tag.getCompound("ExtraAttributes") : new NBTTagCompound());
@@ -671,18 +701,19 @@ public class SBItemStack extends ItemStack {
         NBTTagCompound abils = (attributes.getCompound("Abilities") != null ? attributes.getCompound("Abilities") : new NBTTagCompound());
         NBTTagCompound func = (attributes.getCompound("Ability_" + index) != null ? attributes.getCompound("Ability_" + index) : new NBTTagCompound());
 
-        for(int i=0;i<5;i++) {
-            if(func.hasKey("Function_" + i+1)) {
+        for (int i = 0; i < 5; i++) {
+            if (func.hasKey("Function_" + i + 1)) {
                 return true;
             }
         }
         return false;
     }
 
-    private ItemStack setName(ItemStack stack,String name) {
+    private ItemStack setName(ItemStack stack, String name) {
         ItemMeta meta = stack.getItemMeta();
         meta.setDisplayName(SUtil.colorize(name));
         stack.setItemMeta(meta);
+        stack = setString(stack,ChatColor.stripColor(SUtil.colorize(name)),"item-name");
         return stack;
     }
 
@@ -698,7 +729,7 @@ public class SBItemStack extends ItemStack {
         return stack;
     }
 
-    public ItemStack applyTexture(ItemStack item,String url) {
+    public ItemStack applyTexture(ItemStack item, String url) {
         if (item == null) return item;
 
         SkullMeta itemMeta = (SkullMeta) item.getItemMeta();
@@ -718,7 +749,7 @@ public class SBItemStack extends ItemStack {
         return item;
     }
 
-    public void setDurability(ItemStack item,int durability) {
+    public void setDurability(ItemStack item, int durability) {
         item.setDurability((short) durability);
     }
 }

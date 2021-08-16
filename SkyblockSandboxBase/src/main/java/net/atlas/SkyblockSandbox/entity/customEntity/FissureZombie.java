@@ -95,14 +95,15 @@ public class FissureZombie extends EntityZombie {
             @Override
             public void run() {
                 if(zombie.getLocation().distance(p.getLocation())>=10) {
-                    boolean flag = false;
-                    if(zombie.getLocation().distance(p.getLocation())>=20) {
-                        flag = true;
-                    }
+                    boolean flag = zombie.getLocation().distance(p.getLocation()) >= 20;
                     Random random = new Random();
                     double dx = random.nextInt(20-10);
                     double dz = random.nextInt(20-10);
-                    rand = p.getLocation().add(dx,0,dz);
+
+                    final float newZ = (float)(p.getLocation().getZ() + ( -1 * Math.sin(Math.toRadians(p.getLocation().getYaw() + 90 * 1))));
+
+                    final float newX = (float)(p.getLocation().getX() + ( -1 * Math.cos(Math.toRadians(p.getLocation().getYaw() + 90 * 1))));
+                    rand = p.getLocation().add(newX,0,newZ);
                     if(flag) {
                         zombie.teleport(rand);
                     } else {

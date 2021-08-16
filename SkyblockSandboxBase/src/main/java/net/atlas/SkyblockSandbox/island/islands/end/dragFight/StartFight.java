@@ -59,6 +59,7 @@ public class StartFight {
         System.out.println(weight);
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.playSound(p.getLocation(), Sound.ENDERDRAGON_DEATH, 5, 1);
+            playerDMG.put(p,0D);
         }
         fightActive = true;
 

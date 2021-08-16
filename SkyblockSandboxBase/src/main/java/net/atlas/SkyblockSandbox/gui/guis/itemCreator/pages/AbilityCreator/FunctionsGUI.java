@@ -52,7 +52,7 @@ public class FunctionsGUI extends NormalGUI {
                 List<String> functions = new ArrayList<>();
                 int count = 1;
                 if (getGui().getGuiItem(11) != null) {
-                    if (getGui().getGuiItem(11).getItemStack().equals(FILLER_GLASS)) {
+                    if (getGui().getGuiItem(11).getItemStack().getType()!=Material.COMMAND) {
                         new FunctionsCreatorGUI(getOwner(), index, 1, true).open();
                         functions.add((String) AbilityData.retrieveFunctionData(EnumFunctionsData.NAME, player.getItemInHand(), index, count));
                         return;
@@ -61,7 +61,7 @@ public class FunctionsGUI extends NormalGUI {
                     count++;
                 }
                 if (getGui().getGuiItem(12) != null) {
-                    if (getGui().getGuiItem(12).getItemStack().equals(FILLER_GLASS)) {
+                    if (getGui().getGuiItem(12).getItemStack().getType()!=Material.COMMAND) {
                         new FunctionsCreatorGUI(getOwner(), index, 2, true).open();
                         functions.add((String) AbilityData.retrieveFunctionData(EnumFunctionsData.NAME, player.getItemInHand(), index, count));
                         return;
@@ -70,7 +70,7 @@ public class FunctionsGUI extends NormalGUI {
                     count++;
                 }
                 if (getGui().getGuiItem(13) != null) {
-                    if (getGui().getGuiItem(13).getItemStack().equals(FILLER_GLASS)) {
+                    if (getGui().getGuiItem(13).getItemStack().getType()!=Material.COMMAND) {
                         new FunctionsCreatorGUI(getOwner(), index, 3, true).open();
                         functions.add((String) AbilityData.retrieveFunctionData(EnumFunctionsData.NAME, player.getItemInHand(), index, count));
                         return;
@@ -79,7 +79,7 @@ public class FunctionsGUI extends NormalGUI {
                     count++;
                 }
                 if (getGui().getGuiItem(14) != null) {
-                    if (getGui().getGuiItem(14).getItemStack().equals(FILLER_GLASS)) {
+                    if (getGui().getGuiItem(14).getItemStack().getType()!=Material.COMMAND) {
                         new FunctionsCreatorGUI(getOwner(), index, 4, true).open();
                         functions.add((String) AbilityData.retrieveFunctionData(EnumFunctionsData.NAME, player.getItemInHand(), index, count));
                         return;
@@ -88,7 +88,7 @@ public class FunctionsGUI extends NormalGUI {
                     count++;
                 }
                 if (getGui().getGuiItem(15) != null) {
-                    if (getGui().getGuiItem(15).getItemStack().equals(FILLER_GLASS)) {
+                    if (getGui().getGuiItem(15).getItemStack().getType()!=Material.COMMAND) {
                         new FunctionsCreatorGUI(getOwner(), index, 5, true).open();
                         functions.add((String) AbilityData.retrieveFunctionData(EnumFunctionsData.NAME, player.getItemInHand(), index, count));
                         return;
@@ -119,7 +119,8 @@ public class FunctionsGUI extends NormalGUI {
                 }
                 if (event.getClick().equals(ClickType.RIGHT)) {
                     player.setItemInHand(AbilityData.removeFunction(player.getItemInHand(), index, i, player));
-                    setItems();
+                    player.playSound(player.getLocation(),Sound.HORSE_ARMOR,2,1);
+                    updateItems();
                 }
             }
         }

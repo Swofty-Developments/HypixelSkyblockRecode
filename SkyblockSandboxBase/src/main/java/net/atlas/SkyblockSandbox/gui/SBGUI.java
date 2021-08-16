@@ -35,6 +35,8 @@ public abstract class SBGUI {
 
     public abstract int getRows();
 
+    public abstract void setItems();
+
     public ItemStack makeColorfulItem(Material material, String displayName, int amount, int durability, String... lore) {
         ItemStack item = new ItemStack(material, amount, (short) durability);
         ItemMeta meta = item.getItemMeta();
@@ -109,7 +111,7 @@ public abstract class SBGUI {
     }
 
     public static ItemStack makeColorfulSkullItem(String displayname, String owner, int amount, List<String> lore) {
-        ItemStack item = new ItemStack(Material.SKULL_ITEM, amount, (short) 3);
+        ItemStack item = new ItemStack(Material.SKULL_ITEM, amount, (byte) 3);
         SkullMeta meta = (SkullMeta) item.getItemMeta();
         if(Bukkit.getPlayer(owner)!=null && Bukkit.getPlayer(owner).isValid()) {
             meta.setOwner(owner);
@@ -125,7 +127,7 @@ public abstract class SBGUI {
     }
 
     public static ItemStack makeColorfulSkullItem(String displayname, String owner, int amount, String... lore) {
-        ItemStack item = new ItemStack(Material.SKULL_ITEM, amount, (short) 3);
+        ItemStack item = new ItemStack(Material.SKULL_ITEM, amount, (byte) 3);
         SkullMeta meta = (SkullMeta) item.getItemMeta();
         if(Bukkit.getPlayer(owner)!=null && Bukkit.getPlayer(owner).isValid()) {
             meta.setOwner(owner);

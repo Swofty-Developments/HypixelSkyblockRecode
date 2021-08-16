@@ -37,6 +37,7 @@ public class AbilityDescriptionPicker extends NormalGUI {
             b++;
             int finalB = b;
             setAction(i, event -> {
+                if(event.getCurrentItem().getType().equals(Material.BOOK_AND_QUILL))
                 new SetAbilityDescriptionMenu(getOwner(), finalB).open();
             });
         }

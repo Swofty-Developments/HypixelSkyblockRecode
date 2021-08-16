@@ -12,10 +12,13 @@ public class ItemHeldEvent extends SkyblockListener<PlayerItemHeldEvent> {
         ItemStack swapto = event.getPlayer().getInventory().getItem(event.getNewSlot());
         ItemStack prev = event.getPlayer().getInventory().getItem(event.getPreviousSlot());
         if(swapto!=null && swapto.hasItemMeta()) {
+
             SBItemStack i = new SBItemStack(swapto);
             ItemStack newItem = i.refreshLore();
-            if (swapto.getItemMeta().getLore().equals(newItem.getItemMeta().getLore())) {
-                event.getPlayer().getInventory().setItem(event.getNewSlot(),newItem);
+            if(swapto.getItemMeta().getLore()!=null) {
+                if (!swapto.getItemMeta().getLore().equals(newItem.getItemMeta().getLore())) {
+                    event.getPlayer().getInventory().setItem(event.getNewSlot(), newItem);
+                }
             }
 
         }

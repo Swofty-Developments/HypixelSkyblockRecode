@@ -52,7 +52,12 @@ public abstract class NormalGUI extends SBGUI {
 
     public abstract boolean setClickActions();
 
-    public abstract void setItems();
+    public void updateItems() {
+        setItems();
+        getGui().update();
+        getGui().open(getOwner());
+    }
+
 
     public Gui gui() {
         return gui;

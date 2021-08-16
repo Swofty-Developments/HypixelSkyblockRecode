@@ -65,17 +65,6 @@ public abstract class Slayer {
                             break;
                     }
 
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            if(eman.isDead()) {
-                                this.cancel();
-                            }
-                            if(!(eman.getTarget() instanceof Player)) {
-                                eman.setTarget(p);
-                            }
-                        }
-                    }.runTaskTimer(SBX.getInstance(),0L,5L);
                     returnEn = eman;
                     break;
                 case ZOMBIE:

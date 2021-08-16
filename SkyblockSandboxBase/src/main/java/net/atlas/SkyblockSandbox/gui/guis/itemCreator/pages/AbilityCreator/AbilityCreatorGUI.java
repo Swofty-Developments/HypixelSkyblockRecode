@@ -188,7 +188,7 @@ public class AbilityCreatorGUI extends NormalGUI {
             }
             case BOOK_AND_QUILL: {
                 if(event.getSlot()==30) {
-                    new AbilityDescriptionPicker(getOwner()).open();
+                    new SetAbilityDescriptionMenu(getOwner(),index).open();
                 }
             }
         }
