@@ -3,6 +3,7 @@ package net.atlas.SkyblockSandbox.mongo;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
+import net.atlas.SkyblockSandbox.files.DatabaseInformationFile;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 
@@ -29,7 +30,15 @@ public class MongoCoins implements MongoDB {
 
     @Override
     public void connect() {
-        MongoClient client = MongoClients.create("mongodb+srv://admin:anyg0nSdrBvN0ltL@atlasdb.rpbqq.mongodb.net/test");
+        DatabaseInformationFile dbinfo = new DatabaseInformationFile();
+
+        MongoClient client;
+
+        if (dbinfo.getConfiguration().getBoolean("use"))
+            client = MongoClients.create(dbinfo.getConfiguration().getString("uri"));
+        else
+            client = MongoClients.create("mongodb+srv://admin:anyg0nSdrBvN0ltL@atlasdb.rpbqq.mongodb.net/test");
+
         MongoDatabase database = client.getDatabase("AtlasSandbox");
         col = database.getCollection("playerdata");
         System.out.println(col);

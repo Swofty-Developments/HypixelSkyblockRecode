@@ -10,6 +10,7 @@ import net.atlas.SkyblockSandbox.economy.Coins;
 import net.atlas.SkyblockSandbox.entity.SkyblockEntity;
 import net.atlas.SkyblockSandbox.event.customEvents.ManaEvent;
 import net.atlas.SkyblockSandbox.event.customEvents.SkillEXPGainEvent;
+import net.atlas.SkyblockSandbox.files.DatabaseInformationFile;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.LootListener;
 import net.atlas.SkyblockSandbox.item.ability.AbiltyListener;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.HellShatter;
@@ -107,6 +108,7 @@ public class SBX extends JavaPlugin {
 
     void createDataFiles() {
         createDragonDataFile();
+        new DatabaseInformationFile().create();
     }
 
     void startOnlineRunnables() {
