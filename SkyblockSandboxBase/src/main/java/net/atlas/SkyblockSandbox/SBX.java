@@ -1,9 +1,11 @@
 package net.atlas.SkyblockSandbox;
 
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCommandArgs;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCompleter;
 import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
 import net.atlas.SkyblockSandbox.command.commands.Command_createitem;
+import net.atlas.SkyblockSandbox.command.commands.Command_island;
 import net.atlas.SkyblockSandbox.command.commands.Command_spawnmob;
 import net.atlas.SkyblockSandbox.command.commands.Command_giveItem;
 import net.atlas.SkyblockSandbox.economy.Coins;
@@ -11,6 +13,7 @@ import net.atlas.SkyblockSandbox.entity.SkyblockEntity;
 import net.atlas.SkyblockSandbox.event.customEvents.ManaEvent;
 import net.atlas.SkyblockSandbox.event.customEvents.SkillEXPGainEvent;
 import net.atlas.SkyblockSandbox.files.DatabaseInformationFile;
+import net.atlas.SkyblockSandbox.files.IslandInfoFile;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.LootListener;
 import net.atlas.SkyblockSandbox.item.ability.AbiltyListener;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.HellShatter;
@@ -19,12 +22,15 @@ import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.mongo.MongoCoins;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
+import net.atlas.SkyblockSandbox.playerIsland.Data;
 import net.atlas.SkyblockSandbox.slayer.SlayerTier;
 import net.atlas.SkyblockSandbox.slayer.Slayers;
 import net.atlas.SkyblockSandbox.util.NumberTruncation.NumberSuffix;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Bukkit;
+import org.bukkit.WorldCreator;
+import org.bukkit.WorldType;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -67,15 +73,18 @@ public class SBX extends JavaPlugin {
     public void onEnable() {
         instance = this;
         framework = new SkyblockCommandFramework(this);
+        createDataFiles();
         mongoStats = new MongoCoins();
         mongoStats.connect();
         coins = new Coins();
 
+        Data.initialize();
+
         registerListeners();
         registerCommands();
+        createIslandWorld();
 
         startOnlineRunnables();
-        createDataFiles();
 
 
         //registerEntity("Enderman", 58, EntityZombie.class, NoTeleportEnderman.class);
@@ -103,12 +112,21 @@ public class SBX extends JavaPlugin {
         framework.registerCommands(new Command_spawnmob(this));
         framework.registerCommands(new Command_giveItem(this));
         framework.registerCommands(new Command_createitem(this));
+        framework.registerCommands(new Command_island(this));
         framework.registerHelp();
+    }
+
+    void createIslandWorld() {
+        WorldCreator wc = new WorldCreator("islands");
+        wc.type(WorldType.FLAT);
+        wc.generatorSettings("2;0;1");
+        wc.createWorld();
     }
 
     void createDataFiles() {
         createDragonDataFile();
         new DatabaseInformationFile().create();
+        new IslandInfoFile().create();
     }
 
     void startOnlineRunnables() {
@@ -259,4 +277,7 @@ public class SBX extends JavaPlugin {
         return instance;
     }
 
+    public static WorldEditPlugin getWorldEdit() {
+        return (WorldEditPlugin) Bukkit.getPluginManager().getPlugin("WorldEdit");
+    }
 }
