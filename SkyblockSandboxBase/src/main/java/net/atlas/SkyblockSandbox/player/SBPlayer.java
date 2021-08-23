@@ -4,10 +4,15 @@ import lombok.Setter;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.item.SkyblockItem;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
+import net.atlas.SkyblockSandbox.playerIsland.Data;
+import net.atlas.SkyblockSandbox.playerIsland.IslandId;
+import net.atlas.SkyblockSandbox.playerIsland.PlayerIsland;
+import net.atlas.SkyblockSandbox.playerIsland.PlayerIslandHandler;
 import net.atlas.SkyblockSandbox.sound.Jingle;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -260,6 +265,19 @@ public class SBPlayer extends PluginPlayer {
         public boolean isRegen() {
             return isRegen;
         }
+    }
+
+    public PlayerIsland getPlayerIsland() {
+        for (FileConfiguration cfg : Data.getAllIslandFiles()) {
+            if (cfg.getString("owner").equals(sbPlayer.getUniqueId().toString()))
+                return new PlayerIslandHandler(IslandId.fromString(cfg.getString("id")));
+        }
+
+        return null;
+    }
+
+    public boolean hasIsland() {
+        return getPlayerIsland() != null;
     }
 
 }
