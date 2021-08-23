@@ -3,10 +3,13 @@ package net.atlas.SkyblockSandbox.playerIsland;
 import lombok.experimental.UtilityClass;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.files.IslandInfoFile;
+import net.atlas.SkyblockSandbox.util.SUtil;
 import net.atlas.SkyblockSandbox.util.WorldEditUtil;
+import net.citizensnpcs.npc.ai.speech.Chat;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.libs.jline.internal.Log;
@@ -96,15 +99,20 @@ public class Data {
 					@Override
 					public void run() {
 						owner.teleport(loc);
+						owner.playSound(owner.getLocation(), Sound.NOTE_PLING,2,1);
+						owner.sendMessage(SUtil.colorize("&e&lWelcome to Skyblock Sandbox!"));
 						if (members.length != 0)
-							for (Player player : members)
+							for (Player player : members) {
 								player.teleport(loc);
+								player.playSound(player.getLocation(), Sound.NOTE_PLING,2,1);
+								player.sendMessage(SUtil.colorize("&e&lWelcome To Skyblock Sandbox!"));
+							}
 					}
 				}.runTaskLater(SBX.getInstance(), 10);
 
 				return new PlayerIslandHandler(islandId);
 			} catch (Exception ex) {
-				throw new IOException(ex.getMessage());
+				throw new IOException(ex);
 			}
 		} else {
 			islandData.save(f);

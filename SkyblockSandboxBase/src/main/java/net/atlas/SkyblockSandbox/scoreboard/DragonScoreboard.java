@@ -92,7 +92,11 @@ public class DragonScoreboard {
         String yourDamageScore = "";
         if (StartFight.fightActive) {
             dragHealth = StartFight.dragonHealth;
+            if (!StartFight.playerDMG.containsKey(p)) {
+                StartFight.playerDMG.put(p, 0D);
+            }
             dmg = StartFight.playerDMG.get(p);
+
             dragHealthScore = "Dragon Health: " + ChatColor.GREEN + new DecimalFormat("#").format(dragHealth) + ChatColor.RED + "❤";
             yourDamageScore = "Your Damage: " + ChatColor.RED + new DecimalFormat("#").format(dmg);
             if (yourDamageScore.length() > 32) {

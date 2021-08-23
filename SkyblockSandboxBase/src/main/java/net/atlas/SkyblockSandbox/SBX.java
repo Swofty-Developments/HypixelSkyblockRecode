@@ -4,10 +4,7 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCommandArgs;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCompleter;
 import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
-import net.atlas.SkyblockSandbox.command.commands.Command_createitem;
-import net.atlas.SkyblockSandbox.command.commands.Command_island;
-import net.atlas.SkyblockSandbox.command.commands.Command_spawnmob;
-import net.atlas.SkyblockSandbox.command.commands.Command_giveItem;
+import net.atlas.SkyblockSandbox.command.commands.*;
 import net.atlas.SkyblockSandbox.economy.Coins;
 import net.atlas.SkyblockSandbox.entity.SkyblockEntity;
 import net.atlas.SkyblockSandbox.event.customEvents.ManaEvent;
@@ -60,6 +57,8 @@ public class SBX extends JavaPlugin {
     public static HashMap<UUID, HashMap<SkillType, Double>> cachedSkills = new HashMap<>();
     public static HashMap<UUID, SkillEXPGainEvent> prevSkillEvent = new HashMap<>();
     public static HashMap<UUID, SkillEXPGainEvent> cachedEvent = new HashMap<>();
+    public static HashMap<UUID,List<String>> queuedBarMessages = new HashMap<>();
+    public static HashMap<UUID,String> prevBarMessage = new HashMap<>();
 
     private static SBX instance;
     SkyblockCommandFramework framework;
@@ -79,12 +78,12 @@ public class SBX extends JavaPlugin {
         coins = new Coins();
 
         Data.initialize();
-
         registerListeners();
         registerCommands();
         createIslandWorld();
 
         startOnlineRunnables();
+        createDataFiles();
 
 
         //registerEntity("Enderman", 58, EntityZombie.class, NoTeleportEnderman.class);
@@ -113,6 +112,8 @@ public class SBX extends JavaPlugin {
         framework.registerCommands(new Command_giveItem(this));
         framework.registerCommands(new Command_createitem(this));
         framework.registerCommands(new Command_island(this));
+        framework.registerCommands(new Command_jingle(this));
+        framework.registerCommands(new Command_warp(this));
         framework.registerHelp();
     }
 
@@ -224,31 +225,6 @@ public class SBX extends JavaPlugin {
 
     public static String getStatMessage(SBPlayer p, ManaEvent e) {
         return SUtil.colorize("&c" + p.getStat(SBPlayer.PlayerStat.HEALTH) + "/" + p.getMaxStat(SBPlayer.PlayerStat.HEALTH) + " &b" + p.getStat(SBPlayer.PlayerStat.INTELLIGENCE) + "/" + p.getMaxStat(SBPlayer.PlayerStat.INTELLIGENCE));
-    }
-
-    public void registerEntity(String name, int id, Class<? extends EntityInsentient> nmsClass, Class<? extends EntityInsentient> customClass) {
-        try {
-
-            List<Map<?, ?>> dataMap = new ArrayList<Map<?, ?>>();
-            for (Field f : EntityTypes.class.getDeclaredFields()) {
-                if (f.getType().getSimpleName().equals(Map.class.getSimpleName())) {
-                    f.setAccessible(true);
-                    dataMap.add((Map<?, ?>) f.get(null));
-                }
-            }
-
-            if (dataMap.get(2).containsKey(id)) {
-                dataMap.get(0).remove(name);
-                dataMap.get(2).remove(id);
-            }
-
-            Method method = EntityTypes.class.getDeclaredMethod("a", Class.class, String.class, int.class);
-            method.setAccessible(true);
-            method.invoke(null, customClass, name, id);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public void createDragonDataFile() {

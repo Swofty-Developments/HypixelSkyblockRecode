@@ -548,9 +548,6 @@ public class NoTeleportEnderman extends EntityEnderman {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if(!(customEnt.getGoalTarget() instanceof EntityPlayer)) {
-                    customEnt.setGoalTarget(((CraftPlayer) p.getPlayer()).getHandle());
-                }
                 if (customEnt.getBukkitEntity().isDead()) {
                     this.cancel();
                 }

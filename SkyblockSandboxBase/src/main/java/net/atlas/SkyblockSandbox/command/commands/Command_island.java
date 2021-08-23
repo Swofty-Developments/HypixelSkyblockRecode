@@ -6,6 +6,9 @@ import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.playerIsland.Data;
 import net.atlas.SkyblockSandbox.playerIsland.IslandId;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 public class Command_island extends SkyblockCommandFramework {
@@ -25,7 +28,18 @@ public class Command_island extends SkyblockCommandFramework {
 		SBPlayer player = new SBPlayer(cmd.getPlayer());
 
 		if (args.length == 0) {
-			player.sendMessage("§7Missing args.");
+			if (!player.hasIsland()) {
+				player.sendMessage("§7Creating island...");
+				createProcess(player);
+				return;
+			}
+			player.sendMessage("§7Teleporting home...");
+
+			Location teleLoc = player.getPlayerIsland().getCenter();
+			while (teleLoc.getBlock().getType()!= Material.AIR) {
+				teleLoc.add(0,1,0);
+			}
+			player.teleport(teleLoc);
 			return;
 		}
 
@@ -34,24 +48,35 @@ public class Command_island extends SkyblockCommandFramework {
 				if (player.hasIsland()) {
 					player.sendMessage("§7Your island already exists!");
 				} else {
-					try {
-						Data.createIsland(player.getPlayer(), IslandId.randomIslandId());
-						player.sendMessage("§7Island created!");
-					} catch (Exception ex) {
-						player.sendMessage("§7Failed to create your island, please report this!");
-					}
+					player.sendMessage("§7Creating island...");
+					createProcess(player);
 				}
 				break;
 			case "home":
 			case "tp":
 				if (!player.hasIsland()) {
-					player.sendMessage("§7You need to create an island first!");
+					player.sendMessage("§7Creating island...");
+					createProcess(player);
 					return;
 				}
 				player.sendMessage("§7Teleporting home...");
-				player.teleport(player.getPlayerIsland().getCenter());
+				Location teleLoc = player.getPlayerIsland().getCenter();
+				while (teleLoc.getBlock().getType()!= Material.AIR) {
+					teleLoc.add(0,1,0);
+				}
+				player.teleport(teleLoc);
 
 				break;
+		}
+	}
+
+	void createProcess(SBPlayer player) {
+		try {
+			Data.createIsland(player.getPlayer(), IslandId.randomIslandId());
+			player.sendMessage("§7Island created!");
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			player.sendMessage("§7Failed to create your island, please report this!");
 		}
 	}
 }

@@ -71,7 +71,7 @@ public class SoulCry extends Ability {
                         if (isSoulCryActive.containsKey(pl.getUniqueId())) {
                             if (!isSoulCryActive.get(pl.getUniqueId())) {
                                 double oldfero = pl.getMaxStat(SBPlayer.PlayerStat.FEROCITY);
-                                pl.playJingle(Jingle.SOULCRY);
+                                pl.playJingle(Jingle.SOULCRY,false);
                                 pl.setMaxStat(SBPlayer.PlayerStat.FEROCITY, pl.getMaxStat(SBPlayer.PlayerStat.FEROCITY) + 400);
                                 isSoulCryActive.put(pl.getUniqueId(), true);
                                 if (sbitem.getString(item, "UUID").equals("")) {
@@ -84,7 +84,7 @@ public class SoulCry extends Ability {
                                 new BukkitRunnable() {
                                     @Override
                                     public void run() {
-                                        pl.playJingle(Jingle.SOULCRY);
+                                        pl.playJingle(Jingle.SOULCRY,false);
                                         pl.setMaxStat(SBPlayer.PlayerStat.FEROCITY, oldfero);
                                         isSoulCryActive.put(pl.getUniqueId(), false);
                                         for (int c = 0; c < p.getInventory().getContents().length; c++) {

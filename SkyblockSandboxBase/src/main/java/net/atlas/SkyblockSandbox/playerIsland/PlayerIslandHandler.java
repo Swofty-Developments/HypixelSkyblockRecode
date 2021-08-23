@@ -1,10 +1,14 @@
 package net.atlas.SkyblockSandbox.playerIsland;
 
+import net.atlas.SkyblockSandbox.SBX;
+import net.atlas.SkyblockSandbox.util.SUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.craftbukkit.libs.jline.internal.Log;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +18,47 @@ public class PlayerIslandHandler implements PlayerIsland {
 	private final IslandId id;
 	private final String stringId;
 
+
 	public PlayerIslandHandler(IslandId id) {
 		this.id = id;
 		this.stringId = id.toString();
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				for(OfflinePlayer player : getMembers()) {
+					if(player.isOnline()) {
+						Player pl = player.getPlayer();
+						if(pl.getLocation().getWorld()==getCenter().getWorld()) {
+							if (pl.getLocation().distance(getCenter()) > dist()) {
+								Location teleLoc = getCenter();
+								while (teleLoc.getBlock().getType()!= Material.AIR) {
+									teleLoc.add(0,1,0);
+								}
+								pl.teleport(teleLoc);
+								pl.sendMessage(SUtil.colorize("&cYou cannot travel more than " + dist() + " blocks in that direction!"));
+							}
+						}
+					}
+				}
+				if(getOwner().isOnline()) {
+					Player pl = getOwner().getPlayer();
+					if(pl.getLocation().getWorld()==getCenter().getWorld()) {
+						if (pl.getLocation().distance(getCenter()) > dist()) {
+							Location teleLoc = getCenter();
+							while (teleLoc.getBlock().getType()!= Material.AIR) {
+								teleLoc.add(0,1,0);
+							}
+							pl.teleport(teleLoc);
+							pl.sendMessage(SUtil.colorize("&cYou cannot travel more than " + dist() + " blocks in that direction!"));
+						}
+					}
+				}
+			}
+		}.runTaskTimer(SBX.getInstance(),20L,20L);
+	}
+
+	public static int dist() {
+		return 100;
 	}
 
 	@Override

@@ -1,6 +1,12 @@
 package net.atlas.SkyblockSandbox.player;
 
 import lombok.Setter;
+import com.xxmicloxx.NoteBlockAPI.model.RepeatMode;
+import com.xxmicloxx.NoteBlockAPI.model.Song;
+import com.xxmicloxx.NoteBlockAPI.songplayer.RadioSongPlayer;
+import com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder;
+
+import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.item.SkyblockItem;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
@@ -16,12 +22,10 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.io.File;
+import java.util.*;
 
-import static net.atlas.SkyblockSandbox.SBX.cachedSkills;
-import static net.atlas.SkyblockSandbox.SBX.isSoulCryActive;
+import static net.atlas.SkyblockSandbox.SBX.*;
 import static net.atlas.SkyblockSandbox.listener.sbEvents.PlayerJoin.maxStats;
 import static net.atlas.SkyblockSandbox.listener.sbEvents.PlayerJoin.bonusStats;
 import static net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat.HEALTH;
@@ -190,6 +194,15 @@ public class SBPlayer extends PluginPlayer {
         }
     }
 
+    public void queueMiddleActionText(SBPlayer p,String s) {
+        s = SUtil.colorize(s);
+        if(queuedBarMessages.containsKey(p.getUniqueId())) {
+            List<String> temp = new ArrayList<>(queuedBarMessages.get(p.getUniqueId()));
+            temp.add(s);
+            queuedBarMessages.put(p.getUniqueId(),temp);
+        }
+    }
+
     public void setCurrentAndMaxStat(PlayerStat stat, double v) {
         setMaxStat(stat, v);
         setStat(stat, v);
@@ -211,12 +224,26 @@ public class SBPlayer extends PluginPlayer {
         SUtil.sendActionText(sbPlayer, SUtil.colorize(message));
     }
 
-    public void playJingle(Jingle j) {
-        j.send(sbPlayer.getPlayer());
+    public void playJingle(Jingle j,boolean loop) {
+        j.send(sbPlayer.getPlayer(),loop);
+    }
+
+    public void playJingle(String file,boolean loop) {
+        Song song = NBSDecoder.parse(new File(SBX.getInstance().getDataFolder().getPath() + "/Jingles/" + file + ".nbs"));
+        playSong(song,sbPlayer.getPlayer(),loop);
     }
 
     public double getCurrentSkillExp(SkillType type) {
         return cachedSkills.get(sbPlayer.getUniqueId()).get(type);
+    }
+
+    public void playSong(Song song,Player p,boolean loop) {
+        RadioSongPlayer rsp = new RadioSongPlayer(song);
+        rsp.addPlayer(p);
+        if(loop) {
+            rsp.setRepeatMode(RepeatMode.ALL);
+        }
+        rsp.setPlaying(true);
     }
 
     public void addSkillXP(SkillType type, double amt) {

@@ -72,11 +72,15 @@ public class HellShatter extends Ability {
         }
         SBPlayer pl = new SBPlayer(p);
         SBItemStack sbitem = new SBItemStack(item);
-        p.playSound(p.getLocation(), Sound.ENDERDRAGON_GROWL, 1, 0.6f);
         Location blockLoc = pl.getLocation();
         while (blockLoc.getBlock().getType()==Material.AIR) {
             blockLoc.setY(blockLoc.getY()-1);
+            if(blockLoc.getY()<=0) {
+                p.sendMessage(SUtil.colorize("&cYou must be above a solid block!"));
+                return;
+            }
         }
+        p.playSound(p.getLocation(), Sound.ENDERDRAGON_GROWL, 1, 0.6f);
         cylinder(blockLoc.clone().subtract(0,1,0),Material.OBSIDIAN,5,p);
         new BukkitRunnable() {
             int i = 0;

@@ -52,7 +52,7 @@ public class SkillXPGainListener extends SkyblockListener<SkillEXPGainEvent> {
                                     @Override
                                     public void run() {
                                         if(en.isDead()) {
-                                            p.playJingle(Jingle.RARE_DROP);
+                                            p.playJingle(Jingle.RARE_DROP,false);
                                             p.sendMessage(SUtil.colorize("  &6&lNICE! SLAYER BOSS SLAIN!"));
                                             p.sendMessage(SUtil.colorize("   &5&l> &7Talk to Maddox to claim your " + slayer.getSingular() + " Slayer XP!"));
                                             activeSlayers.remove(p.getUniqueId());

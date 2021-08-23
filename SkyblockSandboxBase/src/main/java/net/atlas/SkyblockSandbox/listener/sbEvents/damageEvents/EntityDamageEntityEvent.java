@@ -76,6 +76,12 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                     newRng = (40 - 0);
                 }
                 newHealth = Math.floor(((p.getStat(SBPlayer.PlayerStat.HEALTH) - 0) * newRng) / oldrng);
+                if(damager instanceof Player) {
+                    SBPlayer pdamager = new SBPlayer(((Player) damager));
+                    Random random = new Random();
+                    double crit = random.nextDouble();
+                    DamageUtil.spawnMarker(damagee,damager,dmg,pdamager.getMaxStat(SBPlayer.PlayerStat.CRIT_CHANCE)/100>=crit);
+                }
             }
             if (newHealth <= 0) {
                 p.setHealth(p.getMaxHealth());
@@ -139,7 +145,7 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                     }
                 }.runTaskLater(SBX.getInstance(), 10L);
             }
-            p.playJingle(Jingle.FEROCITY_START);
+            p.playJingle(Jingle.FEROCITY_START,false);
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -164,7 +170,7 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                         } else {
                             //damagee.damage(0);
                         }
-                        p.playJingle(Jingle.FEROCITY);
+                        p.playJingle(Jingle.FEROCITY,false);
                     }
                 }
             }.runTaskLater(SBX.getInstance(), 10L);
@@ -176,7 +182,6 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
             @Override
             public void run() {
                 damagee.setNoDamageTicks(0);
-                damagee.setVelocity(damagee.getVelocity().normalize().multiply(0.1));
             }
         }.runTaskLater(SBX.getInstance(), 1L);
         double dmg = DamageUtil.calculateSingleHit(damagee, damager);
@@ -198,7 +203,6 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                     @Override
                     public void run() {
                         en.setNoDamageTicks(0);
-                        en.setVelocity(en.getVelocity().normalize().multiply(0.1));
                     }
                 }.runTaskLater(SBX.getInstance(), 1L);
                 //calculating and doing ferocity hits, checks if its greater than 0
