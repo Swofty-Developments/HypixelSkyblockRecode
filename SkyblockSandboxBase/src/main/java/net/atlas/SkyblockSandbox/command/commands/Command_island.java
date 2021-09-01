@@ -3,6 +3,7 @@ package net.atlas.SkyblockSandbox.command.commands;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCommand;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCommandArgs;
 import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
+import net.atlas.SkyblockSandbox.gui.guis.storage.StorageGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.playerIsland.Data;
 import net.atlas.SkyblockSandbox.playerIsland.IslandId;
@@ -66,6 +67,9 @@ public class Command_island extends SkyblockCommandFramework {
 				}
 				player.teleport(teleLoc);
 
+				break;
+			case "storage":
+				new StorageGUI(player).open();
 				break;
 		}
 	}

@@ -17,11 +17,13 @@ import net.atlas.SkyblockSandbox.item.ability.itemAbilities.HellShatter;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.SoulCry;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.mongo.MongoCoins;
+import net.atlas.SkyblockSandbox.mongo.MongoDB;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
 import net.atlas.SkyblockSandbox.playerIsland.Data;
 import net.atlas.SkyblockSandbox.slayer.SlayerTier;
 import net.atlas.SkyblockSandbox.slayer.Slayers;
+import net.atlas.SkyblockSandbox.storage.MongoStorage;
 import net.atlas.SkyblockSandbox.util.NumberTruncation.NumberSuffix;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import net.minecraft.server.v1_8_R3.*;
@@ -38,6 +40,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.reflections.Reflections;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,6 +66,7 @@ public class SBX extends JavaPlugin {
     private static SBX instance;
     SkyblockCommandFramework framework;
     private static MongoCoins mongoStats;
+    private static MongoDB mongoStorage;
     public Coins coins;
 
     private File dragonDataFile;
@@ -74,7 +78,9 @@ public class SBX extends JavaPlugin {
         framework = new SkyblockCommandFramework(this);
         createDataFiles();
         mongoStats = new MongoCoins();
+        mongoStorage = new MongoStorage();
         mongoStats.connect();
+        mongoStorage.connect();
         coins = new Coins();
 
         Data.initialize();
@@ -114,6 +120,8 @@ public class SBX extends JavaPlugin {
         framework.registerCommands(new Command_island(this));
         framework.registerCommands(new Command_jingle(this));
         framework.registerCommands(new Command_warp(this));
+        framework.registerCommands(new Command_storage(this));
+        framework.registerCommands(new Command_debugtest(this));
         framework.registerHelp();
     }
 
