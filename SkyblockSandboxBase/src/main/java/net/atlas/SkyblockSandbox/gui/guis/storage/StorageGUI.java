@@ -2,24 +2,27 @@ package net.atlas.SkyblockSandbox.gui.guis.storage;
 
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
-import net.atlas.SkyblockSandbox.storage.StorageCache;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
-public class StorageGUI extends NormalGUI {
-	public StorageGUI(SBPlayer owner) {
+public class StorageGUI extends NormalGUI
+{
+	public StorageGUI(SBPlayer owner)
+	{
 		super(owner);
 	}
 
 	@Override
-	public void handleMenu(InventoryClickEvent event) {
+	public void handleMenu(InventoryClickEvent event)
+	{
 		Player bp = (Player) event.getWhoClicked();
 		SBPlayer player = new SBPlayer(bp);
 
 		event.setCancelled(true);
 
-		switch (event.getSlot()) {
+		switch (event.getSlot())
+		{
 			case 1:
 				player.sendMessage("WASSSUPPPPP");
 				break;
@@ -29,7 +32,8 @@ public class StorageGUI extends NormalGUI {
 
 		}
 
-		switch (event.getCurrentItem().getType()) {
+		switch (event.getCurrentItem().getType())
+		{
 			case PAPER:
 				new EnderChestPage(getOwner(), event.getSlot() - 8).open();
 				break;
@@ -37,22 +41,26 @@ public class StorageGUI extends NormalGUI {
 	}
 
 	@Override
-	public boolean setClickActions() {
+	public boolean setClickActions()
+	{
 		return false;
 	}
 
 	@Override
-	public String getTitle() {
+	public String getTitle()
+	{
 		return "Storage";
 	}
 
 	@Override
-	public int getRows() {
+	public int getRows()
+	{
 		return 6;
 	}
 
 	@Override
-	public void setItems() {
+	public void setItems()
+	{
 		SBPlayer player = getOwner();
 
 		setMenuGlass();

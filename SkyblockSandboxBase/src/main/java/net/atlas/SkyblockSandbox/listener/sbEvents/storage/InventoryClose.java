@@ -4,15 +4,17 @@ import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.storage.StorageCache;
 import net.atlas.SkyblockSandbox.util.BukkitSerilization;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 
-public class InventoryClose extends SkyblockListener<InventoryCloseEvent> {
+public class InventoryClose extends SkyblockListener<InventoryCloseEvent>
+{
 	@EventHandler
-	public void callEvent(InventoryCloseEvent event) {
-		if (event.getInventory().getTitle().contains("Ender Chest Page")) {
+	public void callEvent(InventoryCloseEvent event)
+	{
+		if (event.getInventory().getTitle().contains("Ender Chest Page"))
+		{
 			int page = Integer.parseInt(event.getInventory().getTitle().split(" ")[3]);
 			String base64Contents = BukkitSerilization.itemStackArrayToBase64(event.getInventory().getContents());
 
