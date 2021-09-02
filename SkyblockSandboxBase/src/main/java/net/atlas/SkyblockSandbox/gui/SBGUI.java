@@ -23,12 +23,15 @@ import java.util.Set;
 
 public abstract class SBGUI {
 
-    private final SBPlayer owner;
+    private SBPlayer owner;
 
     protected ItemStack FILLER_GLASS = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte)15);
 
     public SBGUI(SBPlayer owner) {
         this.owner = owner;
+    }
+    public SBGUI() {
+
     }
 
     public abstract String getTitle();
@@ -37,7 +40,7 @@ public abstract class SBGUI {
 
     public abstract void setItems();
 
-    public ItemStack makeColorfulItem(Material material, String displayName, int amount, int durability, String... lore) {
+    public static ItemStack makeColorfulItem(Material material, String displayName, int amount, int durability, String... lore) {
         ItemStack item = new ItemStack(material, amount, (short) durability);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(SUtil.colorize(displayName));
@@ -49,7 +52,7 @@ public abstract class SBGUI {
         return item;
     }
 
-    public ItemStack makeColorfulItem(Material material, String displayName, int amount, int durability, String lore) {
+    public static ItemStack makeColorfulItem(Material material, String displayName, int amount, int durability, String lore) {
         ItemStack item = new ItemStack(material, amount, (short) durability);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(SUtil.colorize(displayName));
@@ -62,7 +65,7 @@ public abstract class SBGUI {
         return item;
     }
 
-    public ItemStack makeColorfulItem(Material material, String displayName, int amount, int durability, String lore, boolean glowing) {
+    public static ItemStack makeColorfulItem(Material material, String displayName, int amount, int durability, String lore, boolean glowing) {
         ItemStack item = new ItemStack(material, amount, (short) durability);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(SUtil.colorize(displayName));
@@ -80,7 +83,7 @@ public abstract class SBGUI {
         return item;
     }
 
-    public ItemStack makeColorfulItem(Material material, String displayName, int amount, int durability, List<String> lore) {
+    public static ItemStack makeColorfulItem(Material material, String displayName, int amount, int durability, List<String> lore) {
         ItemStack item = new ItemStack(material, amount, (short) durability);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(SUtil.colorize(displayName));

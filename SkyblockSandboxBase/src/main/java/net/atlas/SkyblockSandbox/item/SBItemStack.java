@@ -290,6 +290,7 @@ public class SBItemStack extends ItemStack {
 
                 }
                 StringBuilder builder = new StringBuilder();
+                builder.append(" ");
                 for (int b = 0; b < starAmt; b++) {
                     if(masterStarAmt>=b+1) {
                         builder.append("§c✪");
@@ -301,7 +302,7 @@ public class SBItemStack extends ItemStack {
                     builder.append(" ");
                 }
                 meta = stack.getItemMeta();
-                meta.setDisplayName(builder.toString() + rarity.getColor() + NBTUtil.getString(stack,"item-name"));
+                meta.setDisplayName(rarity.getColor() + NBTUtil.getString(stack,"item-name") + builder.toString());
                 meta.setLore(newLore);
                 stack.setItemMeta(meta);
                 return stack;

@@ -16,6 +16,7 @@ import net.atlas.SkyblockSandbox.item.ability.AbiltyListener;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.HellShatter;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.SoulCry;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
+import net.atlas.SkyblockSandbox.listener.sbEvents.abilities.AbilityHandler;
 import net.atlas.SkyblockSandbox.mongo.MongoCoins;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
@@ -104,6 +105,7 @@ public class SBX extends JavaPlugin {
         SkyblockListener.registerListeners();
         Bukkit.getServer().getPluginManager().registerEvents(new AbiltyListener(new SoulCry()), this);
         Bukkit.getServer().getPluginManager().registerEvents(new AbiltyListener(new HellShatter()), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new AbilityHandler(), this);
         Bukkit.getServer().getPluginManager().registerEvents(new LootListener(), this);
     }
 
