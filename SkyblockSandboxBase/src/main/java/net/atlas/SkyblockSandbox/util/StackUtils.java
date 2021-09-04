@@ -8,6 +8,7 @@ import dev.triumphteam.gui.builder.item.SkullBuilder;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -169,5 +170,35 @@ public class StackUtils {
         item.setItemMeta(meta);
 
         return item;
+    }
+    public static List<String> stringToLore(String string, int characterLimit, ChatColor prefixColor) {
+        String[] words = string.split(" ");
+        List<String> lines = new ArrayList();
+        StringBuilder currentLine = new StringBuilder();
+        String[] var6 = words;
+        int var7 = words.length;
+
+        for(int var8 = 0; var8 < var7; ++var8) {
+            String word = var6[var8];
+            if (!word.equals("/newline")) {
+                if (currentLine.toString().equals("")) {
+                    currentLine = new StringBuilder(word);
+                } else {
+                    currentLine.append(" ").append(word);
+                }
+            }
+
+            if (word.equals("/newline") || currentLine.length() + word.length() >= characterLimit) {
+                String newLine = currentLine.toString();
+                lines.add("" + prefixColor + newLine);
+                currentLine = new StringBuilder();
+            }
+        }
+
+        if (currentLine.length() > 0) {
+            lines.add("" + prefixColor + currentLine);
+        }
+
+        return lines;
     }
 }

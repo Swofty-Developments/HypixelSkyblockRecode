@@ -1,5 +1,6 @@
 package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator;
 
+import net.atlas.SkyblockSandbox.abilityCreator.AdvancedFunctions;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.item.ability.AbilityData;
 import net.atlas.SkyblockSandbox.item.ability.functions.EnumFunctionsData;
@@ -10,9 +11,12 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.reflections.Reflections;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static net.atlas.SkyblockSandbox.util.SUtil.colorize;
 
 public class FunctionsCreatorGUI extends NormalGUI {
     private final int index;
@@ -39,8 +43,7 @@ public class FunctionsCreatorGUI extends NormalGUI {
     @Override
     public void handleMenu(InventoryClickEvent event) {
         event.setCancelled(true);
-        event.setCancelled(true);
-        Player player = (Player) event.getWhoClicked();
+        SBPlayer player = new SBPlayer((Player) event.getWhoClicked());
         List<String> functions = new ArrayList<>();
         for (int b = 0; b < AbilityData.getAbilityAmount(player.getItemInHand()); b++) {
             for (int i = 0; i < 5; i++) {
@@ -48,68 +51,22 @@ public class FunctionsCreatorGUI extends NormalGUI {
                 functions.add(name);
             }
         }
-        switch (event.getSlot()) {
-            case 31: {
-                new FunctionsGUI(getOwner(), index).open();
-                break;
-            }
-
-            case 10: {
-                String name = "Teleport Function";
-                if (functions.contains(name)) {
-                    player.sendMessage(ChatColor.RED + "You cannot have more than one of the same function!");
-                    player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 2, 0);
-                    return;
-                } else {
-                    new FunctionsEditorGUI(getOwner(), name, index, count, update).open();
+        if (event.getSlot() == 31) {
+            new FunctionsGUI(player, index).open();
+        }
+        Reflections reflection = new Reflections("net.atlas.SkyblockSandbox.abilityCreator.functions");
+        for(Class<? extends AdvancedFunctions> l:reflection.getSubTypesOf(AdvancedFunctions.class)) {
+            try {
+                AdvancedFunctions function = l.newInstance();
+                if(function.name().equals(ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName()).replace(" Function", ""))) {
+                    function.setOwner(player);
+                    function.setAindex(index);
+                    function.setFindex(count);
+                    function.setBackGUI(getGui());
+                    function.open();
                 }
-                break;
-            }
-            case 11: {
-                String name = "Implosion Function";
-                if (functions.contains(name)) {
-                    player.sendMessage(ChatColor.RED + "You cannot have more than one of the same function!");
-                    player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 2, 0);
-                    return;
-                } else {
-                    new FunctionsEditorGUI(getOwner(), name, index, count, update).open();
-                }
-                break;
-            }
-            case 12: {
-                new ParticleChooserGUI(getOwner(), index, count, update).open();
-                break;
-            }
-            case 13: {
-                new SoundChooserGUI(getOwner(), index, count, update, null).open();
-                break;
-            }
-            case 14: {
-                String name = "Head Shooter Function";
-                if (functions.contains(name)) {
-                    player.sendMessage(ChatColor.RED + "You cannot have more than one of the same function!");
-                    player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 2, 0);
-                    return;
-                } else {
-                    new HeadChooserGUI(getOwner(), index, count, update).open();
-                }
-                break;
-            }
-            case 16: {
-                String name = "Projectile Shooter Function";
-                if (functions.contains(name)) {
-                    player.sendMessage(ChatColor.RED + "You cannot have more than one of the same function!");
-                    player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 2, 0);
-                    return;
-                } else {
-                    new ProjectileChooserGUI(getOwner(), index, count, update).open();
-                }
-                break;
-            }
-            default: {
-                if (event.getCurrentItem().equals(FILLER_GLASS)) return;
-                player.sendMessage(SUtil.colorize("&cThis hasn't been implemented yet!"));
-                break;
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -123,6 +80,19 @@ public class FunctionsCreatorGUI extends NormalGUI {
     public void setItems() {
         setMenuGlass();
         setItem(31, makeColorfulItem(Material.ARROW, "§aGo Back", 1, 0, "§7To Create Ability #" + index));
+        Reflections reflection = new Reflections("net.atlas.SkyblockSandbox.abilityCreator.functions");
+        int i = 0;
+        for(Class<? extends AdvancedFunctions> l:reflection.getSubTypesOf(AdvancedFunctions.class)) {
+            try {
+                AdvancedFunctions function = l.newInstance();
+
+                setItem(10 + i, makeColorfulItem(function.material(), "&a" + function.name() + " Function", 1, 0, "&6Functionality:\n" + function.description() + "\n\n&eClick to set!"));
+                i++;
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        /*
         setItem(10, makeColorfulItem(Material.ENDER_PEARL, "&aTeleport Function", 1, 0, "&7Set the range and toggle\n&7the message.\n\n&6Functionality:\n&7Teleport forwards a set\n&7range!\n\n&7Maximum: &a100\n&7Minimum: &a0\n\n&eClick to set!"));
         setItem(11, makeColorfulItem(Material.BOOK_AND_QUILL, "&aImplosion Function", 1, 0, "&7Set the range and toggle\n&7the message.\n\n&6Functionality:\n&7Kills all nearby entities in\n&7a range!\n\n&7Maximum: &a15\n&7Minimum: &a0\n\n&eClick to set!"));
         setItem(12, makeColorfulSkullItem("&aParticle Generator", "http://textures.minecraft.net/texture/9b1e20410bb6c7e6968afcd3ec855520c37a40d54a54e8dafc2e6b6f2f9a1915", 1, "&7Set the particle, amount,\n&7distance from player and\n&7shape.\n\n&6Functionality:\n&7Summon a particle that\n&7can kill mobs in its\n&7path, aswell as create\n&7a circle around you!\n\n&eClick to set!"));
@@ -130,5 +100,7 @@ public class FunctionsCreatorGUI extends NormalGUI {
         setItem(14, makeColorfulSkullItem("&aHead Shooter", "http://textures.minecraft.net/texture/41b830eb4082acec836bc835e40a11282bb51193315f91184337e8d3555583", 1, "&7Set the head, range, toggle\n&7the damage and set the\n&7base damage.\n\n&6Functionality:\n&7Choose any skull in your\n&7inventory and shoot it!\n\n&eClick to set!"));
         setItem(15, makeColorfulSkullItem("&aEntity Shooter", "http://textures.minecraft.net/texture/9e99deef919db66ac2bd28d6302756ccd57c7f8b12b9dca8f41c3e0a04ac1cc", 1, "&7Set the entity.\n\n&c&lTHIS HASN'T BEEN IMPLEMENTED YET!\n\n&eClick to set!"));
         setItem(16, makeColorfulItem(Material.DIAMOND_AXE, "&aProjectile Shooter", 1, 0, "&7Set the projectile and toggle\n&7the message.\n\n&6Functionality:\n&7Launch a projectile\n&7forward!\n\n&eClick to set!"));
+    */
     }
+
 }
