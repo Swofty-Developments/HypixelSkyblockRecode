@@ -1,5 +1,6 @@
 package net.atlas.SkyblockSandbox.gui;
 
+import dev.triumphteam.gui.builder.item.ItemBuilder;
 import dev.triumphteam.gui.components.InteractionModifier;
 import dev.triumphteam.gui.guis.BaseGui;
 import dev.triumphteam.gui.guis.Gui;
@@ -17,15 +18,13 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public abstract class SBGUI {
 
     private final SBPlayer owner;
 
-    protected ItemStack FILLER_GLASS = new ItemStack(Material.STAINED_GLASS_PANE,1,(byte)15);
+    protected ItemStack FILLER_GLASS = ItemBuilder.from(new ItemStack(Material.STAINED_GLASS_PANE,1,(byte)15)).name(Component.text(SUtil.colorize("&7"))).build();
 
     public SBGUI(SBPlayer owner) {
         this.owner = owner;
@@ -94,13 +93,22 @@ public abstract class SBGUI {
     }
 
     public static ItemStack makeColorfulSkullItem(String displayname, String owner, int amount, String lore) {
-        ItemStack item = new ItemStack(Material.SKULL_ITEM, amount, (short) 3);
+        ItemStack item = new ItemStack(Material.SKULL_ITEM, amount, (byte) 3);
+
         SkullMeta meta = (SkullMeta) item.getItemMeta();
-        if(Bukkit.getPlayer(owner)!=null && Bukkit.getPlayer(owner).isValid()) {
+        if (Bukkit.getPlayer(owner) != null && Bukkit.getPlayer(owner).isValid()) {
             meta.setOwner(owner);
         } else {
             SBItemStack i = new SBItemStack(item);
-            item = i.applyTexture(item,owner);
+            List<Component> lore2 = new ArrayList<>();
+            String[] loreArr = lore.split("\n");
+            for(String s:loreArr) {
+                lore2.add(Component.text(SUtil.colorize(s)));
+            }
+
+            owner = new String(Base64.getEncoder().encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", owner).getBytes()));
+            item = ItemBuilder.skull(item).texture(owner).name(Component.text(SUtil.colorize(displayname))).amount(amount).lore(lore2).build();
+            return item;
         }
         String[] lore1 = lore.split("\n");
         meta.setLore(SUtil.colorize(Arrays.asList(lore1)));
@@ -113,11 +121,18 @@ public abstract class SBGUI {
     public static ItemStack makeColorfulSkullItem(String displayname, String owner, int amount, List<String> lore) {
         ItemStack item = new ItemStack(Material.SKULL_ITEM, amount, (byte) 3);
         SkullMeta meta = (SkullMeta) item.getItemMeta();
-        if(Bukkit.getPlayer(owner)!=null && Bukkit.getPlayer(owner).isValid()) {
+        if (Bukkit.getPlayer(owner) != null && Bukkit.getPlayer(owner).isValid()) {
             meta.setOwner(owner);
         } else {
             SBItemStack i = new SBItemStack(item);
-            item = i.applyTexture(item,owner);
+            List<Component> lore2 = new ArrayList<>();
+            for(String s:lore) {
+                lore2.add(Component.text(SUtil.colorize(s)));
+            }
+
+            owner = new String(Base64.getEncoder().encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", owner).getBytes()));
+            item = ItemBuilder.skull(item).texture(owner).name(Component.text(SUtil.colorize(displayname))).amount(amount).lore(lore2).build();
+            return item;
         }
         meta.setLore(SUtil.colorize(lore));
         meta.setDisplayName(SUtil.colorize(displayname));
@@ -129,11 +144,18 @@ public abstract class SBGUI {
     public static ItemStack makeColorfulSkullItem(String displayname, String owner, int amount, String... lore) {
         ItemStack item = new ItemStack(Material.SKULL_ITEM, amount, (byte) 3);
         SkullMeta meta = (SkullMeta) item.getItemMeta();
-        if(Bukkit.getPlayer(owner)!=null && Bukkit.getPlayer(owner).isValid()) {
+        if (Bukkit.getPlayer(owner) != null && Bukkit.getPlayer(owner).isValid()) {
             meta.setOwner(owner);
         } else {
             SBItemStack i = new SBItemStack(item);
-            item = i.applyTexture(item,owner);
+            List<Component> lore2 = new ArrayList<>();
+            for(String s:lore) {
+                lore2.add(Component.text(SUtil.colorize(s)));
+            }
+
+            owner = new String(Base64.getEncoder().encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", owner).getBytes()));
+            item = ItemBuilder.skull(item).texture(owner).name(Component.text(SUtil.colorize(displayname))).amount(amount).lore(lore2).build();
+            return item;
         }
         meta.setLore(SUtil.colorize(lore));
         meta.setDisplayName(SUtil.colorize(displayname));

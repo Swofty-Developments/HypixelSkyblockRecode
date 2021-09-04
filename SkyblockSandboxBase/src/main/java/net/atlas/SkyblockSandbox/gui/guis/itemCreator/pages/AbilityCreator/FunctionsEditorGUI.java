@@ -269,7 +269,7 @@ public class FunctionsEditorGUI extends NormalGUI {
                         if (!AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.ID) || (!AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_SHAPE) && !AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_SHOOTING) && !AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_TYPE))) {
                             player.setItemInHand(AbilityData.removeFunction(player.getItemInHand(), index, count, player));
                         }
-                        player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.PARTICLE_TYPE, index, particle.name()));
+                        //player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.PARTICLE_TYPE, index, particle.name()));
                         new ParticleShooterGUI(getOwner(), function, index, count, update, particle).open();
                         break;
                     }
@@ -277,7 +277,7 @@ public class FunctionsEditorGUI extends NormalGUI {
                         if (!AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.ID) || (!AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_SHAPE) && !AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_SHOOTING) && !AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_TYPE))) {
                             player.setItemInHand(AbilityData.removeFunction(player.getItemInHand(), index, count, player));
                         }
-                        player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.PARTICLE_TYPE, index, particle.name()));
+                        //player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.PARTICLE_TYPE, index, particle.name()));
                         new ParticleChooserGUI(getOwner(), index, count, update).open();
                         break;
                     }
@@ -285,7 +285,7 @@ public class FunctionsEditorGUI extends NormalGUI {
                         if (!AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.ID) || (!AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_SHAPE) && !AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_SHOOTING) && !AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_TYPE))) {
                             player.setItemInHand(AbilityData.removeFunction(player.getItemInHand(), index, count, player));
                         }
-                        player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.PARTICLE_TYPE, index, particle.name()));
+                        //player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.PARTICLE_TYPE, index, particle.name()));
                         new ShapeSlectorGUI(getOwner(), function, index, count, update, particle).open();
                         break;
                     }

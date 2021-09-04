@@ -1,10 +1,13 @@
 package net.atlas.SkyblockSandbox.listener.sbEvents.abilities;
 
+import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.item.ability.AbilityData;
 import net.atlas.SkyblockSandbox.item.ability.EnumAbilityData;
+import net.atlas.SkyblockSandbox.item.ability.itemAbilities.WitherImpact;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat;
 import net.atlas.SkyblockSandbox.util.NumUtils;
+import net.atlas.SkyblockSandbox.util.SUtil;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,7 +18,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class AbilityHandler implements Listener {
-    /*@EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onInteract(PlayerInteractEvent event) {
         try {
             if (event.getPlayer().getItemInHand() == null) return;
@@ -79,31 +82,36 @@ public class AbilityHandler implements Listener {
             return;
         }
         if (name.equals("")) {
-            IUtil.abilityUsed.put(player, true);
-            IUtil.sendActionText(player, "§c" + Math.round(user.getHealth()) + "/" + Math.round(user.getTotalHealth()) + "❤§b    §b-" + manaCost + " Mana (§6NONE§b)    " + Math.round(user.getIntelligence()) + "/" + Math.round(user.getTotalIntelligence()) + "✎ Mana");
-            new User(player).setIntelligence(new User(player).getIntelligence() - (NumUtils.isInt(AbilityData.retrieveData(EnumAbilityData.MANA_COST, item, i).toString()) ? Integer.parseInt(AbilityData.retrieveData(EnumAbilityData.MANA_COST, item, i).toString()) : 0));
+            SBX.abilityUsed.put(player, true);
+
+            p.queueMiddleActionText(p, SUtil.colorize("§b    §b-" + manaCost + " Mana (§6NONE§b)    "),20L);
+            //p.sendBarMessage(player, "§c" + Math.round(user.getHealth()) + "/" + Math.round(user.getTotalHealth()) + "❤§b    §b-" + manaCost + " Mana (§6NONE§b)    " + Math.round(user.getIntelligence()) + "/" + Math.round(user.getTotalIntelligence()) + "✎ Mana");
+            //new User(player).setIntelligence(new User(player).getIntelligence() - (NumUtils.isInt(AbilityData.retrieveData(EnumAbilityData.MANA_COST, item, i).toString()) ? Integer.parseInt(AbilityData.retrieveData(EnumAbilityData.MANA_COST, item, i).toString()) : 0));
+            p.setStat(PlayerStat.INTELLIGENCE,p.getStat(PlayerStat.INTELLIGENCE)-manaCost);
         } else {
             if (manaCost != 0) {
-                IUtil.abilityUsed.put(player, true);
-                IUtil.sendActionText(player, "§c" + Math.round(user.getHealth()) + "/" + Math.round(user.getTotalHealth()) + "❤§b    §b-" + manaCost + " Mana (§6" + name + "§b)    " + Math.round(user.getIntelligence()) + "/" + Math.round(user.getTotalIntelligence()) + "✎ Mana");
-                new User(player).setIntelligence(new User(player).getIntelligence() - (NumUtils.isInt(AbilityData.retrieveData(EnumAbilityData.MANA_COST, item, i).toString()) ? Integer.parseInt(AbilityData.retrieveData(EnumAbilityData.MANA_COST, item, i).toString()) : 0));
+                SBX.abilityUsed.put(player, true);
+                p.queueMiddleActionText(p,"§b    §b-" + manaCost + " Mana (§6" + name + "§b)    ",20L);
+                //IUtil.sendActionText(player, "§c" + Math.round(user.getHealth()) + "/" + Math.round(user.getTotalHealth()) + "❤§b    §b-" + manaCost + " Mana (§6" + name + "§b)    " + Math.round(user.getIntelligence()) + "/" + Math.round(user.getTotalIntelligence()) + "✎ Mana");
+                p.setStat(PlayerStat.INTELLIGENCE,p.getStat(PlayerStat.INTELLIGENCE)-manaCost);
             }
         }
         switch (String.valueOf(AbilityData.retrieveData(EnumAbilityData.BASE_ABILITY, item, i))) {
             case "INSTANT_TRANSMISSION":
-                new InstantTransmission(player,
+                /*new InstantTransmission(player,
                         (NumUtils.isInt(AbilityData.retrieveData(EnumAbilityData.DAMAGE, item, i).toString()) ? Integer.parseInt(AbilityData.retrieveData(EnumAbilityData.DAMAGE, item, i).toString()) : 0),
                         (NumUtils.isInt(AbilityData.retrieveData(EnumAbilityData.COOLDOWN, item, i).toString()) ? Integer.parseInt(AbilityData.retrieveData(EnumAbilityData.COOLDOWN, item, i).toString()) : 0),
                         (NumUtils.isInt(AbilityData.retrieveData(EnumAbilityData.MANA_COST, item, i).toString()) ? Integer.parseInt(AbilityData.retrieveData(EnumAbilityData.MANA_COST, item, i).toString()) : 0),
-                        (NumUtils.isInt(AbilityData.retrieveData(EnumAbilityData.SPEED, item, i).toString()) ? Integer.parseInt(AbilityData.retrieveData(EnumAbilityData.SPEED, item, i).toString()) : 0)).run();
+                        (NumUtils.isInt(AbilityData.retrieveData(EnumAbilityData.SPEED, item, i).toString()) ? Integer.parseInt(AbilityData.retrieveData(EnumAbilityData.SPEED, item, i).toString()) : 0)).run();*/
                 break;
             case "WITHER_IMPACT":
-                new WitherImpact(player,
+                /*new WitherImpact(player,
                         (NumUtils.isInt(AbilityData.retrieveData(EnumAbilityData.DAMAGE, item, i).toString()) ? Integer.parseInt(AbilityData.retrieveData(EnumAbilityData.DAMAGE, item, i).toString()) : 0),
                         (NumUtils.isInt(AbilityData.retrieveData(EnumAbilityData.COOLDOWN, item, i).toString()) ? Integer.parseInt(AbilityData.retrieveData(EnumAbilityData.COOLDOWN, item, i).toString()) : 0),
-                        (NumUtils.isInt(AbilityData.retrieveData(EnumAbilityData.MANA_COST, item, i).toString()) ? Integer.parseInt(AbilityData.retrieveData(EnumAbilityData.MANA_COST, item, i).toString()) : 0)).run();
+                        (NumUtils.isInt(AbilityData.retrieveData(EnumAbilityData.MANA_COST, item, i).toString()) ? Integer.parseInt(AbilityData.retrieveData(EnumAbilityData.MANA_COST, item, i).toString()) : 0)).run();*/
+                new WitherImpact().rightClickAirAction(player,event,item);
                 break;
         }
         new FunctionHandler(player, i, String.valueOf(AbilityData.retrieveData(EnumAbilityData.FUNCTION, item, i))).run();
-    }*/
+    }
 }

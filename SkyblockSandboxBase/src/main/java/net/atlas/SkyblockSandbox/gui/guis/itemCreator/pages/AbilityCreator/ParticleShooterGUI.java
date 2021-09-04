@@ -47,6 +47,7 @@ public class ParticleShooterGUI extends NormalGUI {
     @Override
     public void handleMenu(InventoryClickEvent event) {
         SBPlayer player = getOwner();
+        event.setCancelled(true);
         switch (event.getSlot()) {
             case 31: {
                 new FunctionsCreatorGUI(getOwner(), index, count, update).open();
@@ -55,7 +56,7 @@ public class ParticleShooterGUI extends NormalGUI {
             case 14: {
                 if(event.getCurrentItem().equals(FILLER_GLASS)) return;
 
-                AnvilGUI gui = new AnvilGUI(player, event1 -> {
+                AnvilGUI gui = new AnvilGUI(player.getPlayer(), event1 -> {
                     if (!NumUtils.isInt(event1.getName())) {
                         player.sendMessage("§cThat's not a valid number!");
                         Bukkit.getScheduler().runTaskLater(SBX.getInstance(), ParticleShooterGUI.super::open, 2);
@@ -77,11 +78,10 @@ public class ParticleShooterGUI extends NormalGUI {
                     }
                     if (NumUtils.isInt(event1.getName()) && event1.getName() != null) {
                         player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.PARTICLE_SHOOT_RANGE, count, event1.getName()));
-                        Bukkit.getScheduler().runTaskLater(SBX.getInstance(), ParticleShooterGUI.super::open, 2);
                     } else {
                         invalidNumberError(event1, player);
-                        Bukkit.getScheduler().runTaskLater(SBX.getInstance(), ParticleShooterGUI.super::open, 2);
                     }
+                    Bukkit.getScheduler().runTaskLater(SBX.getInstance(), ParticleShooterGUI.super::open, 2);
                 });
 
                 gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, makeColorfulItem(Material.PAPER, "Enter your range", 1, 0));
@@ -90,30 +90,18 @@ public class ParticleShooterGUI extends NormalGUI {
             }
             case 13: {
                 if (AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.ID)) {
-                    if (AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_TYPE) || AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_SHAPE) || AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_SHOOT_RANGE)) {
-                        if (event.getClick().equals(ClickType.RIGHT)) {
-                            player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.PARTICLE_SHOOTING, count, "False"));
-                            player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.NAME, count, "Particle Function"));
-                            setItems();
-                        }
-                        if (event.getClick().equals(ClickType.LEFT)) {
-                            player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.PARTICLE_SHOOTING, count, "True"));
-                            player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.NAME, count, "Particle Function"));
-                            setItems();
-                        }
-                    } else {
+                    if (!AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_TYPE) && !AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_SHAPE) && !AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_SHOOT_RANGE)) {
                         player.setItemInHand(AbilityData.removeFunction(player.getItemInHand(), index, count, player));
-                        if (event.getClick().equals(ClickType.RIGHT)) {
-                            player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.PARTICLE_SHOOTING, count, "False"));
-                            player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.NAME, count, "Particle Function"));
-                            setItems();
-
-                        }
-                        if (event.getClick().equals(ClickType.LEFT)) {
-                            player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.PARTICLE_SHOOTING, count, "True"));
-                            player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.NAME, count, "Particle Function"));
-                            setItems();
-                        }
+                    }
+                    if (event.getClick().equals(ClickType.RIGHT)) {
+                        player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.PARTICLE_SHOOTING, count, "False"));
+                        player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.NAME, count, "Particle Function"));
+                        updateItems();
+                    }
+                    if (event.getClick().equals(ClickType.LEFT)) {
+                        player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.PARTICLE_SHOOTING, count, "True"));
+                        player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.NAME, count, "Particle Function"));
+                        updateItems();
                     }
                 }
                 break;
@@ -122,30 +110,18 @@ public class ParticleShooterGUI extends NormalGUI {
                 if(event.getCurrentItem().equals(FILLER_GLASS)) return;
 
                 if (AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.ID)) {
-                    if (AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_TYPE) || AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_SHAPE) || AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_SHOOT_RANGE) || AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_SHOOTING)) {
-                        if (event.getClick().equals(ClickType.RIGHT)) {
-                            player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.PARTICLE_DAMAGE_ENTITY, count, "False"));
-                            player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.NAME, count, "Particle Function"));
-                            setItems();
-                        }
-                        if (event.getClick().equals(ClickType.LEFT)) {
-                            player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.PARTICLE_DAMAGE_ENTITY, count, "True"));
-                            player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.NAME, count, "Particle Function"));
-                            setItems();
-                        }
-                    } else {
+                    if (!AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_TYPE) && !AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_SHAPE) && !AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_SHOOT_RANGE) && !AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_SHOOTING)) {
                         player.setItemInHand(AbilityData.removeFunction(player.getItemInHand(), index, count, player));
-                        if (event.getClick().equals(ClickType.RIGHT)) {
-                            player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.PARTICLE_DAMAGE_ENTITY, count, "False"));
-                            player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.NAME, count, "Particle Function"));
-                            setItems();
-
-                        }
-                        if (event.getClick().equals(ClickType.LEFT)) {
-                            player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.PARTICLE_DAMAGE_ENTITY, count, "True"));
-                            player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.NAME, count, "Particle Function"));
-                            setItems();
-                        }
+                    }
+                    if (event.getClick().equals(ClickType.RIGHT)) {
+                        player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.PARTICLE_DAMAGE_ENTITY, count, "False"));
+                        player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.NAME, count, "Particle Function"));
+                        updateItems();
+                    }
+                    if (event.getClick().equals(ClickType.LEFT)) {
+                        player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.PARTICLE_DAMAGE_ENTITY, count, "True"));
+                        player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.NAME, count, "Particle Function"));
+                        updateItems();
                     }
                 }
                 break;
@@ -153,36 +129,32 @@ public class ParticleShooterGUI extends NormalGUI {
             case 4: {
                 if(event.getCurrentItem().equals(FILLER_GLASS)) return;
 
-                AnvilGUI gui = new AnvilGUI(player, new AnvilGUI.AnvilClickEventHandler() {
-                    @Override
-                    public void onAnvilClick(AnvilGUI.AnvilClickEvent event) {
-                        if (!NumUtils.isFloat(event.getName())) {
-                            player.sendMessage("§cThat's not a valid float!");
-                            Bukkit.getScheduler().runTaskLater(SBX.getInstance(), ParticleShooterGUI.super::open, 2);
-                            return;
-                        }
-                        if (Float.parseFloat(event.getName()) > 5) {
-                            player.sendMessage("§cThe range cannot be more than 5!");
-                            Bukkit.getScheduler().runTaskLater(SBX.getInstance(), ParticleShooterGUI.super::open, 2);
-                            player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 0);
-                            player.closeInventory();
-                            return;
-                        }
-                        if (Float.parseFloat(event.getName()) < 0) {
-                            player.sendMessage("§cThe range cannot be less than 0!");
-                            Bukkit.getScheduler().runTaskLater(SBX.getInstance(), ParticleShooterGUI.super::open, 2);
-                            player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 0);
-                            player.closeInventory();
-                            return;
-                        }
-                        if (NumUtils.isFloat(event.getName()) && event.getName() != null) {
-                            player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.PARTICLE_DAMAGE_MULTIPLIER, count, event.getName()));
-                            Bukkit.getScheduler().runTaskLater(SBX.getInstance(), ParticleShooterGUI.super::open, 2);
-                        } else {
-                            invalidNumberError(event, player);
-                            Bukkit.getScheduler().runTaskLater(SBX.getInstance(), ParticleShooterGUI.super::open, 2);
-                        }
+                AnvilGUI gui = new AnvilGUI(player.getPlayer(), event12 -> {
+                    if (!NumUtils.isFloat(event12.getName())) {
+                        player.sendMessage("§cThat's not a valid float!");
+                        Bukkit.getScheduler().runTaskLater(SBX.getInstance(), ParticleShooterGUI.super::open, 2);
+                        return;
                     }
+                    if (Float.parseFloat(event12.getName()) > 5) {
+                        player.sendMessage("§cThe range cannot be more than 5!");
+                        Bukkit.getScheduler().runTaskLater(SBX.getInstance(), ParticleShooterGUI.super::open, 2);
+                        player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 0);
+                        player.closeInventory();
+                        return;
+                    }
+                    if (Float.parseFloat(event12.getName()) < 0) {
+                        player.sendMessage("§cThe range cannot be less than 0!");
+                        Bukkit.getScheduler().runTaskLater(SBX.getInstance(), ParticleShooterGUI.super::open, 2);
+                        player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 0);
+                        player.closeInventory();
+                        return;
+                    }
+                    if (NumUtils.isFloat(event12.getName()) && event12.getName() != null) {
+                        player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.PARTICLE_DAMAGE_MULTIPLIER, count, event12.getName()));
+                    } else {
+                        invalidNumberError(event12, player);
+                    }
+                    Bukkit.getScheduler().runTaskLater(SBX.getInstance(), ParticleShooterGUI.super::open, 2);
                 });
 
                 gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, makeColorfulItem(Material.PAPER, "Enter your range", 1, 0));
@@ -196,12 +168,12 @@ public class ParticleShooterGUI extends NormalGUI {
                     if (event.getClick().equals(ClickType.RIGHT)) {
                         player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.PARTICLE_MESSAGE, count, "False"));
                         player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.NAME, count, "Particle Function"));
-                        setItems();
+                        updateItems();
                     }
                     if (event.getClick().equals(ClickType.LEFT)) {
                         player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.PARTICLE_MESSAGE, count, "True"));
                         player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index, EnumFunctionsData.NAME, count, "Particle Function"));
-                        setItems();
+                        updateItems();
                     }
                 }
                 break;
@@ -220,8 +192,14 @@ public class ParticleShooterGUI extends NormalGUI {
         setItem(31, makeColorfulItem(Material.ARROW, "§aGo Back", 1, 0, "§7To Function editor #" + count));
         setItem(13, makeColorfulItem(Material.IRON_BLOCK, "&aToggle Shooting", 1, 0, "&7Toggle shooting for the\n&bParticle Function&7!\n\n&eLeft-click to enable\n&bRight-click to disable"));
         if(AbilityData.retrieveFunctionData(EnumFunctionsData.PARTICLE_SHOOTING, getOwner().getItemInHand(), index, count).equals("True")) {
+            String enabled = "";
+            if(AbilityData.retrieveFunctionData(EnumFunctionsData.PARTICLE_DAMAGE_ENTITY, getOwner().getItemInHand(), index, count).equals("True")) {
+               enabled = "&aTRUE";
+            } else {
+                enabled = "&cFALSE";
+            }
+            setItem(12, makeColorfulItem(Material.SKULL_ITEM, "&aToggle Entity Damage", 1, 0, "&7Toggle Entity Damage for\n&7the &bParticle Function&7!\n\n&7Enabled: " + enabled + "\n\n&eLeft-click to enable\n&bRight-click to disable"));
             setItem(14, makeColorfulItem(Material.STICK, "&aShooting Range", 1, 0, "&7Set the range of the\n&7the &bParticle Function&7!\n\n&eClick to set!"));
-            setItem(12, makeColorfulItem(Material.SKULL_ITEM, "&aToggle Entity Damage", 1, 0, "&7Toggle Entity Damage for\n&7the &bParticle Function&7!\n\n&eLeft-click to enable\n&bRight-click to disable"));
             setItem(4, makeColorfulItem(Material.IRON_AXE, "&aDamage Multiplier", 1, 0, "&7Set the damage multiplier\n&7of the &bParticle\n&bFunction&7!\n&7Default: &a0.3\n\n&eClick to set!"));
             setItem(5, makeColorfulItem(Material.ENDER_PORTAL_FRAME, "&aToggle Message", 1,0, "&7Toggle Message for\n&7the &bParticle Function&7!\n\n&eLeft-click to enable\n&bRight-click to disable"));
         } else {

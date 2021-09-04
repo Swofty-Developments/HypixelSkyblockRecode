@@ -222,6 +222,12 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                     if (en.hasMetadata(Slayers.ENDERMAN.toString())) {
                         //
                         if (en.getMetadata("hitshield").get(0).asInt() != 0) {
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    en.setVelocity(en.getVelocity().normalize().multiply(0.1));
+                                }
+                            }.runTaskLater(SBX.getInstance(), 1L);
                         } else {
                             new BukkitRunnable() {
                                 @Override

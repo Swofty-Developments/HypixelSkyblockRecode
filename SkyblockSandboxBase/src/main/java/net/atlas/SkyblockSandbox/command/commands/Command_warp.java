@@ -8,6 +8,7 @@ import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.item.SkyblockItem;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.playerIsland.SBLocations;
+import net.atlas.SkyblockSandbox.util.BungeeUtil;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -37,6 +38,11 @@ public class Command_warp extends SkyblockCommandFramework {
                     sbLoc.teleport(p);
                     p.playSound(p.getLocation(),Sound.ENDERMAN_TELEPORT,2,1);
                     p.sendMessage(SUtil.colorize("&7Warping..."));
+                    if(p.getServer().getServerName().equalsIgnoreCase("islands")) {
+                        BungeeUtil.sendPlayer(p,"hub");
+                    }
+                } else {
+                    p.sendMessage(ChatColor.RED + "Invalid warp location!");
                 }
             }
         }

@@ -75,7 +75,7 @@ public class AbilityEditorGUI extends NormalGUI {
                     if (event.getClick().isRightClick()) {
                         if (event.getCurrentItem().getType().equals(Material.WOOD_BUTTON)) {
                         } else {
-                            owner.setItemInHand(it.removeAbil(it, finalI + 1));
+                            owner.setItemInHand(it.removeAbil(it.asBukkitItem(), finalI + 1));
                             new AbilityEditorGUI(owner).open();
                             owner.playSound(owner.getLocation(), Sound.HORSE_ARMOR, 1, 1);
                         }

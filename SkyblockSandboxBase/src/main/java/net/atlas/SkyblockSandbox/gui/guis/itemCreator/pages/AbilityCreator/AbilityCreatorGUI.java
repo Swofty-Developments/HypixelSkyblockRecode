@@ -8,12 +8,14 @@ import net.atlas.SkyblockSandbox.item.ability.EnumAbilityData;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.NumUtils;
 import net.atlas.SkyblockSandbox.util.SUtil;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -46,6 +48,9 @@ public class AbilityCreatorGUI extends NormalGUI {
                     if(event12.getSlot().equals(AnvilGUI.AnvilSlot.OUTPUT)) {
                         SBItemStack i = new SBItemStack(player.getItemInHand());
                         player.setItemInHand(i.setAbilData(player.getItemInHand(),EnumAbilityData.NAME, event12.getName(), index));
+                        if(((String)i.getAbilData(EnumAbilityData.MANA_COST,index)).isEmpty()) {
+                            player.setItemInHand(i.setAbilData(player.getItemInHand(),EnumAbilityData.MANA_COST, 0, index));
+                        }
 
                         new BukkitRunnable() {
                             @Override
@@ -85,11 +90,10 @@ public class AbilityCreatorGUI extends NormalGUI {
                     if (event1.getName() != null) {
                         SBItemStack i = new SBItemStack(player.getItemInHand());
                         player.setItemInHand(i.setAbilData(player.getItemInHand(),EnumAbilityData.COOLDOWN, event1.getName(), index));
-                        Bukkit.getScheduler().runTaskLater(SBX.getInstance(), AbilityCreatorGUI.super::open, 2);
                     } else {
                         invalidNumberError(event1, player);
-                        Bukkit.getScheduler().runTaskLater(SBX.getInstance(), AbilityCreatorGUI.super::open, 2);
                     }
+                    Bukkit.getScheduler().runTaskLater(SBX.getInstance(), AbilityCreatorGUI.super::open, 2);
                 });
 
                 gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, makeColorfulItem(Material.PAPER, "Enter your cooldown", 1, 0));
@@ -147,7 +151,7 @@ public class AbilityCreatorGUI extends NormalGUI {
                 SBItemStack i = new SBItemStack(player.getItemInHand());
                 i.setAbilData(player.getItemInHand(),EnumAbilityData.FUNCTION,event.getClick().toString().toUpperCase() + "_CLICK",index);
                 player.setItemInHand(i.asBukkitItem());
-                setItems();
+                updateItems();
                 break;
             }
             case SUGAR: {

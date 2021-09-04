@@ -49,7 +49,7 @@ public abstract class SkyblockListener<E extends Event> implements Listener {
                                 PacketType.Play.Server.ENTITY_STATUS) {
                             //System.out.println(event.getPacket().getBytes().getValues().get(0));
                             if(event.getPacket().getBytes().getValues().get(0)==(byte)2) {
-                                event.setCancelled(true);
+                                //event.setCancelled(true);
                             }
 
                         }

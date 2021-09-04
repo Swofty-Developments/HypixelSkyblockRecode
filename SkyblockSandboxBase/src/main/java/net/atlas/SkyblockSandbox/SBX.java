@@ -15,7 +15,9 @@ import net.atlas.SkyblockSandbox.island.islands.end.dragFight.LootListener;
 import net.atlas.SkyblockSandbox.item.ability.AbiltyListener;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.HellShatter;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.SoulCry;
+import net.atlas.SkyblockSandbox.item.ability.itemAbilities.WitherImpact;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
+import net.atlas.SkyblockSandbox.listener.sbEvents.abilities.AbilityHandler;
 import net.atlas.SkyblockSandbox.mongo.MongoCoins;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
@@ -24,25 +26,22 @@ import net.atlas.SkyblockSandbox.slayer.SlayerTier;
 import net.atlas.SkyblockSandbox.slayer.Slayers;
 import net.atlas.SkyblockSandbox.util.NumberTruncation.NumberSuffix;
 import net.atlas.SkyblockSandbox.util.SUtil;
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_8_R3.EntityArmorStand;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.*;
-import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -57,8 +56,16 @@ public class SBX extends JavaPlugin {
     public static HashMap<UUID, HashMap<SkillType, Double>> cachedSkills = new HashMap<>();
     public static HashMap<UUID, SkillEXPGainEvent> prevSkillEvent = new HashMap<>();
     public static HashMap<UUID, SkillEXPGainEvent> cachedEvent = new HashMap<>();
-    public static HashMap<UUID,List<String>> queuedBarMessages = new HashMap<>();
-    public static HashMap<UUID,String> prevBarMessage = new HashMap<>();
+    public static LinkedHashMap<UUID, LinkedHashMap<String, Long>> queuedBarMessages = new LinkedHashMap<>();
+    public static HashMap<EntityArmorStand, Integer> cooldownMap = new HashMap<>();
+    public static HashMap<EntityArmorStand, Integer> counterMap = new HashMap<>();
+    public static HashMap<EntityArmorStand, Vector> vMap = new HashMap<>();
+    public static HashMap<EntityArmorStand,Integer> angleMap = new HashMap<>();
+    public static BukkitTask prevRunnable = null;
+    public static HashMap<UUID, String> prevBarMessage = new HashMap<>();
+    public static Map<Player, Boolean> abilityUsed = new HashMap<>();
+    public static HashMap<Player, Boolean> canfire = new HashMap<>();
+    public static HashMap<Player, List<EntityArmorStand>> thrownAxes = new HashMap<>();
 
     private static SBX instance;
     SkyblockCommandFramework framework;
@@ -70,6 +77,7 @@ public class SBX extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        getServer().getMessenger().registerOutgoingPluginChannel(this,"BungeeCord");
         instance = this;
         framework = new SkyblockCommandFramework(this);
         createDataFiles();
@@ -104,7 +112,9 @@ public class SBX extends JavaPlugin {
         SkyblockListener.registerListeners();
         Bukkit.getServer().getPluginManager().registerEvents(new AbiltyListener(new SoulCry()), this);
         Bukkit.getServer().getPluginManager().registerEvents(new AbiltyListener(new HellShatter()), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new AbiltyListener(new WitherImpact()), this);
         Bukkit.getServer().getPluginManager().registerEvents(new LootListener(), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new AbilityHandler(),this);
     }
 
     void registerCommands() {
@@ -114,6 +124,8 @@ public class SBX extends JavaPlugin {
         framework.registerCommands(new Command_island(this));
         framework.registerCommands(new Command_jingle(this));
         framework.registerCommands(new Command_warp(this));
+        framework.registerCommands(new Command_importhead(this));
+        framework.registerCommands(new Command_sbmenu(this));
         framework.registerHelp();
     }
 
@@ -195,31 +207,43 @@ public class SBX extends JavaPlugin {
                     sbPlayer.updateStats();
                 }
             }
-        }.runTaskTimer(SBX.getInstance(),0L,5L);
+        }.runTaskTimer(SBX.getInstance(), 0L, 5L);
 
         new BukkitRunnable() {
+            int i = 0;
             @Override
             public void run() {
                 if (Bukkit.getOnlinePlayers().size() > 0) {
+
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         SBPlayer sbPlayer = new SBPlayer(p);
-                        sbPlayer.doRegenStats();
+                        if(i==2) {
+                            sbPlayer.doRegenStats();
+                            i=0;
+                        }
                         sbPlayer.sendBarMessage(getStatMessage(sbPlayer));
+                        i++;
                     }
                 }
             }
-        }.runTaskTimerAsynchronously(this, 0L, 20L);
+        }.runTaskTimerAsynchronously(this, 0L, 10L);
     }
 
     public static String getStatMessage(SBPlayer p) {
         DecimalFormat f = new DecimalFormat("#");
         String middlemsg = "";
-        if (prevSkillEvent.containsKey(p.getUniqueId()) && cachedEvent.containsKey(p.getUniqueId())) {
+        if (queuedBarMessages.containsKey(p.getUniqueId())) {
+            String s = queuedBarMessages.get(p.getUniqueId()).keySet().stream().findFirst().orElse("");
+            if (!s.equals("")) {
+                middlemsg = s;
+            }
+        }
+        /*if (prevSkillEvent.containsKey(p.getUniqueId()) && cachedEvent.containsKey(p.getUniqueId())) {
             if (prevSkillEvent.get(p.getUniqueId()) != null && cachedEvent.get(p.getUniqueId()) != prevSkillEvent.get(p.getUniqueId())) {
                 cachedEvent.put(p.getUniqueId(), prevSkillEvent.get(p.getUniqueId()));
                 middlemsg = SUtil.colorize(" &3+" + prevSkillEvent.get(p.getUniqueId()).getExpAmt() + " " + prevSkillEvent.get(p.getUniqueId()).getSkill().getName() + " (" + p.getCurrentSkillExp(prevSkillEvent.get(p.getUniqueId()).getSkill()) + "/" + prevSkillEvent.get(p.getUniqueId()).getSkill().getTotalXP() + ")");
             }
-        }
+        }*/
         return SUtil.colorize("&c" + f.format(p.getStat(SBPlayer.PlayerStat.HEALTH)) + "/" + f.format(p.getMaxStat(SBPlayer.PlayerStat.HEALTH)) + "❤ Health " + middlemsg + " &b" + f.format(p.getStat(SBPlayer.PlayerStat.INTELLIGENCE)) + "/" + f.format(p.getMaxStat(SBPlayer.PlayerStat.INTELLIGENCE)) + "✎ Mana");
     }
 
