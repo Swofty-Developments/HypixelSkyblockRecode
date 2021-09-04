@@ -261,7 +261,10 @@ public class SBItemStack extends ItemStack {
                 //if pet set XP bar
                 if(Boolean.parseBoolean(NBTUtil.getString(stack,"is-pet"))) {
                     for(int b = 0;b<3;b++) {
-                        List<String> perkDescript = get
+                        List<String> perkDescript = NBTUtil.getPetPerkDescription(stack,b+1);
+                        String perkName = NBTUtil.getPerkName(stack,b+1);
+                        newLore.add(SUtil.colorize("&6" + ChatColor.stripColor(perkName)));
+                        newLore.addAll(perkDescript);
                     }
 
                     if (Boolean.parseBoolean(NBTUtil.getString(stack, "is-equipped"))) {

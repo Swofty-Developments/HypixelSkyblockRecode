@@ -81,6 +81,6 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.sk89q:jchronic:0.2.4a" level="project" />
     <orderEntry type="library" name="Maven: junit:junit:4.8.1" level="project" />
     <orderEntry type="library" name="Maven: dev.triumphteam:triumph-gui:3.0.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.github.koca2000:NoteBlockAPI:-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.github.koca2000:NoteBlockAPI:-29fdeeeb51-1" level="project" />
   </component>
 </module>
