@@ -1,16 +1,26 @@
 package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages;
 
 import com.google.common.base.Enums;
+import net.atlas.SkyblockSandbox.SBX;
+import net.atlas.SkyblockSandbox.gui.AnvilGUI;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.item.Rarity;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
+import net.atlas.SkyblockSandbox.util.NumUtils;
+import net.atlas.SkyblockSandbox.util.SUtil;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import static net.atlas.SkyblockSandbox.item.Rarity.*;
 
@@ -87,6 +97,9 @@ public class RaritiesGUI extends NormalGUI {
         setAction(21, event -> {
             addStar(getOwner().getItemInHand(), event.getClick().isRightClick());
         });
+        setAction(23,event -> {
+            petTypeGui(getOwner());
+        });
         return true;
     }
 
@@ -114,7 +127,14 @@ public class RaritiesGUI extends NormalGUI {
         setItem(16, makeColorfulItem(Material.STAINED_CLAY, "§cSpecial", 1, 14, "§7Set your item's rarity", "§7to §cSpecial§7!", "", "§eClick to set!"));
         setItem(22, makeColorfulSkullItem("&6Recombobulate", "http://textures.minecraft.net/texture/57ccd36dc8f72adcb1f8c8e61ee82cd96ead140cf2a16a1366be9b5a8e3cc3fc", 1, "&7Automatically recombobulate your item!", "", "&eClick to recombobulate!"));
         setItem(21, makeColorfulItem(Material.QUARTZ, "&c✪✪✪✪&6✪ Add dungeon stars", 1, 0, "&7Add a dungeon star to your item!", "", "&eRight click for master stars!"));
+        setItem(23,makeColorfulSkullItem("&aSet Pet Type!","http://textures.minecraft.net/texture/49d0e833d9bda32f2d736d8c3c3be8b9b964addd59357c12263ffccb8b8dae",1,"&7Click to set the pet type!"));
 
+    }
+
+    private void setPetType(String s,ItemStack i,Player player) {
+        ItemStack i1 = NBTUtil.setString(i, SUtil.colorize(s), "pet-type");
+        SBItemStack it = new SBItemStack(i1);
+        player.setItemInHand(it.refreshLore());
     }
 
     private void setRarity(Rarity r, ItemStack i, Player player) {
@@ -180,5 +200,21 @@ public class RaritiesGUI extends NormalGUI {
         SBItemStack it = new SBItemStack(i1);
         it = new SBItemStack(it.setInteger(it.asBukkitItem(), it.getInteger(it.asBukkitItem(), "rarity_upgrades") + 1, "rarity_upgrades"));
         player.setItemInHand(it.refreshLore());
+    }
+
+    public AnvilGUI petTypeGui(SBPlayer player) {
+        AnvilGUI gui = new AnvilGUI(player.getPlayer(), event1 -> {
+            setPetType(event1.getName(),player.getItemInHand(),player);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    updateItems();
+                }
+            }.runTaskLater(SBX.getInstance(), 1);
+        });
+
+        gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, makeColorfulItem(Material.PAPER, "Set Pet Type", 1, 0));
+        gui.open();
+        return gui;
     }
 }

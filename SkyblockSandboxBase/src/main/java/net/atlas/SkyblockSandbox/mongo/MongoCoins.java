@@ -4,9 +4,12 @@ import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import net.atlas.SkyblockSandbox.files.DatabaseInformationFile;
+import net.atlas.SkyblockSandbox.util.Serialization;
 import org.bson.Document;
 import org.bukkit.Bukkit;
+import org.bukkit.inventory.ItemStack;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -90,6 +93,61 @@ public class MongoCoins implements MongoDB {
                 }
             }
 
+        }
+        return null;
+    }
+
+    public void removeData(UUID uuid, String key)
+    {
+
+        Document query = new Document("uuid", uuid.toString());
+        if(query.isEmpty()) {
+            setData(uuid,key,0D);
+        }else {
+            if(col.find(query).first()!=null) {
+                Document found = col.find(query).first();
+                if(found.get(key)!=null) {
+
+                    found.remove(key);
+                    col.updateOne(col.find(query).first(), found);
+                    System.out.println(found.values());
+                } else {
+                }
+
+            } else {
+                setData(uuid,key,0D);
+                if(col.find(query).first()!=null) {
+                    Document found2 = col.find(query).first();
+                    found2.remove(key);
+                }
+            }
+
+        }
+    }
+
+    public List<ItemStack> getPets(UUID uuid) {
+        List<String> petStrings = new ArrayList<>();
+        Document query = new Document("uuid", uuid.toString());
+        if(query.isEmpty()) {
+            return null;
+        }else {
+            if(col.find(query).first()!=null) {
+                Document found = col.find(query).first();
+                for(String s:found.keySet()) {
+                    if(s.contains("pet_")) {
+                        if(found.get(s) instanceof String)
+                        petStrings.add((String) found.get(s));
+                    }
+                }
+                List<ItemStack> items = new ArrayList<>();
+                for(String s:petStrings) {
+                    try {
+                        items.add(Serialization.itemStackFromBase64(s));
+                    } catch (IOException ignored) {
+                    }
+                }
+                return items;
+            }
         }
         return null;
     }

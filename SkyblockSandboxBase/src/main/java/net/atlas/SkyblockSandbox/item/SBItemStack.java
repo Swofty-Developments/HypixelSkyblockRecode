@@ -1,6 +1,7 @@
 package net.atlas.SkyblockSandbox.item;
 
 import com.google.common.base.Enums;
+import com.google.common.base.Strings;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.atlas.SkyblockSandbox.item.ability.Ability;
@@ -8,6 +9,9 @@ import net.atlas.SkyblockSandbox.item.ability.AbilityType;
 import net.atlas.SkyblockSandbox.item.ability.EnumAbilityData;
 import net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
+import net.atlas.SkyblockSandbox.util.NumUtils;
+import net.atlas.SkyblockSandbox.util.NumberTruncation.NumberSuffix;
+import net.atlas.SkyblockSandbox.util.NumberTruncation.RomanNumber;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import org.bukkit.ChatColor;
@@ -26,6 +30,7 @@ import java.util.*;
 import static net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.RaritiesGUI.masterStarKey;
 import static net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.RaritiesGUI.starKey;
 import static net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat.*;
+import static net.atlas.SkyblockSandbox.player.pets.PetBuilder.petXP;
 
 public class SBItemStack extends ItemStack {
     String[] statsformat = {"Gear_Score", "Damage", "Strength","Crit_Chance", "Crit_Damage", "Attack_Speed", "blank","Health","Defense", "Intelligence", "Speed", "Ferocity", "Mining_Speed","Mining_Fortune","Pristine","blank"};
@@ -149,6 +154,10 @@ public class SBItemStack extends ItemStack {
                 List<String> ultEnchantsLore = new ArrayList<>();
 
                 int i = 0;
+                if(!(NBTUtil.getString(stack,"pet-type")==null)||!NBTUtil.getString(stack,"pet-type").isEmpty()) {
+                    newLore.add(SUtil.colorize("&8" + NBTUtil.getString(stack,"pet-type")));
+                    newLore.add("");
+                }
                 for (String s : statsformat) {
 
                     i++;
@@ -248,6 +257,32 @@ public class SBItemStack extends ItemStack {
                     }
                 }
 
+
+                //if pet set XP bar
+                if(Boolean.parseBoolean(NBTUtil.getString(stack,"is-pet"))) {
+                    for(int b = 0;b<3;b++) {
+                        List<String> perkDescript = NBTUtil.getPetPerkDescription(stack,b+1);
+                        String perkName = NBTUtil.getPerkName(stack,b+1);
+                        newLore.add(SUtil.colorize("&6" + ChatColor.stripColor(perkName)));
+                        newLore.addAll(perkDescript);
+                    }
+
+                    if (Boolean.parseBoolean(NBTUtil.getString(stack, "is-equipped"))) {
+                        int totalXp = petXP[NBTUtil.getInteger(stack, "pet-level")];
+                        if (totalXp != 0) {
+                            int percent = NBTUtil.getInteger(stack, "pet-xp") * 100 / totalXp;
+                            double c = Math.round(percent * 10.0) / 10.0;
+                            newLore.add(SUtil.colorize("&7Progress to level " + (NBTUtil.getInteger(stack, "pet-level") + 1) + ": &e" + c + "%"));
+                            newLore.add(SUtil.colorize(getProgressBar(NBTUtil.getInteger(stack, "pet-xp"), totalXp, 20, '-', ChatColor.DARK_GREEN, ChatColor.WHITE) + " &e" + NBTUtil.getInteger(stack, "pet-xp") + "&6/&e" + NumberSuffix.format(totalXp)));
+                            newLore.add("");
+                        }
+                    } else {
+                        newLore.addAll(SUtil.colorize("&eRight-click to add this pet to", "&eYour pet menu!"));
+                        newLore.add("");
+                    }
+                }
+
+
                 String s = NBTUtil.getString(stack, "RARITY");
                 Rarity rarity;
                 if (!s.equals("")) {
@@ -285,7 +320,9 @@ public class SBItemStack extends ItemStack {
                     if(ChatColor.stripColor(meta.getDisplayName())==null || ChatColor.stripColor(meta.getDisplayName()).isEmpty()) {
                         stack = NBTUtil.setString(stack,"null","item-name");
                     } else {
-                        stack = NBTUtil.setString(stack,ChatColor.stripColor(meta.getDisplayName()),"item-name");
+                        if(NBTUtil.getString(stack,"item-name").isEmpty()||NBTUtil.getString(stack,"item-name")==null) {
+                            stack = NBTUtil.setString(stack,meta.getDisplayName(),"item-name");
+                        }
                     }
 
                 }
@@ -301,7 +338,7 @@ public class SBItemStack extends ItemStack {
                     builder.append(" ");
                 }
                 meta = stack.getItemMeta();
-                meta.setDisplayName(builder.toString() + rarity.getColor() + NBTUtil.getString(stack,"item-name"));
+                meta.setDisplayName(builder.toString() + rarity.getColor() + SUtil.colorize(NBTUtil.getString(stack,"item-name")));
                 meta.setLore(newLore);
                 stack.setItemMeta(meta);
                 return stack;
@@ -713,7 +750,7 @@ public class SBItemStack extends ItemStack {
         ItemMeta meta = stack.getItemMeta();
         meta.setDisplayName(SUtil.colorize(name));
         stack.setItemMeta(meta);
-        stack = setString(stack,ChatColor.stripColor(SUtil.colorize(name)),"item-name");
+        stack = setString(stack,SUtil.colorize(name),"item-name");
         return stack;
     }
 
@@ -751,5 +788,14 @@ public class SBItemStack extends ItemStack {
 
     public void setDurability(ItemStack item, int durability) {
         item.setDurability((short) durability);
+    }
+
+    public String getProgressBar(int current, int max, int totalBars, char symbol, ChatColor completedColor,
+                                 ChatColor notCompletedColor) {
+        float percent = (float) current / max;
+        int progressBars = (int) (totalBars * percent);
+
+        return Strings.repeat("" + completedColor + symbol, progressBars)
+                + Strings.repeat("" + notCompletedColor + symbol, totalBars - progressBars);
     }
 }

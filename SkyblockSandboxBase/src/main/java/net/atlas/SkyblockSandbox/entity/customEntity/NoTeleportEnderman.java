@@ -194,7 +194,7 @@ public class NoTeleportEnderman extends EntityEnderman {
 
     @Override
     protected Item getLoot() {
-        return Items.SNOWBALL;
+        return null;
     }
 
     @Override

@@ -70,6 +70,6 @@ public class SkillXPGainListener extends SkyblockListener<SkillEXPGainEvent> {
             }
         }
 
-        prevSkillEvent.put(p.getUniqueId(),event);
+        p.queueMiddleActionText(p,SUtil.colorize(" &3+" + event.getExpAmt() + " " + event.getSkill().getName() + " (" + p.getCurrentSkillExp(event.getSkill()) + "/" + event.getSkill().getTotalXP() + ")"),20L);
     }
 }

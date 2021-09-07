@@ -1,7 +1,8 @@
-package net.atlas.SkyblockSandbox.gui.guis;
+package net.atlas.SkyblockSandbox.gui.guis.skyblockmenu;
 
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
+import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.text.DecimalFormat;
@@ -19,6 +20,9 @@ public class SBMenu extends NormalGUI {
 
     @Override
     public boolean setClickActions() {
+        setAction(29,event -> {
+            new PetsMenu(getOwner()).open();
+        });
         return true;
     }
 
@@ -46,6 +50,7 @@ public class SBMenu extends NormalGUI {
                         "&bIntelligence &r" + format.format(owner.getMaxStat(SBPlayer.PlayerStat.INTELLIGENCE)),
                         "&eBonus Attack Speed &r" + format.format(owner.getMaxStat(SBPlayer.PlayerStat.ATTACK_SPEED)) + "%",
                         "&cFerocity &r" + format.format(owner.getMaxStat(SBPlayer.PlayerStat.FEROCITY)))));
+        setItem(29,makeColorfulItem(Material.BONE,"&aPets",1,0,"","&eClick to open the pets menu!"));
     }
 
 }

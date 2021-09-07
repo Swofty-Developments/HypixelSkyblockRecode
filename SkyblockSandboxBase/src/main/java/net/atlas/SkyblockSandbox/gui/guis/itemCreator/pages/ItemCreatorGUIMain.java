@@ -5,6 +5,7 @@ import net.atlas.SkyblockSandbox.gui.AnvilGUI;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.AbilityEditorGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
+import net.atlas.SkyblockSandbox.player.pets.PetBuilder;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import org.bukkit.ChatColor;
@@ -54,7 +55,7 @@ public class ItemCreatorGUIMain extends NormalGUI {
 
                     meta.setDisplayName(SUtil.colorize(event1.getName()));
                     player.getItemInHand().setItemMeta(meta);
-                    ItemStack i = NBTUtil.setString(player.getItemInHand(),ChatColor.stripColor(SUtil.colorize(event1.getName())),"item-name");
+                    ItemStack i = NBTUtil.setString(player.getItemInHand(),SUtil.colorize(event1.getName()),"item-name");
                     player.setItemInHand(i);
 
                     new BukkitRunnable() {
@@ -111,6 +112,9 @@ public class ItemCreatorGUIMain extends NormalGUI {
                 player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1f, 0f);
             }
         });
+        setAction(21,event -> {
+            new PetBuilderGUI(getOwner()).open();
+        });
         return true;
     }
 
@@ -136,6 +140,7 @@ public class ItemCreatorGUIMain extends NormalGUI {
         setItem(14, makeColorfulItem(Material.GOLDEN_APPLE, "§aEdit Item Stats", 1, 0, SUtil.colorize("&7Edit the stats the item has!", "&7Including Defense, Health, and Intelligence!", "", "&eClick to edit!")));
         setItem(12, makeColorfulItem(Material.PAINTING, "§aSet item Rarity", 1, 0, SUtil.colorize("&7Set the rarity of your item", "&7you can choose anything", "&7between: &fCommon&7, &aUncommon", "&9Rare&7, &5Epic&7, &6Legendary&7,", "&dMythic&7, &cSpecial&7.", "", "§cNote: The last line of", "§clore in your item will", "§cturn into the rarity name.", "", "&eClick to set!")));
         setItem(15, makeColorfulItem(Material.GLOWSTONE_DUST, "§aSet item ability", 1, 0, SUtil.colorize("&7Create your own custom ability!", "&7Using the Base Abilites or", "&7the Advanced functions!", "", "&eClick to create!")));
+        setItem(21,makeColorfulItem(Material.BARRIER,"&aPet Builder",1,0,SUtil.colorize("&7Create your own custom pet!","","&eClick to create!")));
         setItem(22, makeColorfulItem(Material.ENCHANTED_BOOK, "§aEdit Item Tags", 1, 0, SUtil.colorize("&7Edit the tags the item has!", "&7Including Unbreakable, Enchant tag,", "&7Glowing tag, and the Damage Tag!", "", "&eClick to edit!")));
         setItem(11, makeColorfulItem(Material.INK_SACK, "§aSet item color", 1, 5, SUtil.colorize("&7Edit the color of the item!", "&7you can change any item", "&7from: &aWool &7, &aStained_Clay &7, ", "&aStained_Glass_Panes &7, &aStained_Glass  ", "&7or &aINK_SACK(DYES)")));
 

@@ -17,10 +17,12 @@ import net.atlas.SkyblockSandbox.playerIsland.PlayerIslandHandler;
 import net.atlas.SkyblockSandbox.sound.Jingle;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.SUtil;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.util.*;
@@ -30,6 +32,8 @@ import static net.atlas.SkyblockSandbox.listener.sbEvents.PlayerJoin.maxStats;
 import static net.atlas.SkyblockSandbox.listener.sbEvents.PlayerJoin.bonusStats;
 import static net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat.HEALTH;
 import static net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat.INTELLIGENCE;
+import static net.atlas.SkyblockSandbox.util.StackUtils.makeColorfulItem;
+import static net.atlas.SkyblockSandbox.util.StackUtils.makeColorfulSkullItem;
 
 
 @Setter
@@ -159,8 +163,11 @@ public class SBPlayer extends PluginPlayer {
             } else {
                 newRng = (40-0);
             }
-            newHealth = Math.floor(((sbPlayer.getStat(SBPlayer.PlayerStat.HEALTH) - 0) * newRng) / oldrng);
-            sbPlayer.setHealth(Math.floor(newHealth));
+            newHealth = Math.ceil(((sbPlayer.getStat(SBPlayer.PlayerStat.HEALTH) - 0) * newRng) / oldrng);
+            if(newHealth> sbPlayer.getMaxHealth()) {
+                newHealth = sbPlayer.getMaxHealth();
+            }
+            sbPlayer.setHealth(Math.ceil(newHealth));
         }
         //maxStats.put(sbPlayer.getUniqueId(),map);
     }
@@ -194,12 +201,24 @@ public class SBPlayer extends PluginPlayer {
         }
     }
 
-    public void queueMiddleActionText(SBPlayer p,String s) {
+    public void queueMiddleActionText(SBPlayer p,String s,long timeInTicks) {
         s = SUtil.colorize(s);
         if(queuedBarMessages.containsKey(p.getUniqueId())) {
-            List<String> temp = new ArrayList<>(queuedBarMessages.get(p.getUniqueId()));
-            temp.add(s);
+            LinkedHashMap<String,Long> temp = new LinkedHashMap<>(queuedBarMessages.get(p.getUniqueId()));
+            temp.put(s,timeInTicks);
             queuedBarMessages.put(p.getUniqueId(),temp);
+            String finalS = s;
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    LinkedHashMap<String,Long> temp = new LinkedHashMap<>(queuedBarMessages.get(p.getUniqueId()));
+                    temp.remove(finalS);
+                    queuedBarMessages.put(p.getUniqueId(),temp);
+                }
+            }.runTaskLater(SBX.getInstance(),timeInTicks);
+        } else {
+            LinkedHashMap<String,Long> map = new LinkedHashMap<>();
+            queuedBarMessages.put(p.getUniqueId(),map);
         }
     }
 
@@ -264,25 +283,38 @@ public class SBPlayer extends PluginPlayer {
     }
 
     public enum PlayerStat {
-        HEALTH("health", 100, true),
-        DAMAGE("damage", 0, false),
-        STRENGTH("strength", 0, false),
-        INTELLIGENCE("intelligence", 100, true),
-        DEFENSE("defense", 0, false),
-        CRIT_DAMAGE("crit_damage", 50, false),
-        SPEED("speed", 100, false),
-        FEROCITY("ferocity", 0, false),
-        ATTACK_SPEED("attack_speed", 0, false),
-        CRIT_CHANCE("crit_chance", 30, false);
+        HEALTH("health", 100, true,makeColorfulItem(Material.GOLDEN_APPLE,"&cHealth",1,0,"")),
+        DEFENSE("defense", 0, false,makeColorfulItem(Material.IRON_CHESTPLATE,"&aDefense",1,0,"")),
+        STRENGTH("strength", 0, false,makeColorfulItem(Material.BLAZE_POWDER,"&cStrength",1,0,"")),
+        SPEED("speed", 100, false,makeColorfulItem(Material.SUGAR,"&rSpeed",1,0,"")),
+        CRIT_CHANCE("crit_chance", 30, false,makeColorfulSkullItem("&9Crit Chance","http://textures.minecraft.net/texture/3e4f49535a276aacc4dc84133bfe81be5f2a4799a4c04d9a4ddb72d819ec2b2b",1,"")),
+        CRIT_DAMAGE("crit_damage", 50, false,makeColorfulSkullItem("&9Crit Damage","http://textures.minecraft.net/texture/ddafb23efc57f251878e5328d11cb0eef87b79c87b254a7ec72296f9363ef7c",1,"")),
+        INTELLIGENCE("intelligence", 100, true,makeColorfulItem(Material.ENCHANTED_BOOK,"&bIntelligence",1,0,"")),
+        MINING_SPEED("mining_speed",0,false,makeColorfulItem(Material.DIAMOND_PICKAXE,"&6Mining Speed",1,0,"")),
+        ATTACK_SPEED("attack_speed", 0, false,makeColorfulItem(Material.GOLD_AXE,"&eAttack Speed",1,0,"")),
+        SEA_CREATURE_CHANCE("sea_creature_chance",0,false,makeColorfulItem(Material.PRISMARINE_CRYSTALS,"&3Sea Creature Chance",1,0,"")),
+        MAGIC_FIND("magic_find",0,false,makeColorfulItem(Material.STICK,"&bMagic Find",1,0,"")),
+        PET_LUCK("pet_luck",0,false,makeColorfulSkullItem("&dPet Luck","http://textures.minecraft.net/texture/93c8aa3fde295fa9f9c27f734bdbab11d33a2e43e855accd7465352377413b",1,"")),
+        TRUE_DEFENSE("true_defense",0,false,makeColorfulItem(Material.INK_SACK,"&rTrue Defense",1, 15,"")),
+        FEROCITY("ferocity", 0, false,makeColorfulItem(Material.INK_SACK,"&cFerocity",1,1,"")),
+        ABILITY_DAMAGE("ability_damage",0,false,makeColorfulItem(Material.BEACON,"&cAbility Damage",1,0,"")),
+        MINING_FORTUNE("mining_fortune",0,false,makeColorfulSkullItem("&6Mining Fortune","http://textures.minecraft.net/texture/f07dff657d61f302c7d2e725265d17b64aa73642391964fb48fc15be950831d8",1,"")),
+        FARMING_FORTUNE("farming_fortune",0,false,makeColorfulSkullItem("&6Farming Fortune","http://textures.minecraft.net/texture/2ab879e1e590041146bc78c018af5877d39e5475eb7db368fcaf2acda373833d",1,"")),
+        FORAGING_FORTUNE("foraging_fortune",0,false,makeColorfulSkullItem("&6Foraging Fortune","http://textures.minecraft.net/texture/4f960c639d4004d1882575aeba69f456fb3c744077935714947e19c1306d2733", 1,"")),
+        PRISTINE("pristine",0,false,makeColorfulSkullItem("&5Pristine","http://textures.minecraft.net/texture/db6975af70724d6a44fd5946e60b2717737dfdb545b4dab1893351a9c9dd183c",1, "")),
+        DAMAGE("damage", 0, false,makeColorfulItem(Material.IRON_SWORD,"&cDamage",1,0,""));
+
 
         private String name;
         private double base;
         private boolean isRegen;
+        private ItemStack stack;
 
-        PlayerStat(String name, double base, boolean isRegen) {
+        PlayerStat(String name, double base, boolean isRegen,ItemStack stack) {
             this.name = name;
             this.base = base;
             this.isRegen = isRegen;
+            this.stack = stack;
         }
 
         public double getBase() {
@@ -291,6 +323,10 @@ public class SBPlayer extends PluginPlayer {
 
         public boolean isRegen() {
             return isRegen;
+        }
+
+        public ItemStack getStack() {
+            return stack;
         }
     }
 

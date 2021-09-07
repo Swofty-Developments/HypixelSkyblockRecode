@@ -2,8 +2,13 @@ package net.atlas.SkyblockSandbox.util;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import com.sk89q.worldedit.blocks.SkullBlock;
+import dev.triumphteam.gui.builder.item.ItemBuilder;
+import dev.triumphteam.gui.builder.item.SkullBuilder;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -12,14 +17,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class StackUtils {
 
     public static String textureFromSkullMeta(SkullMeta skullMeta, ItemStack item) {
-        if(item.getType().equals(Material.SKULL_ITEM) || item.getType().equals(Material.SKULL))
+        if (item.getType().equals(Material.SKULL_ITEM) || item.getType().equals(Material.SKULL))
             new NullPointerException("That is not a skull!");
 
         Field profileField = null;
@@ -29,13 +32,13 @@ public class StackUtils {
                 profileField.setAccessible(true);
                 GameProfile profile = (GameProfile) profileField.get(skullMeta);
                 Collection<Property> textures = profile.getProperties().get("textures");
-                for(Property property : textures) {
+                for (Property property : textures) {
                     return property.getValue();
                 }
             } catch (NoSuchFieldException e) {
                 e.printStackTrace();
             }
-        }catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
         return null;
@@ -72,7 +75,7 @@ public class StackUtils {
         meta.setDisplayName(SUtil.colorize(displayName));
         meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 
-        if(glowing) {
+        if (glowing) {
             meta.addEnchant(Enchantment.LUCK, 1, false);
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
@@ -98,13 +101,22 @@ public class StackUtils {
     }
 
     public static ItemStack makeColorfulSkullItem(String displayname, String owner, int amount, String lore) {
-        ItemStack item = new ItemStack(Material.SKULL_ITEM, amount, (short) 3);
+        ItemStack item = new ItemStack(Material.SKULL_ITEM, amount, (byte) 3);
+
         SkullMeta meta = (SkullMeta) item.getItemMeta();
-        if(Bukkit.getPlayer(owner)!=null && Bukkit.getPlayer(owner).isValid()) {
+        if (Bukkit.getPlayer(owner) != null && Bukkit.getPlayer(owner).isValid()) {
             meta.setOwner(owner);
         } else {
             SBItemStack i = new SBItemStack(item);
-            item = i.applyTexture(item,owner);
+            List<Component> lore2 = new ArrayList<>();
+            String[] loreArr = lore.split("\n");
+            for(String s:loreArr) {
+                lore2.add(Component.text(SUtil.colorize(s)));
+            }
+
+            owner = new String(Base64.getEncoder().encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", owner).getBytes()));
+            item = ItemBuilder.skull(item).texture(owner).name(Component.text(SUtil.colorize(displayname))).amount(amount).lore(lore2).build();
+            return item;
         }
         String[] lore1 = lore.split("\n");
         meta.setLore(SUtil.colorize(Arrays.asList(lore1)));
@@ -115,13 +127,20 @@ public class StackUtils {
     }
 
     public static ItemStack makeColorfulSkullItem(String displayname, String owner, int amount, List<String> lore) {
-        ItemStack item = new ItemStack(Material.SKULL_ITEM, amount, (short) 3);
+        ItemStack item = new ItemStack(Material.SKULL_ITEM, amount, (byte) 3);
         SkullMeta meta = (SkullMeta) item.getItemMeta();
-        if(Bukkit.getPlayer(owner)!=null && Bukkit.getPlayer(owner).isValid()) {
+        if (Bukkit.getPlayer(owner) != null && Bukkit.getPlayer(owner).isValid()) {
             meta.setOwner(owner);
         } else {
             SBItemStack i = new SBItemStack(item);
-            item = i.applyTexture(item,owner);
+            List<Component> lore2 = new ArrayList<>();
+            for(String s:lore) {
+                lore2.add(Component.text(SUtil.colorize(s)));
+            }
+
+            owner = new String(Base64.getEncoder().encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", owner).getBytes()));
+            item = ItemBuilder.skull(item).texture(owner).name(Component.text(SUtil.colorize(displayname))).amount(amount).lore(lore2).build();
+            return item;
         }
         meta.setLore(SUtil.colorize(lore));
         meta.setDisplayName(SUtil.colorize(displayname));
@@ -131,18 +150,55 @@ public class StackUtils {
     }
 
     public static ItemStack makeColorfulSkullItem(String displayname, String owner, int amount, String... lore) {
-        ItemStack item = new ItemStack(Material.SKULL_ITEM, amount, (short) 3);
+        ItemStack item = new ItemStack(Material.SKULL_ITEM, amount, (byte) 3);
         SkullMeta meta = (SkullMeta) item.getItemMeta();
-        if(Bukkit.getPlayer(owner)!=null && Bukkit.getPlayer(owner).isValid()) {
+        if (Bukkit.getPlayer(owner) != null && Bukkit.getPlayer(owner).isValid()) {
             meta.setOwner(owner);
         } else {
             SBItemStack i = new SBItemStack(item);
-            item = i.applyTexture(item,owner);
+            List<Component> lore2 = new ArrayList<>();
+            for(String s:lore) {
+                lore2.add(Component.text(SUtil.colorize(s)));
+            }
+
+            owner = new String(Base64.getEncoder().encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", owner).getBytes()));
+            item = ItemBuilder.skull(item).texture(owner).name(Component.text(SUtil.colorize(displayname))).amount(amount).lore(lore2).build();
+            return item;
         }
         meta.setLore(SUtil.colorize(lore));
         meta.setDisplayName(SUtil.colorize(displayname));
         item.setItemMeta(meta);
 
         return item;
+    }
+    public static List<String> stringToLore(String string, int characterLimit, ChatColor prefixColor) {
+        String[] words = string.split(" ");
+        List<String> lines = new ArrayList();
+        StringBuilder currentLine = new StringBuilder();
+        String[] var6 = words;
+        int var7 = words.length;
+
+        for(int var8 = 0; var8 < var7; ++var8) {
+            String word = var6[var8];
+            if (!word.equals("/newline")) {
+                if (currentLine.toString().equals("")) {
+                    currentLine = new StringBuilder(word);
+                } else {
+                    currentLine.append(" ").append(word);
+                }
+            }
+
+            if (word.equals("/newline") || currentLine.length() + word.length() >= characterLimit) {
+                String newLine = currentLine.toString();
+                lines.add("" + prefixColor + newLine);
+                currentLine = new StringBuilder();
+            }
+        }
+
+        if (currentLine.length() > 0) {
+            lines.add("" + prefixColor + currentLine);
+        }
+
+        return lines;
     }
 }

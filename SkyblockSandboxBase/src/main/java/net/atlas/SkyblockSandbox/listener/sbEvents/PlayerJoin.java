@@ -4,8 +4,14 @@ import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
+import net.atlas.SkyblockSandbox.playerIsland.Data;
+import net.atlas.SkyblockSandbox.playerIsland.IslandId;
 import net.atlas.SkyblockSandbox.scoreboard.DragonScoreboard;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
+import net.atlas.SkyblockSandbox.util.SUtil;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 
@@ -24,6 +30,22 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
     public void callEvent(PlayerJoinEvent event) {
 
         SBPlayer p = new SBPlayer(event.getPlayer());
+        System.out.println(p.getServer().getName());
+        if(p.getServer().getServerName().equalsIgnoreCase("islands")) {
+            if(p.hasIsland()) {
+                Location teleLoc = p.getPlayerIsland().getCenter();
+                while (teleLoc.getBlock().getType()!= Material.AIR) {
+                    teleLoc.add(0,1,0);
+                }
+                p.teleport(teleLoc);
+            } else {
+                try {
+                    Data.createIsland(p.getPlayer(), IslandId.randomIslandId());
+                } catch (Exception ex) {
+                    p.sendMessage(SUtil.colorize("&cFailed to create island. Please contact a server administrator if this issue persists."));
+                }
+            }
+        }
         HashMap<SBPlayer.PlayerStat,Double> maxStat = new HashMap<>();
         HashMap<SBPlayer.PlayerStat,Double> empty = new HashMap<>();
         for (SBPlayer.PlayerStat s : SBPlayer.PlayerStat.values()) {

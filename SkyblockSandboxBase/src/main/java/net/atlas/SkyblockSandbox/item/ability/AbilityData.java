@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class AbilityData {
@@ -115,6 +116,33 @@ public class AbilityData {
 
         return NBTUtil.setInteger(CraftItemStack.asBukkitCopy(nmsItem), 1, "hasAbility");
     }
+    public static ItemStack setFunctionData(ItemStack item, int index, String type, int count, Object data) {
+        if(index > 5)
+            throw new NullPointerException("Ability index can't be higher than 5!");
+        if(count > 5)
+            throw new NullPointerException("Function count can't be higher than 3!");
+
+        net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+        NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+        NBTTagCompound attributes = (tag.getCompound("ExtraAttributes") != null ? tag.getCompound("ExtraAttributes") : new NBTTagCompound());
+        NBTTagCompound ability = (attributes.getCompound("Abilities") != null ? attributes.getCompound("Abilities") : new NBTTagCompound());
+        NBTTagCompound abilitySlot = (ability.getCompound("Ability_" + index) != null ? ability.getCompound("Ability_" + index) : new NBTTagCompound());
+        NBTTagCompound function = (abilitySlot.getCompound("Functions") != null ? abilitySlot.getCompound("Functions") : new NBTTagCompound());
+        NBTTagCompound functionSlot = (function.getCompound("Function_" + count) != null ? function.getCompound("Function_" + count) : new NBTTagCompound());
+
+        functionSlot.setString(type, data.toString());
+        function.set("Function_" + count, functionSlot);
+        functionSlot.setString("id", UUID.randomUUID().toString());
+        abilitySlot.setString("id", UUID.randomUUID().toString());
+
+        abilitySlot.set("Functions", function);
+        ability.set("Ability_" + index, abilitySlot);
+        attributes.set("Abilities", ability);
+        tag.set("ExtraAttributes", attributes);
+        nmsItem.setTag(tag);
+
+        return NBTUtil.setInteger(CraftItemStack.asBukkitCopy(nmsItem), 1, "hasAbility");
+    }
 
     public static Object retrieveFunctionData(EnumFunctionsData dataType, ItemStack item, int index, int count) {
         if(index > 5)
@@ -131,6 +159,37 @@ public class AbilityData {
         NBTTagCompound functionSlot = (function.getCompound("Function_" + count) != null ? function.getCompound("Function_" + count) : new NBTTagCompound());
 
         return "" + functionSlot.getString(dataType.getA());
+    }
+    public static Object retrieveFunctionData(String type, ItemStack item, int index, int count) {
+        if(index > 5)
+            throw new NullPointerException("Ability index can't be higher than 5!");
+        if(count > 5)
+            throw new NullPointerException("Ability Function can't be more than 3!");
+
+        net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+        NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+        NBTTagCompound attributes = (tag.getCompound("ExtraAttributes") != null ? tag.getCompound("ExtraAttributes") : new NBTTagCompound());
+        NBTTagCompound ability = (attributes.getCompound("Abilities") != null ? attributes.getCompound("Abilities") : new NBTTagCompound());
+        NBTTagCompound abilitySlot = (ability.getCompound("Ability_" + index) != null ? ability.getCompound("Ability_" + index) : new NBTTagCompound());
+        NBTTagCompound function = (abilitySlot.getCompound("Functions") != null ? abilitySlot.getCompound("Functions") : new NBTTagCompound());
+        NBTTagCompound functionSlot = (function.getCompound("Function_" + count) != null ? function.getCompound("Function_" + count) : new NBTTagCompound());
+
+        return "" + functionSlot.getString(type);
+    }
+    public static Set<String> listFunctionData(ItemStack item, int index, int count) {
+        if(index > 5)
+            throw new NullPointerException("Ability index can't be higher than 5!");
+        if(count > 5)
+            throw new NullPointerException("Ability Function can't be more than 3!");
+
+        net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+        NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+        NBTTagCompound attributes = (tag.getCompound("ExtraAttributes") != null ? tag.getCompound("ExtraAttributes") : new NBTTagCompound());
+        NBTTagCompound ability = (attributes.getCompound("Abilities") != null ? attributes.getCompound("Abilities") : new NBTTagCompound());
+        NBTTagCompound abilitySlot = (ability.getCompound("Ability_" + index) != null ? ability.getCompound("Ability_" + index) : new NBTTagCompound());
+        NBTTagCompound function = (abilitySlot.getCompound("Functions") != null ? abilitySlot.getCompound("Functions") : new NBTTagCompound());
+        NBTTagCompound functionSlot = (function.getCompound("Function_" + count) != null ? function.getCompound("Function_" + count) : new NBTTagCompound());
+        return functionSlot.c();
     }
 
     public static boolean hasFunctionData(ItemStack item, int index, int count, EnumFunctionsData type) {
@@ -173,6 +232,23 @@ public class AbilityData {
     }
 
     public static ItemStack removeFunction(ItemStack item, int index, int count, Player player) {
+        if(index > 5)
+            throw new NullPointerException("Ability index can't be higher than 5!");
+        net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+        NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+        NBTTagCompound attributes = (tag.getCompound("ExtraAttributes") != null ? tag.getCompound("ExtraAttributes") : new NBTTagCompound());
+        NBTTagCompound ability = (attributes.getCompound("Abilities") != null ? attributes.getCompound("Abilities") : new NBTTagCompound());
+        NBTTagCompound abilitySlot = (ability.getCompound("Ability_" + index) != null ? ability.getCompound("Ability_" + index) : new NBTTagCompound());
+        NBTTagCompound function = (abilitySlot.getCompound("Functions") != null ? abilitySlot.getCompound("Functions") : new NBTTagCompound());
+        function.remove("Function_" + count);
+
+        attributes.set("Abilities", ability);
+        tag.set("ExtraAttributes", attributes);
+        nmsItem.setTag(tag);
+
+        return CraftItemStack.asBukkitCopy(nmsItem);
+    }
+    public static ItemStack removeFunction(ItemStack item, int index, int count) {
         if(index > 5)
             throw new NullPointerException("Ability index can't be higher than 5!");
         net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);

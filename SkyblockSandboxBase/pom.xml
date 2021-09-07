@@ -42,7 +42,7 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <outputFile>${user.home}\Desktop\Plugin\.notbungee\plugins\${project.artifactId}-${project.version}.jar</outputFile>
+                            <outputFile>${user.home}\Desktop\Bungee Server\Servers\hub\plugins\${project.artifactId}-${project.version}.jar</outputFile>
                         </configuration>
                     </execution>
                     <execution>
@@ -68,6 +68,10 @@
     </build>
 
     <repositories>
+            <repository>
+                <id>jitpack.io</id>
+                <url>https://jitpack.io</url>
+            </repository>
         <repository>
             <id>dmulloy2-repo</id>
             <url>https://repo.dmulloy2.net/repository/public/</url>
@@ -230,6 +234,12 @@
             <groupId>dev.triumphteam</groupId>
             <artifactId>triumph-gui</artifactId>
             <version>3.0.3</version> <!-- replace version here -->
+        </dependency>
+        <dependency>
+            <groupId>com.github.koca2000</groupId>
+            <artifactId>NoteBlockAPI</artifactId>
+            <version>-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

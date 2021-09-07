@@ -2,11 +2,15 @@ package net.atlas.SkyblockSandbox.util;
 
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
+import net.atlas.SkyblockSandbox.player.pets.PetPerk;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 public class NBTUtil {
 
@@ -66,6 +70,39 @@ public class NBTUtil {
             }
         }
         return "";
+    }
+
+    public static List<String> getPetPerkDescription(ItemStack host, int index) {
+        if (host != null) {
+            net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(host);
+            NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+            NBTTagCompound data = tag.getCompound("ExtraAttributes");
+            NBTTagCompound perkData = data.getCompound("perk_" + index);
+            if(perkData!=null) {
+                NBTTagCompound description = perkData.getCompound("description");
+                Set<String> desc = description.c();
+                ArrayList<String> descList = new ArrayList<>();
+                for (int i = 0; i < desc.size(); i++) {
+                    descList.add(description.getString(String.valueOf(i)));
+                }
+                return descList;
+            }
+        }
+        return null;
+    }
+
+    public static String getPerkName(ItemStack host, int index) {
+        if (host != null) {
+            net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(host);
+            NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+            NBTTagCompound data = tag.getCompound("ExtraAttributes");
+            NBTTagCompound perkData = data.getCompound("perk_" + index);
+            if(perkData!=null) {
+                String name = perkData.getString("name");
+                return name;
+            }
+        }
+        return null;
     }
 
     public static Integer getInteger(ItemStack item, String key) {
