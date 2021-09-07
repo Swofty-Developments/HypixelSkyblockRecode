@@ -5,7 +5,8 @@ import net.atlas.SkyblockSandbox.player.SBPlayer;
 
 import java.util.*;
 
-public class StorageCache {
+public class StorageCache
+{
 	private final static Map<UUID, String> ENDER_CHEST_PAGE_1 = new HashMap<>();
 	private final static Map<UUID, String> ENDER_CHEST_PAGE_2 = new HashMap<>();
 	private final static Map<UUID, String> ENDER_CHEST_PAGE_3 = new HashMap<>();

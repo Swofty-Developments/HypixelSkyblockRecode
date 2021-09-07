@@ -8,7 +8,6 @@ import net.atlas.SkyblockSandbox.item.ability.EnumAbilityData;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.NumUtils;
 import net.atlas.SkyblockSandbox.util.SUtil;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import org.bukkit.Bukkit;

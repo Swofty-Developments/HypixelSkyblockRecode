@@ -9,7 +9,6 @@ import net.atlas.SkyblockSandbox.playerIsland.IslandId;
 import net.atlas.SkyblockSandbox.scoreboard.DragonScoreboard;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.SUtil;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
