@@ -1,10 +1,14 @@
 package net.atlas.SkyblockSandbox.gui.guis.storage;
 
+import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.storage.StorageCache;
 import net.atlas.SkyblockSandbox.util.BukkitSerilization;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -24,7 +28,14 @@ public class EnderChestPage extends NormalGUI
 	@Override
 	public void handleMenu(InventoryClickEvent event)
 	{
+		if (event.getSlot() < 9 && event.getCurrentItem().getType() == Material.STAINED_GLASS_PANE)
+			event.setCancelled(true);
 
+		if (event.getSlot() == 0 && event.getCurrentItem().getType() == Material.ARROW)
+		{
+			event.setCancelled(true);
+			Bukkit.getScheduler().scheduleSyncDelayedTask(SBX.getInstance(), () -> new StorageGUI(getOwner()).open(), 3);
+		}
 	}
 
 	@Override
@@ -68,5 +79,12 @@ public class EnderChestPage extends NormalGUI
 
 		if (!contents.isEmpty())
 			setContents(contents.toArray(new ItemStack[0]));
+
+		for (int i = 0; i < 9; i++)
+		{
+			setItem(i, FILLER_GLASS);
+		}
+
+		setItem(0, makeColorfulItem(Material.ARROW, "&eBack", 1, 0, "&7Click to go back."));
 	}
 }
