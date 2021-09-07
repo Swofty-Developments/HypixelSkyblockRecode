@@ -45,6 +45,17 @@
                             <outputFile>${user.home}\Desktop\Bungee Server\Servers\hub\plugins\${project.artifactId}-${project.version}.jar</outputFile>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>ex-2</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <outputFile>${user.home}\Desktop\Plugin\Bungee\islands\plugins\${project.artifactId}-${project.version}.jar</outputFile>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
@@ -110,9 +121,23 @@
             <id>repo</id>
             <url>https://repo.mattstudios.me/artifactory/public/</url>
         </repository>
+        <repository>
+            <id>glaremasters</id>
+            <url>https://repo.glaremasters.me/repository/concuncan/</url>
+        </repository>
+        <repository>
+            <id>OnARandomBox</id>
+            <url>http://repo.onarandombox.com/content/groups/public/</url>
+        </repository>
+        <repository> <id>jitpack.io</id> <url>https://jitpack.io</url> </repository>
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>com.github.koca2000</groupId>
+            <artifactId>NoteBlockAPI</artifactId>
+            <version>1.4.4</version>
+        </dependency>
         <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
