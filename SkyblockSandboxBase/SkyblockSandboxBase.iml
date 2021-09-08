@@ -6,7 +6,6 @@
         <autoDetectTypes>
           <platformType>SPIGOT</platformType>
           <platformType>ADVENTURE</platformType>
-          <platformType>BUKKIT</platformType>
         </autoDetectTypes>
       </configuration>
     </facet>
@@ -21,6 +20,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.github.koca2000:NoteBlockAPI:1.4.4" level="project" />
     <orderEntry type="library" name="Maven: org.reflections:reflections:0.9.9" level="project" />
     <orderEntry type="library" name="Maven: com.google.guava:guava:15.0" level="project" />
     <orderEntry type="library" name="Maven: org.javassist:javassist:3.18.2-GA" level="project" />
@@ -54,11 +54,11 @@
     <orderEntry type="library" name="Maven: net.kyori:adventure-platform-bukkit:4.0.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: net.kyori:adventure-platform-api:4.0.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: net.kyori:adventure-text-serializer-craftbukkit:4.0.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:adventure-text-serializer-gson-legacy-impl:4.8.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:adventure-text-serializer-gson-legacy-impl:4.9.1" level="project" />
     <orderEntry type="library" name="Maven: net.kyori:adventure-text-serializer-bungeecord:4.0.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: net.kyori:adventure-text-serializer-legacy:4.8.1" level="project" />
-    <orderEntry type="library" name="Maven: net.kyori:adventure-nbt:4.8.1" level="project" />
-    <orderEntry type="library" name="Maven: net.kyori:adventure-text-serializer-gson:4.8.1" level="project" />
+    <orderEntry type="library" name="Maven: net.kyori:adventure-text-serializer-legacy:4.9.1" level="project" />
+    <orderEntry type="library" name="Maven: net.kyori:adventure-nbt:4.9.1" level="project" />
+    <orderEntry type="library" name="Maven: net.kyori:adventure-text-serializer-gson:4.9.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:adventure-platform-facet:4.0.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:adventure-platform-viaversion:4.0.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: one.util:streamex:0.6.1" level="project" />
@@ -80,6 +80,5 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.sk89q:jchronic:0.2.4a" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: junit:junit:4.8.1" level="project" />
     <orderEntry type="library" name="Maven: dev.triumphteam:triumph-gui:3.0.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.github.koca2000:NoteBlockAPI:-29fdeeeb51-1" level="project" />
   </component>
 </module>

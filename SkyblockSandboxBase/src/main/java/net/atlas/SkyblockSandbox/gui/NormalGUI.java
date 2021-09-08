@@ -42,6 +42,17 @@ public abstract class NormalGUI extends SBGUI {
         gui.setItem(index, ItemBuilder.from(i).asGuiItem());
     }
 
+    public void setContents(ItemStack[] contents) {
+        for (int i = 0; i < contents.length; i++) {
+            if (contents[i] == null) {
+                setItem(i, new ItemStack(Material.AIR));
+                continue;
+            }
+
+            setItem(i, contents[i]);
+        }
+    }
+
     public void setItem(Gui gui,int index,ItemStack i) {
         gui.setItem(index, ItemBuilder.from(i).asGuiItem());
     }

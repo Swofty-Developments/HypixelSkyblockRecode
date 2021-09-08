@@ -21,12 +21,14 @@ import net.atlas.SkyblockSandbox.item.ability.itemAbilities.SoulCry;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.WitherImpact;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.listener.sbEvents.abilities.AbilityHandler;
-import net.atlas.SkyblockSandbox.database.mongo.MongoCoins;
+import net.atlas.SkyblockSandbox.mongo.MongoCoins;
+import net.atlas.SkyblockSandbox.mongo.MongoDB;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
 import net.atlas.SkyblockSandbox.playerIsland.Data;
 import net.atlas.SkyblockSandbox.slayer.SlayerTier;
 import net.atlas.SkyblockSandbox.slayer.Slayers;
+import net.atlas.SkyblockSandbox.storage.MongoStorage;
 import net.atlas.SkyblockSandbox.util.NumberTruncation.NumberSuffix;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import net.minecraft.server.v1_8_R3.EntityArmorStand;
@@ -74,6 +76,7 @@ public class SBX extends JavaPlugin {
     private static SBX instance;
     SkyblockCommandFramework framework;
     private static MongoCoins mongoStats;
+    public MongoDB mongoStorage;
     public Coins coins;
     public MySQL sql;
 
@@ -84,10 +87,12 @@ public class SBX extends JavaPlugin {
     public void onEnable() {
         getServer().getMessenger().registerOutgoingPluginChannel(this,"BungeeCord");
         instance = this;
+        mongoStorage = new MongoStorage();
         framework = new SkyblockCommandFramework(this);
         createDataFiles();
         mongoStats = new MongoCoins();
         mongoStats.connect();
+        mongoStorage.connect();
         coins = new Coins();
         sql = new MySQL();
         SQLBpCache.init();
@@ -139,6 +144,7 @@ public class SBX extends JavaPlugin {
         framework.registerCommands(new Command_warp(this));
         framework.registerCommands(new Command_importhead(this));
         framework.registerCommands(new Command_sbmenu(this));
+        framework.registerCommands(new Command_storage(this));
         framework.registerHelp();
     }
 
