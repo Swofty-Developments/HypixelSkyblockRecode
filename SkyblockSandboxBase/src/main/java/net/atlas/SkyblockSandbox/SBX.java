@@ -5,6 +5,9 @@ import net.atlas.SkyblockSandbox.command.abstraction.SBCommandArgs;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCompleter;
 import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
 import net.atlas.SkyblockSandbox.command.commands.*;
+import net.atlas.SkyblockSandbox.database.sql.BackpackData;
+import net.atlas.SkyblockSandbox.database.sql.MySQL;
+import net.atlas.SkyblockSandbox.database.sql.SQLBpCache;
 import net.atlas.SkyblockSandbox.economy.Coins;
 import net.atlas.SkyblockSandbox.entity.SkyblockEntity;
 import net.atlas.SkyblockSandbox.event.customEvents.ManaEvent;
@@ -18,7 +21,7 @@ import net.atlas.SkyblockSandbox.item.ability.itemAbilities.SoulCry;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.WitherImpact;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.listener.sbEvents.abilities.AbilityHandler;
-import net.atlas.SkyblockSandbox.mongo.MongoCoins;
+import net.atlas.SkyblockSandbox.database.mongo.MongoCoins;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
 import net.atlas.SkyblockSandbox.playerIsland.Data;
@@ -28,6 +31,7 @@ import net.atlas.SkyblockSandbox.util.NumberTruncation.NumberSuffix;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import net.minecraft.server.v1_8_R3.EntityArmorStand;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -71,6 +75,7 @@ public class SBX extends JavaPlugin {
     SkyblockCommandFramework framework;
     private static MongoCoins mongoStats;
     public Coins coins;
+    public MySQL sql;
 
     private File dragonDataFile;
     private FileConfiguration dragonData;
@@ -84,6 +89,8 @@ public class SBX extends JavaPlugin {
         mongoStats = new MongoCoins();
         mongoStats.connect();
         coins = new Coins();
+        sql = new MySQL();
+        SQLBpCache.init();
 
         Data.initialize();
         registerListeners();
@@ -96,6 +103,12 @@ public class SBX extends JavaPlugin {
 
         //registerEntity("Enderman", 58, EntityZombie.class, NoTeleportEnderman.class);
         SkyblockEntity.registerEntities();
+    }
+
+    @Override
+    public void onDisable() {
+        BackpackData.save();
+        getServer().getConsoleSender().sendMessage(SUtil.colorize("&cSkyblock Sandbox core was disabled. Please re-enable if you want the server to work."));
     }
 
 
@@ -238,12 +251,6 @@ public class SBX extends JavaPlugin {
                 middlemsg = s;
             }
         }
-        /*if (prevSkillEvent.containsKey(p.getUniqueId()) && cachedEvent.containsKey(p.getUniqueId())) {
-            if (prevSkillEvent.get(p.getUniqueId()) != null && cachedEvent.get(p.getUniqueId()) != prevSkillEvent.get(p.getUniqueId())) {
-                cachedEvent.put(p.getUniqueId(), prevSkillEvent.get(p.getUniqueId()));
-                middlemsg = SUtil.colorize(" &3+" + prevSkillEvent.get(p.getUniqueId()).getExpAmt() + " " + prevSkillEvent.get(p.getUniqueId()).getSkill().getName() + " (" + p.getCurrentSkillExp(prevSkillEvent.get(p.getUniqueId()).getSkill()) + "/" + prevSkillEvent.get(p.getUniqueId()).getSkill().getTotalXP() + ")");
-            }
-        }*/
         return SUtil.colorize("&c" + f.format(p.getStat(SBPlayer.PlayerStat.HEALTH)) + "/" + f.format(p.getMaxStat(SBPlayer.PlayerStat.HEALTH)) + "❤ Health " + middlemsg + " &b" + f.format(p.getStat(SBPlayer.PlayerStat.INTELLIGENCE)) + "/" + f.format(p.getMaxStat(SBPlayer.PlayerStat.INTELLIGENCE)) + "✎ Mana");
     }
 

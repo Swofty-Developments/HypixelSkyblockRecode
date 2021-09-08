@@ -4,6 +4,7 @@ import com.google.common.base.Enums;
 import com.google.common.base.Strings;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import dev.triumphteam.gui.builder.item.ItemBuilder;
 import net.atlas.SkyblockSandbox.item.ability.Ability;
 import net.atlas.SkyblockSandbox.item.ability.AbilityType;
 import net.atlas.SkyblockSandbox.item.ability.EnumAbilityData;
@@ -81,6 +82,12 @@ public class SBItemStack extends ItemStack {
         stack = setString(stack, this.itemID, "ID");
         applyTexture(stack, url);
 
+    }
+
+    public SBItemStack(ItemStack item, String itemID) {
+        this.stack = item;
+        itemID = itemID.toUpperCase().replace(' ', '_');
+        this.stack = setString(stack, itemID, "ID");
     }
 
     public SBItemStack(String name, String itemID, Material mat, int durability, boolean stackable, boolean reforgeable, String url, Rarity rarity, double damage, double strength, double intelligence, double ferocity, double crit_chance, double crit_damage, double health, double attack_speed, double defense) {
@@ -259,21 +266,32 @@ public class SBItemStack extends ItemStack {
 
 
                 //if pet set XP bar
+                StringBuilder petLvl = new StringBuilder();
                 if(Boolean.parseBoolean(NBTUtil.getString(stack,"is-pet"))) {
+                    petLvl.append(SUtil.colorize("&7[Lvl"));
+                    petLvl.append(NBTUtil.getInteger(stack, "pet-level"));
+                    petLvl.append("] ");
                     for(int b = 0;b<3;b++) {
                         List<String> perkDescript = NBTUtil.getPetPerkDescription(stack,b+1);
                         String perkName = NBTUtil.getPerkName(stack,b+1);
                         newLore.add(SUtil.colorize("&6" + ChatColor.stripColor(perkName)));
-                        newLore.addAll(perkDescript);
+                        if(!perkDescript.isEmpty()) {
+                            newLore.addAll(perkDescript);
+                            newLore.add("");
+                        }
                     }
 
                     if (Boolean.parseBoolean(NBTUtil.getString(stack, "is-equipped"))) {
                         int totalXp = petXP[NBTUtil.getInteger(stack, "pet-level")];
                         if (totalXp != 0) {
-                            int percent = NBTUtil.getInteger(stack, "pet-xp") * 100 / totalXp;
-                            double c = Math.round(percent * 10.0) / 10.0;
-                            newLore.add(SUtil.colorize("&7Progress to level " + (NBTUtil.getInteger(stack, "pet-level") + 1) + ": &e" + c + "%"));
-                            newLore.add(SUtil.colorize(getProgressBar(NBTUtil.getInteger(stack, "pet-xp"), totalXp, 20, '-', ChatColor.DARK_GREEN, ChatColor.WHITE) + " &e" + NBTUtil.getInteger(stack, "pet-xp") + "&6/&e" + NumberSuffix.format(totalXp)));
+                            if(NBTUtil.getInteger(stack, "pet-level")<100) {
+                                int percent = NBTUtil.getInteger(stack, "pet-xp") * 100 / totalXp;
+                                double c = Math.round(percent * 10.0) / 10.0;
+                                newLore.add(SUtil.colorize("&7Progress to level " + (NBTUtil.getInteger(stack, "pet-level") + 1) + ": &e" + c + "%"));
+                                newLore.add(SUtil.colorize(getProgressBar(NBTUtil.getInteger(stack, "pet-xp"), totalXp, 20, '-', ChatColor.DARK_GREEN, ChatColor.WHITE) + " &e" + NBTUtil.getInteger(stack, "pet-xp") + "&6/&e" + NumberSuffix.format(totalXp)));
+                            } else {
+                                newLore.add(SUtil.colorize("&b&lMAX LEVEL"));
+                            }
                             newLore.add("");
                         }
                     } else {
@@ -337,8 +355,9 @@ public class SBItemStack extends ItemStack {
                 if(starAmt!=0||masterStarAmt!=0) {
                     builder.append(" ");
                 }
+
                 meta = stack.getItemMeta();
-                meta.setDisplayName(builder.toString() + rarity.getColor() + SUtil.colorize(NBTUtil.getString(stack,"item-name")));
+                meta.setDisplayName(builder + petLvl.toString() + rarity.getColor() + SUtil.colorize(NBTUtil.getString(stack,"item-name")));
                 meta.setLore(newLore);
                 stack.setItemMeta(meta);
                 return stack;

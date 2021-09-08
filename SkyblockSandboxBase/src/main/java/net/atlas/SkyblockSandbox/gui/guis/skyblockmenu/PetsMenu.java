@@ -1,10 +1,9 @@
 package net.atlas.SkyblockSandbox.gui.guis.skyblockmenu;
 
 import dev.triumphteam.gui.builder.item.ItemBuilder;
-import dev.triumphteam.gui.components.util.ItemNbt;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.gui.PaginatedGUI;
-import net.atlas.SkyblockSandbox.mongo.MongoCoins;
+import net.atlas.SkyblockSandbox.database.mongo.MongoCoins;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.Serialization;
@@ -63,13 +62,14 @@ public class PetsMenu extends PaginatedGUI {
                 getOwner().playSound(getOwner().getLocation(), Sound.ORB_PICKUP, 5, 1);
                 convertToItem = false;
                 ItemStack pet = event.getCurrentItem();
-                pet = ItemNbt.removeTag(pet,"mf-gui");
+                pet = NBTUtil.removeTag(pet,"mf-gui");
                 String petStr = Serialization.itemStackToBase64(pet);
 
-                db.removeData(getOwner().getUniqueId(), "pet_" + petStr);
+                db.removeData(getOwner().getUniqueId(), petStr);
                 if (getOwner().hasSpace()) {
-                    getOwner().getInventory().addItem(pet);
+                    getOwner().getInventory().addItem(NBTUtil.setString(pet,"false","is-equipped"));
                 }
+
                 new PetsMenu(getOwner(),convertToItem).open();
             }
         }

@@ -5,7 +5,7 @@ import net.atlas.SkyblockSandbox.event.customEvents.PlayerCustomDeathEvent;
 import net.atlas.SkyblockSandbox.event.customEvents.SkillEXPGainEvent;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.StartFight;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
-import net.atlas.SkyblockSandbox.mongo.MongoCoins;
+import net.atlas.SkyblockSandbox.database.mongo.MongoCoins;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
 import org.bukkit.Bukkit;

@@ -37,9 +37,6 @@ public abstract class NormalGUI extends SBGUI {
         super(owner);
         this.owner = owner;
     }
-    public NormalGUI() {
-        super();
-    }
 
     public void setItem(int index,ItemStack i) {
         gui.setItem(index, ItemBuilder.from(i).asGuiItem());

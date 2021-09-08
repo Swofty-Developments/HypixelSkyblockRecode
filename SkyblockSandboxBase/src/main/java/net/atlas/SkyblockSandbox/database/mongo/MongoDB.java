@@ -1,4 +1,4 @@
-package net.atlas.SkyblockSandbox.mongo;
+package net.atlas.SkyblockSandbox.database.mongo;
 
 import org.bson.Document;
 

@@ -1,15 +1,20 @@
 package net.atlas.SkyblockSandbox.listener.sbEvents;
 
+import com.google.common.base.Enums;
 import net.atlas.SkyblockSandbox.SBX;
+import net.atlas.SkyblockSandbox.gui.guis.backpacks.Backpack;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.SummonListener;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.SummoningAltaar;
+import net.atlas.SkyblockSandbox.item.BackpackSize;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.item.SkyblockItem;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
+import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import net.atlas.SkyblockSandbox.util.Serialization;
-import org.bson.Document;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -25,6 +30,7 @@ public class PlayerInteractEvent extends SkyblockListener<org.bukkit.event.playe
         if (p.getItemInHand() != null && p.getItemInHand().hasItemMeta()) {
             if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
                 runPetLogic(event);
+                runBPLogic(event);
                 SBItemStack item = new SBItemStack(event.getItem());
                 if (item.getString(event.getItem(), "ID") != null) {
                     if (item.getString(event.getItem(), "ID").equals(SkyblockItem.Default.SUMMONING_EYE.item().getItemID())) {
@@ -39,6 +45,7 @@ public class PlayerInteractEvent extends SkyblockListener<org.bukkit.event.playe
             }
             if(event.getAction().equals(Action.RIGHT_CLICK_AIR)) {
                 runPetLogic(event);
+                runBPLogic(event);
             }
         }
     }
@@ -46,8 +53,7 @@ public class PlayerInteractEvent extends SkyblockListener<org.bukkit.event.playe
     void runPetLogic(org.bukkit.event.player.PlayerInteractEvent e) {
         if(Boolean.parseBoolean(NBTUtil.getString(e.getItem(),"is-pet"))) {
             Player p = e.getPlayer();
-            SBItemStack item = new SBItemStack(e.getItem());
-            ItemStack it = NBTUtil.setString(item.asBukkitItem(), "true", "is-equipped");
+            ItemStack it = NBTUtil.setString(e.getItem(), "true", "is-equipped");
             SBItemStack itnew = new SBItemStack(it);
             it = itnew.refreshLore();
             String serialized = Serialization.itemStackToBase64(it);
@@ -57,6 +63,17 @@ public class PlayerInteractEvent extends SkyblockListener<org.bukkit.event.playe
             p.playSound(p.getLocation(), Sound.ORB_PICKUP, 5, 1);
             e.setCancelled(true);
             p.getInventory().setItemInHand(new ItemStack(Material.AIR));
+        }
+    }
+
+    void runBPLogic(org.bukkit.event.player.PlayerInteractEvent e) {
+        if(ChatColor.stripColor(NBTUtil.getString(e.getItem(),"ID")).toLowerCase().contains("backpack")) {
+            String name = ChatColor.stripColor(NBTUtil.getString(e.getItem(),"ID"));
+            String size = name.split("_")[0].toUpperCase();
+            BackpackSize backpackSize = Enums.getIfPresent(BackpackSize.class,size).orNull();
+            if(backpackSize!=null) {
+                new Backpack(new SBPlayer(e.getPlayer()),backpackSize,e.getItem()).open();
+            }
         }
     }
 }

@@ -3,7 +3,7 @@ package net.atlas.SkyblockSandbox.island.islands.end.dragFight;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.dragClasses.AbstractDragon;
-import net.atlas.SkyblockSandbox.mongo.MongoCoins;
+import net.atlas.SkyblockSandbox.database.mongo.MongoCoins;
 import net.atlas.SkyblockSandbox.util.StandUtils;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Material;

@@ -2,6 +2,7 @@ package net.atlas.SkyblockSandbox.abilityCreator.functions;
 
 import net.atlas.SkyblockSandbox.abilityCreator.AdvancedFunctions;
 import net.atlas.SkyblockSandbox.item.ability.AbilityData;
+import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.minecraft.server.v1_8_R3.EnumParticle;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -9,6 +10,10 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 
 public class Particle extends AdvancedFunctions {
+    public Particle(SBPlayer owner) {
+        super(owner);
+    }
+
     @Override
     public void runnable() {
 

@@ -2,7 +2,7 @@ package net.atlas.SkyblockSandbox.economy;
 
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.event.CustomCoinEvent;
-import net.atlas.SkyblockSandbox.mongo.MongoCoins;
+import net.atlas.SkyblockSandbox.database.mongo.MongoCoins;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 

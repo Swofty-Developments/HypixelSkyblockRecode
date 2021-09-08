@@ -140,7 +140,7 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                     @Override
                     public void run() {
                         if (!damagee.isDead()) {
-                            calculateFeroHit(p, damagee, finalFero);
+                            calculateFeroDoubleStrike(p, damagee, finalFero);
                         }
                     }
                 }.runTaskLater(SBX.getInstance(), 10L);
@@ -174,6 +174,49 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                     }
                 }
             }.runTaskLater(SBX.getInstance(), 10L);
+        }
+    }
+
+    public void calculateFeroDoubleStrike(SBPlayer p, LivingEntity damagee, double fero) {
+
+        Random random = new Random();
+        double chance = random.nextDouble();
+        if ((fero / 100) >= chance) {
+            if (fero > 100) {
+                fero -= 100;
+                double finalFero = fero;
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        if (!damagee.isDead()) {
+                            calculateFeroDoubleStrike(p, damagee, finalFero);
+                        }
+                    }
+                }.runTaskLater(SBX.getInstance(), 5L);
+            }
+            if (!damagee.isDead()) {
+                double dmg = DamageUtil.calculateSingleHit(damagee, p);
+                Location loc = damagee.getLocation();
+                if (dmg != 0) {
+                    //damagee.damage(dmg);
+                    if (damagee.getHealth() - dmg < 0) {
+                        damagee.damage(dmg);
+                    } else {
+                        damagee.setHealth(damagee.getHealth() - dmg);
+                    }
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            damagee.setNoDamageTicks(0);
+                            PacketPlayOutEntityStatus packet = new PacketPlayOutEntityStatus(((CraftEntity) damagee).getHandle(), (byte) 2);
+                            ((CraftPlayer) p.getPlayer()).getHandle().playerConnection.sendPacket(packet);
+                        }
+                    }.runTaskLater(SBX.getInstance(), 1L);
+                } else {
+                    //damagee.damage(0);
+                }
+                p.playJingle(Jingle.FEROCITY,false);
+            }
         }
     }
 

@@ -68,6 +68,41 @@ public class PetBuilder {
         return this;
     }
 
+    public PetBuilder perkName(int perkIndex, String perkName) {
+        for(PetPerk perk:perks) {
+            if(perk.getPerkIndex()==perkIndex) {
+                perk.setName(SUtil.colorize(perkName));
+                return this;
+            }
+        }
+        perks.add(new PetPerk(perkIndex,SUtil.colorize(perkName), null));
+        return this;
+    }
+
+    public PetBuilder perkDescription(int perkIndex, String... perkDescript) {
+        for(PetPerk perk:perks) {
+            if(perk.getPerkIndex()==perkIndex) {
+                perk.setDescript(SUtil.colorize(Arrays.asList(perkDescript)));
+                return this;
+            }
+        }
+        perks.add(new PetPerk(perkIndex,"Default name",SUtil.colorize(Arrays.asList(perkDescript))));
+        return this;
+    }
+
+    public PetBuilder addPerkDescriptionLine(int perkIndex, String... perkDescript) {
+        for(PetPerk perk:perks) {
+            if(perk.getPerkIndex()==perkIndex) {
+                for(String s:SUtil.colorize(perkDescript)) {
+                    perk.addDescript(s);
+                }
+                return this;
+            }
+        }
+        perks.add(new PetPerk(perkIndex,"Default name",SUtil.colorize(Arrays.asList(perkDescript))));
+        return this;
+    }
+
     public PetBuilder rarity(Rarity rarity) {
         this.rarity = rarity;
         return this;
@@ -125,6 +160,7 @@ public class PetBuilder {
         stack = NBTUtil.setInteger(stack, lvl, "pet-level");
         stack = NBTUtil.setInteger(stack,xp,"pet-xp");
         stack = NBTUtil.setString(stack,"true","is-pet");
+        stack = NBTUtil.setString(stack,"false","is-equipped");
 
         return stack;
     }
