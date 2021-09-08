@@ -22,6 +22,8 @@ import org.bukkit.util.Vector;
 import java.net.InetSocketAddress;
 import java.util.*;
 
+import static net.atlas.SkyblockSandbox.util.SUtil.colorize;
+
 public abstract class PluginPlayer implements Player {
 
     private final Player player;
@@ -451,7 +453,7 @@ public abstract class PluginPlayer implements Player {
     }
 
     public void sendMessage(String s) {
-        player.sendMessage(s);
+        player.sendMessage(colorize(s));
     }
 
     public void sendMessage(String[] strings) {
