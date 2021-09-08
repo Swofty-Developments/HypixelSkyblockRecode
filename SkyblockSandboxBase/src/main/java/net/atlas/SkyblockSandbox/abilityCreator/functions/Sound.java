@@ -2,12 +2,17 @@ package net.atlas.SkyblockSandbox.abilityCreator.functions;
 
 import net.atlas.SkyblockSandbox.abilityCreator.AdvancedFunctions;
 import net.atlas.SkyblockSandbox.item.ability.AbilityData;
+import net.atlas.SkyblockSandbox.player.SBPlayer;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 
 public class Sound extends AdvancedFunctions {
+    public Sound(SBPlayer owner) {
+        super(owner);
+    }
+
     @Override
     public void runnable() {
 

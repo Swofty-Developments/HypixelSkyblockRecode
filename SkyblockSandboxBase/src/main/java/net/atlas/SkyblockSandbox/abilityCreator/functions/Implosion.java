@@ -12,6 +12,10 @@ import java.util.ArrayList;
 import java.util.function.Function;
 
 public class Implosion extends AdvancedFunctions {
+    public Implosion(SBPlayer owner) {
+        super(owner);
+    }
+
     @Override
     public void runnable() {
         SBPlayer player = getOwner();

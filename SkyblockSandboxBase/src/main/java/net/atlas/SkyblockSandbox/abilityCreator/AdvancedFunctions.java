@@ -43,6 +43,11 @@ public abstract class AdvancedFunctions extends NormalGUI {
     protected Gui backGUI;
     private ItemStack back;
     private Object[] enumList;
+
+    public AdvancedFunctions(SBPlayer owner) {
+        super(owner);
+    }
+
     @Override
     public String getTitle() {
         return name() + " Function";

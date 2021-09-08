@@ -2,9 +2,15 @@ package net.atlas.SkyblockSandbox.item;
 
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.HellShatter;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.SoulCry;
+import net.atlas.SkyblockSandbox.util.NBTUtil;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
 public interface SkyblockItem {
 
@@ -59,12 +65,18 @@ public interface SkyblockItem {
     enum Default implements SkyblockItem {
         BEDROCK(new SBItemStack("Bedrock","BEDROCK", Material.BEDROCK,0,true,false,null, type(), Rarity.LEGENDARY,5000,5000,144,60,100,8000,2300,100,50000)),
         SUMMONING_EYE(new SBItemStack("Summoning Eye","SUMMONING_EYE",Material.SKULL_ITEM,3,false,false,"http://textures.minecraft.net/texture/daa8fc8de6417b48d48c80b443cf5326e3d9da4dbe9b25fcd49549d96168fc0",Rarity.EPIC,0,0,0,0,0,0,0,0,0)),
-        SLEEPING_EYE(new SBItemStack("Sleeping Eye","SLEEPING_EYE",Material.SKULL_ITEM,3,false,false,"http://textures.minecraft.net/texture/37c0d010dd0e512ffea108d7c5fe69d576c31ec266c884b51ec0b28cc457",Rarity.EPIC,0,0,0,0,0,0,0,0,0));
+        SLEEPING_EYE(new SBItemStack("Sleeping Eye","SLEEPING_EYE",Material.SKULL_ITEM,3,false,false,"http://textures.minecraft.net/texture/37c0d010dd0e512ffea108d7c5fe69d576c31ec266c884b51ec0b28cc457",Rarity.EPIC,0,0,0,0,0,0,0,0,0)),
+        SMALL_BACKPACK(new SBItemStack("Small Backpack","SMALL_BACKPACK",Material.SKULL_ITEM,3,false,false,"http://textures.minecraft.net/texture/58bc8fa716cadd004b828cb27cc0f6f6ade3be41511688ca9eceffd1647fb9",Rarity.UNCOMMON,0,0,0,0,0,0,0,0,0),"0000","stored-items");
 
         private final SBItemStack item;
 
         Default(SBItemStack item) {
             this.item = item;
+        }
+
+        Default(SBItemStack item, String nbtMsg,String nbtKey) {
+            this.item = item;
+            this.item.setString(item.asBukkitItem(),nbtMsg,nbtKey);
         }
 
         @Override

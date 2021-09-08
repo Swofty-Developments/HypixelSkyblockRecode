@@ -2,6 +2,7 @@ package net.atlas.SkyblockSandbox.abilityCreator.functions;
 
 import net.atlas.SkyblockSandbox.abilityCreator.AdvancedFunctions;
 import net.atlas.SkyblockSandbox.item.ability.AbilityData;
+import net.atlas.SkyblockSandbox.player.SBPlayer;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -11,6 +12,10 @@ import java.util.ArrayList;
 import java.util.Set;
 
 public class Teleport extends AdvancedFunctions {
+    public Teleport(SBPlayer owner) {
+        super(owner);
+    }
+
     @Override
     public void runnable() {
         int range = Integer.parseInt(String.valueOf(getData(FunctionVariables.RANGE, getOwner().getItemInHand(), aindex, findex)));

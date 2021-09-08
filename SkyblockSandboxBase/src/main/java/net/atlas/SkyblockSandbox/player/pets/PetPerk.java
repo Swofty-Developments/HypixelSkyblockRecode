@@ -1,7 +1,10 @@
 package net.atlas.SkyblockSandbox.player.pets;
 
+import net.atlas.SkyblockSandbox.util.SUtil;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -24,6 +27,28 @@ public class PetPerk {
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescript(List<String> descript) {
+        this.descript = descript;
+    }
+
+    public void addDescript(String... descript) {
+        List<String> copy = new ArrayList<>(this.descript);
+        List<String> supported = new ArrayList<>(SUtil.colorize(descript));
+        copy.addAll(supported);
+        this.descript = copy;
+    }
+
+    public void addDescript(List<String> descript) {
+        List<String> copy = new ArrayList<>(this.descript);
+        List<String> supported = new ArrayList<>(SUtil.colorize(descript));
+        copy.addAll(supported);
+        this.descript = copy;
     }
 
     public int getPerkIndex() {

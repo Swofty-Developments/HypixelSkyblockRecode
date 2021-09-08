@@ -19,6 +19,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.reflections.Reflections;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 public class AbilityHandler implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInteract(PlayerInteractEvent event) {
@@ -72,14 +75,15 @@ public class AbilityHandler implements Listener {
         for (int i = 1; i < 6; i++) {
             for(Class<? extends AdvancedFunctions> l:new Reflections("net.atlas.SkyblockSandbox.abilityCreator.functions").getSubTypesOf(AdvancedFunctions.class)) {
                 try {
-                    AdvancedFunctions function = l.newInstance();
+                    Constructor<? extends AdvancedFunctions> ctor = l.getDeclaredConstructor(SBPlayer.class);
+                    AdvancedFunctions function = ctor.newInstance(player);
                     if(function.name().equals(String.valueOf(AbilityData.retrieveFunctionData("name", player.getItemInHand(), aindex, i)))) {
                         function.setOwner(new SBPlayer(player));
                         function.setAindex(aindex);
                         function.setFindex(i);
                         function.runnable();
                     }
-                } catch (InstantiationException | IllegalAccessException e) {
+                } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
             }
