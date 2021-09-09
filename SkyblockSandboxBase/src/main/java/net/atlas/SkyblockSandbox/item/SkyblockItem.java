@@ -16,6 +16,8 @@ public interface SkyblockItem {
 
     SBItemStack item();
 
+    boolean isPublic();
+
     static List<SBItemStack> getAllItems() {
         List<SBItemStack> items = new ArrayList<>();
         for(Default i: Default.values()) {
@@ -31,6 +33,30 @@ public interface SkyblockItem {
             items.add(i.item());
         }
         for(Unobtainable i: Unobtainable.values()) {
+            items.add(i.item());
+        }
+        return items;
+    }
+    static List<SBItemStack> getAllPublicItems() {
+        List<SBItemStack> items = new ArrayList<>();
+        for(Default i: Default.values()) {
+            if (!i.isPublic()) continue;
+            items.add(i.item());
+        }
+        for(Sword i: Sword.values()) {
+            if (!i.isPublic()) continue;
+            items.add(i.item());
+        }
+        for(Axe i: Axe.values()) {
+            if (!i.isPublic()) continue;
+            items.add(i.item());
+        }
+        for(Dungeon i: Dungeon.values()) {
+            if (!i.isPublic()) continue;
+            items.add(i.item());
+        }
+        for(Unobtainable i: Unobtainable.values()) {
+            if (!i.isPublic()) continue;
             items.add(i.item());
         }
         return items;
@@ -58,6 +84,11 @@ public interface SkyblockItem {
             return item;
         }
 
+        @Override
+        public boolean isPublic() {
+            return false;
+        }
+
 
         public static ItemType type() {
             return ItemType.ITEM;
@@ -80,6 +111,11 @@ public interface SkyblockItem {
             return item;
         }
 
+        @Override
+        public boolean isPublic() {
+            return true;
+        }
+
         public static ItemType type() {
             return ItemType.SWORD;
         }
@@ -97,6 +133,11 @@ public interface SkyblockItem {
         @Override
         public SBItemStack item() {
             return item;
+        }
+
+        @Override
+        public boolean isPublic() {
+            return true;
         }
 
         public static ItemType type() {
@@ -119,6 +160,11 @@ public interface SkyblockItem {
             return item;
         }
 
+        @Override
+        public boolean isPublic() {
+            return true;
+        }
+
         public static ItemType type() {
             return ItemType.DUNGEON_ITEM;
         }
@@ -136,6 +182,11 @@ public interface SkyblockItem {
         @Override
         public SBItemStack item() {
             return item;
+        }
+
+        @Override
+        public boolean isPublic() {
+            return false;
         }
 
         public static ItemType type() {

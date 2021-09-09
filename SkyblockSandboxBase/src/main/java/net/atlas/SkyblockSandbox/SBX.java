@@ -1,6 +1,11 @@
 package net.atlas.SkyblockSandbox;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import dev.triumphteam.gui.builder.item.ItemBuilder;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCommandArgs;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCompleter;
 import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
@@ -31,24 +36,40 @@ import net.atlas.SkyblockSandbox.slayer.Slayers;
 import net.atlas.SkyblockSandbox.storage.MongoStorage;
 import net.atlas.SkyblockSandbox.util.NumberTruncation.NumberSuffix;
 import net.atlas.SkyblockSandbox.util.SUtil;
-import net.minecraft.server.v1_8_R3.EntityArmorStand;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.WorldCreator;
+import net.atlas.SkyblockSandbox.util.StackUtils;
+import net.minecraft.server.v1_8_R3.*;
+import org.apache.commons.io.FileUtils;
+import org.bukkit.*;
+import org.bukkit.Material;
 import org.bukkit.WorldType;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GitHub;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -73,6 +94,7 @@ public class SBX extends JavaPlugin {
     public static Map<Player, Boolean> abilityUsed = new HashMap<>();
     public static HashMap<Player, Boolean> canfire = new HashMap<>();
     public static HashMap<Player, List<EntityArmorStand>> thrownAxes = new HashMap<>();
+    public static final TreeMap<String, ItemStack> hypixelItemMap = new TreeMap<>();
 
     private static SBX instance;
     SkyblockCommandFramework framework;
@@ -103,6 +125,7 @@ public class SBX extends JavaPlugin {
         registerListeners();
         registerCommands();
         createIslandWorld();
+        githubItems();
 
         startOnlineRunnables();
         createDataFiles();
@@ -147,6 +170,8 @@ public class SBX extends JavaPlugin {
         framework.registerCommands(new Command_importhead(this));
         framework.registerCommands(new Command_sbmenu(this));
         framework.registerCommands(new Command_storage(this));
+        framework.registerCommands(new Command_dev(this));
+        framework.registerCommands(new Command_items(this));
         framework.registerHelp();
     }
 
@@ -294,5 +319,95 @@ public class SBX extends JavaPlugin {
 
     public static WorldEditPlugin getWorldEdit() {
         return (WorldEditPlugin) Bukkit.getPluginManager().getPlugin("WorldEdit");
+    }
+
+    public static ArrayList<Material> getIllegalMaterials() {
+        ArrayList<Material> blacklisted = new ArrayList<>();
+        for (Material mat : Material.values()) {
+            try {
+                ItemBuilder.from(new ItemStack(mat, 1, (short) 0)).asGuiItem();
+            } catch (Exception e) {
+                blacklisted.add(mat);
+            }
+        }
+        return blacklisted;
+    }
+
+    private void githubItems() {
+        try {
+            System.err.println("Starting to download neu-repo");
+            File repoLocation = new File(getDataFolder(), File.separator + "github");
+            repoLocation.mkdirs();
+            File itemsZip = new File(repoLocation, "neu-items-master.zip");
+            try {
+                itemsZip.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+
+
+            URL url = new URL("https://github.com/Moulberry/NotEnoughUpdates-REPO/archive/refs/heads/master.zip");
+            URLConnection urlConnection = url.openConnection();
+            urlConnection.setConnectTimeout(15000);
+            urlConnection.setReadTimeout(30000);
+
+            try (InputStream is = urlConnection.getInputStream()) {
+                FileUtils.copyInputStreamToFile(is, itemsZip);
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.err.println("Failed to download NEU Repo! Please report this issue to the mod creator");
+                return;
+            }
+            System.out.println("Successfully downloaded NEU Repo!");
+            System.out.println("Starting to unzip NEU Repo!");
+
+            SUtil.unzipIgnoreFirstFolder(itemsZip.getAbsolutePath(), repoLocation.getAbsolutePath());
+            File items = new File(repoLocation, "items");
+            if(items.exists()) {
+                File[] itemFiles = new File(repoLocation, "items").listFiles();
+                if(itemFiles != null) {
+                    for(File f : itemFiles) {
+                        JSONParser parser = new JSONParser();
+                        JSONObject json;
+                        try {
+                            try (Reader reader = Files.newBufferedReader(f.toPath().toAbsolutePath(), StandardCharsets.UTF_8)) {
+                                json = (JSONObject) parser.parse(reader);
+                            }
+                            try {
+                                MinecraftKey mk = new MinecraftKey(json.get("itemid").toString());
+                                ItemStack item = CraftItemStack.asNewCraftStack(net.minecraft.server.v1_8_R3.Item.REGISTRY.get(mk));
+                                Material mat = item.getType();
+                                switch (mat) {
+                                    case BARRIER:
+                                    case COMMAND:
+                                    case COMMAND_MINECART:
+                                    case BURNING_FURNACE:
+                                    case SOIL:
+                                        continue;
+                                }
+                                String displayname = String.valueOf(json.get("displayname"));
+                                ArrayList<String> lore = new ArrayList<>();
+                                for (Object list : (JSONArray) json.get("lore")) {
+                                    lore.add(list.toString());
+                                }
+                                NBTTagCompound nbt = MojangsonParser.parse(json.get("nbttag").toString());
+                                net.minecraft.server.v1_8_R3.ItemStack itemStack = CraftItemStack.asNMSCopy(StackUtils.makeColorfulItem(mat, displayname, 1, Integer.parseInt(json.get("damage").toString()), lore));
+                                itemStack.setTag(nbt);
+                                hypixelItemMap.put(String.valueOf(json.get("internalname")), CraftItemStack.asBukkitCopy(itemStack));
+                            } catch (MojangsonParseException e) {
+                                e.printStackTrace();
+                            }
+                        } catch (NullPointerException e) {
+                            continue;
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

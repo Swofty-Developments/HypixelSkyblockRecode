@@ -51,6 +51,9 @@ public abstract class SBGUI {
 
         return item;
     }
+    public static ItemStack makeItem(Material material, int amount, int durability) {
+        return new ItemStack(material, amount, (short) durability);
+    }
 
     public static ItemStack makeColorfulItem(Material material, String displayName, int amount, int durability, String lore) {
         ItemStack item = new ItemStack(material, amount, (short) durability);
