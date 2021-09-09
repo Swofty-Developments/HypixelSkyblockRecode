@@ -1,6 +1,6 @@
 package net.atlas.SkyblockSandbox.storage;
 
-import net.atlas.SkyblockSandbox.mongo.MongoDB;
+import net.atlas.SkyblockSandbox.database.mongo.MongoDB;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 
 import java.util.*;

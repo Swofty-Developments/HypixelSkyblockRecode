@@ -5,6 +5,8 @@ import net.atlas.SkyblockSandbox.command.abstraction.SBCommandArgs;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCompleter;
 import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
 import net.atlas.SkyblockSandbox.command.commands.*;
+import net.atlas.SkyblockSandbox.database.mongo.MongoCoins;
+import net.atlas.SkyblockSandbox.database.mongo.MongoDB;
 import net.atlas.SkyblockSandbox.database.sql.BackpackData;
 import net.atlas.SkyblockSandbox.database.sql.MySQL;
 import net.atlas.SkyblockSandbox.database.sql.SQLBpCache;
@@ -21,8 +23,6 @@ import net.atlas.SkyblockSandbox.item.ability.itemAbilities.SoulCry;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.WitherImpact;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.listener.sbEvents.abilities.AbilityHandler;
-import net.atlas.SkyblockSandbox.mongo.MongoCoins;
-import net.atlas.SkyblockSandbox.mongo.MongoDB;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
 import net.atlas.SkyblockSandbox.playerIsland.Data;
@@ -48,6 +48,7 @@ import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -76,7 +77,7 @@ public class SBX extends JavaPlugin {
     private static SBX instance;
     SkyblockCommandFramework framework;
     private static MongoCoins mongoStats;
-    public MongoDB mongoStorage;
+    public MongoStorage mongoStorage;
     public Coins coins;
     public MySQL sql;
 
@@ -95,6 +96,7 @@ public class SBX extends JavaPlugin {
         mongoStorage.connect();
         coins = new Coins();
         sql = new MySQL();
+
         SQLBpCache.init();
 
         Data.initialize();

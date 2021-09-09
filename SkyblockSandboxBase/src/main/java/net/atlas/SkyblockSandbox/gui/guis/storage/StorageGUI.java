@@ -20,7 +20,7 @@ public class StorageGUI extends NormalGUI
 
 		event.setCancelled(true);
 
-		switch (event.getSlot()) {
+		/*switch (event.getSlot()) {
 			case 1:
 				player.sendMessage("WASSSUPPPPP");
 				break;
@@ -28,7 +28,7 @@ public class StorageGUI extends NormalGUI
 				player.sendMessage("WASSSUPPPPPPPP 2");
 				break;
 
-		}
+		}*/
 
 		switch (event.getCurrentItem().getType()) {
 			case PAPER:

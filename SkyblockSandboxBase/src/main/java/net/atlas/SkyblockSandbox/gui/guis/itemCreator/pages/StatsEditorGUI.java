@@ -74,18 +74,22 @@ public class StatsEditorGUI extends NormalGUI {
         for (SBPlayer.PlayerStat s : SBPlayer.PlayerStat.values()) {
             getGui().addItem(ItemBuilder.from(s.getStack()).lore(Component.text(""), Component.text(SUtil.colorize("&bClick to set the " + s.getStack().getItemMeta().getDisplayName() + " &bamount!"))).setNbt("Stat", s.name()).asGuiItem());
         }
-        for (int in : getGui().getGuiItems().keySet()) {
-            for (SBPlayer.PlayerStat s : SBPlayer.PlayerStat.values()) {
-                if (getGui().getGuiItem(in) != null) {
-                    if (!NBTUtil.getGenericString(getGui().getGuiItem(in).getItemStack(), "Stat").equals("")) {
-                        setAction(in,event -> {
-                            AnvilGUI gui = setstatGUI(Objects.requireNonNull(Objects.requireNonNull(Enums.getIfPresent(SBPlayer.PlayerStat.class, NBTUtil.getGenericString(Objects.requireNonNull(getGui().getGuiItem(in)).getItemStack(), "Stat"))).orNull()), getOwner().getPlayer());
-                        });
+        for (int in = 0; in < getGui().getInventory().getSize(); in++) {
+            if (getGui().getGuiItem(in) != null) {
+                if (!NBTUtil.getGenericString(getGui().getGuiItem(in).getItemStack(), "Stat").equals("")) {
+                    String stat = NBTUtil.getGenericString(getGui().getGuiItem(in).getItemStack(), "Stat");
+                    System.out.println(stat);
+                    int finalIn = in;
+                    System.out.println(Enums.getIfPresent(SBPlayer.PlayerStat.class, stat).orNull());
+                    setAction(in, event -> {
+                        AnvilGUI gui = setstatGUI(Objects.requireNonNull(Enums.getIfPresent(SBPlayer.PlayerStat.class, stat).orNull()), getOwner().getPlayer());
+                        System.out.println(NBTUtil.getGenericString(getGui().getGuiItem(finalIn).getItemStack(), "Stat"));
+                    });
 
-                    }
                 }
-
             }
+
+
         }
         //setMenuGlass();
         setItem(49, makeColorfulItem(Material.ARROW, "§aGo Back", 1, 0, "§7To Create an Item"));
@@ -111,7 +115,7 @@ public class StatsEditorGUI extends NormalGUI {
     }
 
     public AnvilGUI setstatGUI(SBPlayer.PlayerStat stat, Player player) {
-        String formattedname = stat.name().charAt(0) + stat.name().substring(1).toLowerCase();
+        String formattedname = SUtil.firstLetterUpper(stat.toString());
         AnvilGUI gui = new AnvilGUI(player, event1 -> {
             if (!NumUtils.isInt(event1.getName())) {
                 invalidNumberError(event1, player);

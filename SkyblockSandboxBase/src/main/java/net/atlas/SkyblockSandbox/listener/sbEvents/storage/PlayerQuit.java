@@ -1,7 +1,7 @@
 package net.atlas.SkyblockSandbox.listener.sbEvents.storage;
 
+import net.atlas.SkyblockSandbox.database.mongo.MongoDB;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
-import net.atlas.SkyblockSandbox.mongo.MongoDB;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.storage.MongoStorage;
 import net.atlas.SkyblockSandbox.storage.StorageCache;
