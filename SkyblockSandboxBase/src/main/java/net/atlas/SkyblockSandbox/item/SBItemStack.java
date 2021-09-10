@@ -34,7 +34,7 @@ import static net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat.*;
 import static net.atlas.SkyblockSandbox.player.pets.PetBuilder.petXP;
 
 public class SBItemStack extends ItemStack {
-    String[] statsformat = {"Gear_Score", "Damage", "Strength","Crit_Chance", "Crit_Damage", "Attack_Speed", "blank","Health","Defense", "Intelligence", "Speed", "Ferocity", "Mining_Speed","Mining_Fortune","Pristine","blank"};
+    public static String[] statsformat = {"Gear_Score", "Damage", "Strength","Crit_Chance", "Crit_Damage", "Attack_Speed", "blank","Health","Defense", "Intelligence", "Speed", "Ferocity", "Mining_Speed","Mining_Fortune","Pristine","blank"};
 
     private ItemStack stack;
     private String itemID;
@@ -152,6 +152,9 @@ public class SBItemStack extends ItemStack {
 
     public ItemStack refreshLore() {
         if (stack != null) {
+            if(NBTUtil.getString(stack,"is-hypixel").equals("true")) {
+                return stack;
+            }
             if (stack.hasItemMeta()) {
                 ItemMeta meta = stack.getItemMeta();
 
@@ -161,18 +164,21 @@ public class SBItemStack extends ItemStack {
                 List<String> ultEnchantsLore = new ArrayList<>();
 
                 int i = 0;
-                if(!(NBTUtil.getString(stack,"pet-type")==null)||!NBTUtil.getString(stack,"pet-type").isEmpty()) {
+                if(!NBTUtil.getString(stack,"pet-type").equals("")) {
                     newLore.add(SUtil.colorize("&8" + NBTUtil.getString(stack,"pet-type")));
                     newLore.add("");
                 }
+                String prevS = "";
                 for (String s : statsformat) {
-
                     i++;
                     if (s.equals("blank")) {
-                        newLore.add("");
+                        if(!prevS.equals("")) {
+                            newLore.add("");
+                        }
                     } else {
                         int a = getInteger(stack, s.toUpperCase());
                         if (a != 0) {
+                            prevS = s;
                             s = s.replace('_', ' ');
                             if (s.equals("Intelligence") || s.equals("Mining Speed")) {
                                 newLore.add(ChatColor.GRAY + s + ":" + ChatColor.GREEN + " +" + a);
@@ -317,16 +323,18 @@ public class SBItemStack extends ItemStack {
                         }
                     }
                 } else {
-                    rarity = Rarity.COMMON;
+                    rarity = null;
                 }
                 if (getString(stack, " reforgable").equals("true")) {
                     newLore.add(ChatColor.DARK_GRAY + "This stack can be reforged!");
                 }
-                if (getInteger(stack, "rarity_upgrades") >= 1) {
-                    String recombsymbol = rarity.getColor() + "" + ChatColor.MAGIC + "L" + ChatColor.stripColor("") + rarity.getColor() + "" + ChatColor.BOLD;
-                    newLore.add(recombsymbol + " " + rarity.name() + " " + recombsymbol);
-                } else {
-                    newLore.add(rarity.getColor() + "" + ChatColor.BOLD + rarity.name());
+                if(rarity!=null) {
+                    if (getInteger(stack, "rarity_upgrades") >= 1) {
+                        String recombsymbol = rarity.getColor() + "" + ChatColor.MAGIC + "L" + ChatColor.stripColor("") + rarity.getColor() + "" + ChatColor.BOLD;
+                        newLore.add(recombsymbol + " " + rarity.name() + " " + recombsymbol);
+                    } else {
+                        newLore.add(rarity.getColor() + "" + ChatColor.BOLD + rarity.name());
+                    }
                 }
                 int starAmt = NBTUtil.getInteger(stack, starKey);
                 int masterStarAmt = NBTUtil.getInteger(stack, masterStarKey);
@@ -357,7 +365,11 @@ public class SBItemStack extends ItemStack {
                 }
 
                 meta = stack.getItemMeta();
-                meta.setDisplayName(builder + petLvl.toString() + rarity.getColor() + SUtil.colorize(NBTUtil.getString(stack,"item-name")));
+                if(rarity!=null) {
+                    meta.setDisplayName(builder + petLvl.toString() + rarity.getColor() + SUtil.colorize(NBTUtil.getString(stack,"item-name")));
+                } else {
+                    meta.setDisplayName(builder + petLvl.toString() + SUtil.colorize(NBTUtil.getString(stack,"item-name")));
+                }
                 meta.setLore(newLore);
                 stack.setItemMeta(meta);
                 return stack;

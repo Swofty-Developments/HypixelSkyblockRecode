@@ -41,12 +41,6 @@ public class StatsEditorGUI extends NormalGUI {
     @Override
     public boolean setClickActions() {
 
-        for (int i = 0; i < 7; i++) {
-            int finalI = i;
-            setAction(i + 10, event -> {
-
-            });
-        }
         setAction(49, event -> {
             new ItemCreatorGUIMain(getOwner()).open();
         });
@@ -78,12 +72,9 @@ public class StatsEditorGUI extends NormalGUI {
             if (getGui().getGuiItem(in) != null) {
                 if (!NBTUtil.getGenericString(getGui().getGuiItem(in).getItemStack(), "Stat").equals("")) {
                     String stat = NBTUtil.getGenericString(getGui().getGuiItem(in).getItemStack(), "Stat");
-                    System.out.println(stat);
                     int finalIn = in;
-                    System.out.println(Enums.getIfPresent(SBPlayer.PlayerStat.class, stat).orNull());
                     setAction(in, event -> {
                         AnvilGUI gui = setstatGUI(Objects.requireNonNull(Enums.getIfPresent(SBPlayer.PlayerStat.class, stat).orNull()), getOwner().getPlayer());
-                        System.out.println(NBTUtil.getGenericString(getGui().getGuiItem(finalIn).getItemStack(), "Stat"));
                     });
 
                 }

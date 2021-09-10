@@ -1,5 +1,6 @@
 package net.atlas.SkyblockSandbox;
 
+import com.google.common.base.Enums;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -22,6 +23,8 @@ import net.atlas.SkyblockSandbox.event.customEvents.SkillEXPGainEvent;
 import net.atlas.SkyblockSandbox.files.DatabaseInformationFile;
 import net.atlas.SkyblockSandbox.files.IslandInfoFile;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.LootListener;
+import net.atlas.SkyblockSandbox.item.Rarity;
+import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.item.ability.AbiltyListener;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.HellShatter;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.SoulCry;
@@ -34,6 +37,7 @@ import net.atlas.SkyblockSandbox.playerIsland.Data;
 import net.atlas.SkyblockSandbox.slayer.SlayerTier;
 import net.atlas.SkyblockSandbox.slayer.Slayers;
 import net.atlas.SkyblockSandbox.storage.MongoStorage;
+import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.NumberTruncation.NumberSuffix;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import net.atlas.SkyblockSandbox.util.StackUtils;
@@ -88,7 +92,7 @@ public class SBX extends JavaPlugin {
     public static HashMap<EntityArmorStand, Integer> cooldownMap = new HashMap<>();
     public static HashMap<EntityArmorStand, Integer> counterMap = new HashMap<>();
     public static HashMap<EntityArmorStand, Vector> vMap = new HashMap<>();
-    public static HashMap<EntityArmorStand,Integer> angleMap = new HashMap<>();
+    public static HashMap<EntityArmorStand, Integer> angleMap = new HashMap<>();
     public static BukkitTask prevRunnable = null;
     public static HashMap<UUID, String> prevBarMessage = new HashMap<>();
     public static Map<Player, Boolean> abilityUsed = new HashMap<>();
@@ -108,7 +112,7 @@ public class SBX extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        getServer().getMessenger().registerOutgoingPluginChannel(this,"BungeeCord");
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         instance = this;
         mongoStorage = new MongoStorage();
         framework = new SkyblockCommandFramework(this);
@@ -157,7 +161,7 @@ public class SBX extends JavaPlugin {
         Bukkit.getServer().getPluginManager().registerEvents(new AbiltyListener(new HellShatter()), this);
         Bukkit.getServer().getPluginManager().registerEvents(new AbiltyListener(new WitherImpact()), this);
         Bukkit.getServer().getPluginManager().registerEvents(new LootListener(), this);
-        Bukkit.getServer().getPluginManager().registerEvents(new AbilityHandler(),this);
+        Bukkit.getServer().getPluginManager().registerEvents(new AbilityHandler(), this);
     }
 
     void registerCommands() {
@@ -257,15 +261,16 @@ public class SBX extends JavaPlugin {
 
         new BukkitRunnable() {
             int i = 0;
+
             @Override
             public void run() {
                 if (Bukkit.getOnlinePlayers().size() > 0) {
 
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         SBPlayer sbPlayer = new SBPlayer(p);
-                        if(i==2) {
+                        if (i == 2) {
                             sbPlayer.doRegenStats();
-                            i=0;
+                            i = 0;
                         }
                         sbPlayer.sendBarMessage(getStatMessage(sbPlayer));
                         i++;
@@ -364,10 +369,10 @@ public class SBX extends JavaPlugin {
 
             SUtil.unzipIgnoreFirstFolder(itemsZip.getAbsolutePath(), repoLocation.getAbsolutePath());
             File items = new File(repoLocation, "items");
-            if(items.exists()) {
+            if (items.exists()) {
                 File[] itemFiles = new File(repoLocation, "items").listFiles();
-                if(itemFiles != null) {
-                    for(File f : itemFiles) {
+                if (itemFiles != null) {
+                    for (File f : itemFiles) {
                         JSONParser parser = new JSONParser();
                         JSONObject json;
                         try {
@@ -391,10 +396,42 @@ public class SBX extends JavaPlugin {
                                 for (Object list : (JSONArray) json.get("lore")) {
                                     lore.add(list.toString());
                                 }
+                                String parsedRarity = ChatColor.stripColor(lore.get(lore.size() - 1)).split(" ")[0];
+                                Rarity r = Enums.getIfPresent(Rarity.class, parsedRarity).orNull();
+
                                 NBTTagCompound nbt = MojangsonParser.parse(json.get("nbttag").toString());
                                 net.minecraft.server.v1_8_R3.ItemStack itemStack = CraftItemStack.asNMSCopy(StackUtils.makeColorfulItem(mat, displayname, 1, Integer.parseInt(json.get("damage").toString()), lore));
                                 itemStack.setTag(nbt);
-                                hypixelItemMap.put(String.valueOf(json.get("internalname")), CraftItemStack.asBukkitCopy(itemStack));
+                                ItemStack bukkitStack = CraftItemStack.asBukkitCopy(itemStack);
+                                for (String s : lore) {
+                                    String parsedStat = ChatColor.stripColor(s).replace(' ', '_').toUpperCase().split(":")[0];
+                                    for(String b:SBItemStack.statsformat) {
+                                        if(parsedStat.equalsIgnoreCase(b)) {
+                                            SBPlayer.PlayerStat stat = Enums.getIfPresent(SBPlayer.PlayerStat.class, parsedStat).orNull();
+                                            if (stat != null) {
+                                                try {
+                                                    if(s.contains("\\+") || s.contains("+")) {
+                                                        String split1 = ChatColor.stripColor(s).replace(' ', '_').toUpperCase().split("\\+")[1];
+                                                        int amt = Integer.parseInt(split1);
+                                                        if(amt!=0) {
+                                                            bukkitStack = NBTUtil.setInteger(bukkitStack,amt,stat.name());
+                                                        }
+                                                    }
+
+                                                } catch (NumberFormatException ignored) {
+
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                }
+                                if (r != null) {
+                                    bukkitStack = NBTUtil.setString(bukkitStack, r.toString(), "RARITY");
+                                }
+                                bukkitStack = NBTUtil.setString(bukkitStack, "true", "is-hypixel");
+
+                                hypixelItemMap.put(String.valueOf(json.get("internalname")), bukkitStack);
                             } catch (MojangsonParseException e) {
                                 e.printStackTrace();
                             }
