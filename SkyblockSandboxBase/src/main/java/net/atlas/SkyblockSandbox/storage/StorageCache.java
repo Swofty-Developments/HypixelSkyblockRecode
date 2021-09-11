@@ -1,5 +1,6 @@
 package net.atlas.SkyblockSandbox.storage;
 
+import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.database.mongo.MongoDB;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 
@@ -30,7 +31,7 @@ public class StorageCache
 	 */
 	@Deprecated
 	public void refresh() {
-		MongoDB mongoDB = new MongoStorage();
+		MongoDB mongoDB = SBX.storage;
 
 		if (mongoDB.getData(player.getUniqueId(), "enderchest_page_1") == null) {
 			for (int i = 0; i < 9; i++) {
@@ -55,7 +56,7 @@ public class StorageCache
 	 * ONLY RUN THIS METHOD WHEN PLAYER JOINS AND THEIR DATA IS NOT ALREADY CACHED!!!!
 	 */
 	public void refresh(int page) {
-		MongoDB mongoDB = new MongoStorage();
+		MongoDB mongoDB = SBX.storage;
 		if (mongoDB.getData(player.getUniqueId(), "enderchest_page_1") != null) {
 			switch (page) {
 				case 1:

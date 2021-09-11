@@ -7,6 +7,7 @@ import com.xxmicloxx.NoteBlockAPI.songplayer.RadioSongPlayer;
 import com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder;
 
 import net.atlas.SkyblockSandbox.SBX;
+import net.atlas.SkyblockSandbox.database.mongo.MongoAH;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.item.SkyblockItem;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
@@ -17,6 +18,7 @@ import net.atlas.SkyblockSandbox.playerIsland.PlayerIslandHandler;
 import net.atlas.SkyblockSandbox.sound.Jingle;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.SUtil;
+import org.bson.Document;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -280,6 +282,14 @@ public class SBPlayer extends PluginPlayer {
         cachedSkills.put(sbPlayer.getUniqueId(),map);
 
 
+    }
+    public boolean hasAuctions() {
+        for (Document doc : new MongoAH().getAllDocuments()) {
+            if (doc.get("owner").equals(getUniqueId().toString()))
+                return true;
+        }
+
+        return false;
     }
 
     public enum PlayerStat {

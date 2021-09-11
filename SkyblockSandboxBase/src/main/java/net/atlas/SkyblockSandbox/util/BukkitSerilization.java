@@ -1,6 +1,7 @@
 package net.atlas.SkyblockSandbox.util;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -155,6 +156,37 @@ public class BukkitSerilization {
 			return items;
 		} catch (ClassNotFoundException e) {
 			throw new IOException("Unable to decode class type.", e);
+		}
+	}
+
+	public static ItemStack itemStackFromBase64(String data){
+		try {
+			ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));
+			BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
+
+			ItemStack item = (ItemStack) dataInput.readObject();
+
+			dataInput.close();
+			return item;
+		} catch (ClassNotFoundException | IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public static String itemStackToBase64(ItemStack item) throws IllegalStateException {
+		try {
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
+
+			// Save the item
+			dataOutput.writeObject(item);
+
+			// Serialize that item
+			dataOutput.close();
+			return Base64Coder.encodeLines(outputStream.toByteArray());
+		} catch (Exception e) {
+			throw new IllegalStateException("Unable to save item stacks.", e);
 		}
 	}
 

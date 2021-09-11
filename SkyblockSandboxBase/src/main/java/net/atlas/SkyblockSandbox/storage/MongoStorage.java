@@ -7,6 +7,7 @@ import net.atlas.SkyblockSandbox.database.mongo.MongoDB;
 import net.atlas.SkyblockSandbox.files.DatabaseInformationFile;
 import org.bson.Document;
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.libs.jline.internal.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,5 +119,29 @@ public class MongoStorage implements MongoDB
 		}
 
 		return found;
+	}
+	public void setPlayerData(String id) {
+		Document query = new Document("uuid", id);
+		Document found = col.find(query).first();
+
+		if (found != null) return;
+
+		long cms = System.currentTimeMillis();
+		Log.warn("Data for \"" + id + "\" not found! Creating data for this player...");
+
+		UUID id2 = UUID.fromString(id);
+
+		setData(id2, "enderchest_page_1", null);
+		setData(id2, "enderchest_page_2", null);
+		setData(id2, "enderchest_page_3", null);
+		setData(id2, "enderchest_page_4", null);
+		setData(id2, "enderchest_page_5", null);
+		setData(id2, "enderchest_page_6", null);
+		setData(id2, "enderchest_page_7", null);
+		setData(id2, "enderchest_page_8", null);
+		setData(id2, "enderchest_page_9", null);
+
+
+		Log.info("Created data for \"" + id + "\" in " + (System.currentTimeMillis() - cms) + "ms!");
 	}
 }

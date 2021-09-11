@@ -60,7 +60,7 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:adventure-text-serializer-gson-legacy-impl:4.9.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:adventure-platform-facet:4.0.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:adventure-platform-viaversion:4.0.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: one.util:streamex:0.6.1" level="project" />
+    <orderEntry type="library" name="Maven: one.util:streamex:0.7.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.sk89q.worldedit:worldedit-bukkit:6.1.4-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.bukkit:bukkit:1.9.4-R0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: commons-lang:commons-lang:2.6" level="project" />
@@ -79,7 +79,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.sk89q:jchronic:0.2.4a" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: junit:junit:4.8.1" level="project" />
     <orderEntry type="library" name="Maven: dev.triumphteam:triumph-gui:3.0.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.github.koca2000:NoteBlockAPI:-29fdeeeb51-1" level="project" />
+    <orderEntry type="library" name="Maven: com.github.koca2000:NoteBlockAPI:-29fdeeeb51-1" level="project" />
     <orderEntry type="library" name="Maven: org.kohsuke:github-api:1.132" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.9" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.12.3" level="project" />

@@ -1,5 +1,6 @@
 package net.atlas.SkyblockSandbox.listener.sbEvents.storage;
 
+import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.database.mongo.MongoDB;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
@@ -14,7 +15,7 @@ public class PlayerQuit extends SkyblockListener<PlayerQuitEvent>
 	public void callEvent(PlayerQuitEvent event) {
 		StorageCache cache = new StorageCache(new SBPlayer(event.getPlayer()));
 		if (cache.isCached()) {
-			MongoDB mongoDB = new MongoStorage();
+			MongoDB mongoDB = SBX.storage;
 			for (int i = 0; i < 9; i++) {
 				mongoDB.setData(event.getPlayer().getUniqueId(), "enderchest_page_" + (i + 1), cache.getEnderChestPage(i + 1));
 			}

@@ -11,6 +11,7 @@ import net.atlas.SkyblockSandbox.command.abstraction.SBCommandArgs;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCompleter;
 import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
 import net.atlas.SkyblockSandbox.command.commands.*;
+import net.atlas.SkyblockSandbox.database.mongo.MongoAH;
 import net.atlas.SkyblockSandbox.database.mongo.MongoCoins;
 import net.atlas.SkyblockSandbox.database.mongo.MongoDB;
 import net.atlas.SkyblockSandbox.database.sql.BackpackData;
@@ -41,6 +42,7 @@ import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.NumberTruncation.NumberSuffix;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import net.atlas.SkyblockSandbox.util.StackUtils;
+import net.atlas.SkyblockSandbox.util.signGUI.SignGUI;
 import net.minecraft.server.v1_8_R3.*;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.*;
@@ -54,6 +56,7 @@ import org.bukkit.entity.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -92,40 +95,42 @@ public class SBX extends JavaPlugin {
     public static HashMap<EntityArmorStand, Integer> cooldownMap = new HashMap<>();
     public static HashMap<EntityArmorStand, Integer> counterMap = new HashMap<>();
     public static HashMap<EntityArmorStand, Vector> vMap = new HashMap<>();
-    public static HashMap<EntityArmorStand, Integer> angleMap = new HashMap<>();
+    public static HashMap<EntityArmorStand,Integer> angleMap = new HashMap<>();
     public static BukkitTask prevRunnable = null;
     public static HashMap<UUID, String> prevBarMessage = new HashMap<>();
     public static Map<Player, Boolean> abilityUsed = new HashMap<>();
     public static HashMap<Player, Boolean> canfire = new HashMap<>();
     public static HashMap<Player, List<EntityArmorStand>> thrownAxes = new HashMap<>();
     public static final TreeMap<String, ItemStack> hypixelItemMap = new TreeMap<>();
+    public MySQL sql;
 
     private static SBX instance;
     SkyblockCommandFramework framework;
     private static MongoCoins mongoStats;
     public MongoStorage mongoStorage;
+    public static MongoStorage storage = new MongoStorage();
     public Coins coins;
-    public MySQL sql;
+    public SignGUI signGUI;
 
     private File dragonDataFile;
     private FileConfiguration dragonData;
 
     @Override
     public void onEnable() {
-        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+        getServer().getMessenger().registerOutgoingPluginChannel(this,"BungeeCord");
         instance = this;
-        mongoStorage = new MongoStorage();
         framework = new SkyblockCommandFramework(this);
         createDataFiles();
         mongoStats = new MongoCoins();
         mongoStats.connect();
-        mongoStorage.connect();
+        new MongoAH().connect();
+        signGUI = new SignGUI(this);
         coins = new Coins();
-        sql = new MySQL();
-
-        SQLBpCache.init();
+        storage.connect();
 
         Data.initialize();
+        sql = new MySQL();
+        SQLBpCache.init();
         registerListeners();
         registerCommands();
         createIslandWorld();
@@ -139,13 +144,6 @@ public class SBX extends JavaPlugin {
         SkyblockEntity.registerEntities();
     }
 
-    @Override
-    public void onDisable() {
-        BackpackData.save();
-        getServer().getConsoleSender().sendMessage(SUtil.colorize("&cSkyblock Sandbox core was disabled. Please re-enable if you want the server to work."));
-    }
-
-
     @SBCompleter(name = "spawnmob", aliases = {"spawncustommob"})
     public List<String> spawnMobComplete(SBCommandArgs args) {
         List<String> list = new ArrayList<String>();
@@ -157,11 +155,13 @@ public class SBX extends JavaPlugin {
 
     void registerListeners() {
         SkyblockListener.registerListeners();
-        Bukkit.getServer().getPluginManager().registerEvents(new AbiltyListener(new SoulCry()), this);
-        Bukkit.getServer().getPluginManager().registerEvents(new AbiltyListener(new HellShatter()), this);
-        Bukkit.getServer().getPluginManager().registerEvents(new AbiltyListener(new WitherImpact()), this);
-        Bukkit.getServer().getPluginManager().registerEvents(new LootListener(), this);
-        Bukkit.getServer().getPluginManager().registerEvents(new AbilityHandler(), this);
+        PluginManager pm = Bukkit.getPluginManager();
+
+        pm.registerEvents(new AbiltyListener(new SoulCry()), this);
+        pm.registerEvents(new AbiltyListener(new HellShatter()), this);
+        pm.registerEvents(new AbiltyListener(new WitherImpact()), this);
+        pm.registerEvents(new LootListener(), this);
+        pm.registerEvents(new AbilityHandler(),this);
     }
 
     void registerCommands() {
@@ -176,6 +176,8 @@ public class SBX extends JavaPlugin {
         framework.registerCommands(new Command_storage(this));
         framework.registerCommands(new Command_dev(this));
         framework.registerCommands(new Command_items(this));
+        framework.registerCommands(new Command_storage(this));
+        framework.registerCommands(new Command_debugtest(this));
         framework.registerHelp();
     }
 

@@ -7,6 +7,8 @@ import net.atlas.SkyblockSandbox.player.skills.SkillType;
 import net.atlas.SkyblockSandbox.playerIsland.Data;
 import net.atlas.SkyblockSandbox.playerIsland.IslandId;
 import net.atlas.SkyblockSandbox.scoreboard.DragonScoreboard;
+import net.atlas.SkyblockSandbox.storage.MongoStorage;
+import net.atlas.SkyblockSandbox.storage.StorageCache;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import org.bukkit.Location;
@@ -55,6 +57,12 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
         maxStats.put(p.getUniqueId(), maxStat);
         bonusStats.put(p.getUniqueId(),empty);
         SBX.getInstance().coins.loadCoins(p.getPlayer());
+        MongoStorage mongoStorage = SBX.storage;
+        mongoStorage.setPlayerData(p.getUniqueId().toString());
+        StorageCache storage = new StorageCache(p);
+        for (int i = 1; i <= 9; i++) {
+            storage.refresh(i);
+        }
         DragonScoreboard scoreboard = new DragonScoreboard(SBX.getInstance());
         scoreboard.setScoreboard(p.getPlayer());
         for(SBPlayer.PlayerStat s: SBPlayer.PlayerStat.values()) {

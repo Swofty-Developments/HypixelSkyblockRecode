@@ -1,11 +1,13 @@
 package net.atlas.SkyblockSandbox.command.commands;
 
+import net.atlas.SkyblockSandbox.AuctionHouse.guis.AuctionHouseGUI;
+import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCommand;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCommandArgs;
 import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
 import net.atlas.SkyblockSandbox.gui.guis.TestPage;
-import net.atlas.SkyblockSandbox.gui.guis.skyblockmenu.SBMenu;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
+import net.atlas.SkyblockSandbox.util.signGUI.SignGUI;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -26,6 +28,17 @@ public class Command_dev extends SkyblockCommandFramework {
         switch (cmd.getArgs()[0].toLowerCase()) {
             case "guislot": {
                 new TestPage(p, Integer.parseInt(cmd.getArgs()[1])).open();
+                break;
+            }
+            case "ah": {
+                new AuctionHouseGUI(p).open();
+                break;
+            }
+            case "sign": {
+                SignGUI gui = SBX.getInstance().signGUI;
+                gui.open(p.getPlayer(), new String[] {"", "^^^^^^^^^^^^^^^", "Auction starting", "bid price"}, (player, lines) -> {
+                    player.sendMessage(lines[0]);
+                });
             }
         }
     }
