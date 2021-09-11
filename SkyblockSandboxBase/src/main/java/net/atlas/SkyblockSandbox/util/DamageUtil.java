@@ -206,8 +206,7 @@ public class DamageUtil {
             double def = en.getMetadata("defense").get(0).asInt();
             double dmgreduction = 1 - (def / (def + 100));
             //dmgreduction is just a percentage that i multiply total damage by.
-            double afterDmg = beforeDmg * dmgreduction;
-            return afterDmg;
+            return beforeDmg * dmgreduction;
         }
         return beforeDmg;
     }

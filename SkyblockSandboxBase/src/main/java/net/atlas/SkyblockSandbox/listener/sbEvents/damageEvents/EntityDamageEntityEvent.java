@@ -63,7 +63,7 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                     dmg = Slayers.ENDERMAN.getSlayerClass().getDPS().get(tier) / 2D * dmgreduction;
                 }
             } else {
-                dmg = event.getDamage() * dmgreduction;
+                dmg = DamageUtil.calculateSingleHit(damagee,new SBPlayer((Player) damager))/* * dmgreduction*/;
             }
             p.setStat(SBPlayer.PlayerStat.HEALTH, p.getStat(SBPlayer.PlayerStat.HEALTH) - dmg);
             double newHealth = Math.ceil((p.getStat(SBPlayer.PlayerStat.HEALTH) / 100) * 20);

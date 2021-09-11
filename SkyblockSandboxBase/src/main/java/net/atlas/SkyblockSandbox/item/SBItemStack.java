@@ -34,7 +34,7 @@ import static net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat.*;
 import static net.atlas.SkyblockSandbox.player.pets.PetBuilder.petXP;
 
 public class SBItemStack extends ItemStack {
-    public static String[] statsformat = {"Gear_Score", "Damage", "Strength","Crit_Chance", "Crit_Damage", "Attack_Speed", "blank","Health","Defense", "Intelligence", "Speed", "Ferocity", "Mining_Speed","Mining_Fortune","Pristine","blank"};
+    public static String[] statsformat = {"Gear_Score", "Damage", "Strength", "Crit_Chance", "Crit_Damage", "Attack_Speed", "blank", "Health", "Defense", "Intelligence", "Speed", "Ferocity", "Mining_Speed", "Mining_Fortune", "Pristine", "blank"};
 
     private ItemStack stack;
     private String itemID;
@@ -152,8 +152,8 @@ public class SBItemStack extends ItemStack {
 
     public ItemStack refreshLore() {
         if (stack != null) {
-            if(NBTUtil.getString(stack,"is-hypixel").equals("true")) {
-                return stack;
+            if (NBTUtil.getString(stack, "is-hypixel").equals("true")) {
+                //return stack;
             }
             if (stack.hasItemMeta()) {
                 ItemMeta meta = stack.getItemMeta();
@@ -164,15 +164,15 @@ public class SBItemStack extends ItemStack {
                 List<String> ultEnchantsLore = new ArrayList<>();
 
                 int i = 0;
-                if(!NBTUtil.getString(stack,"pet-type").equals("")) {
-                    newLore.add(SUtil.colorize("&8" + NBTUtil.getString(stack,"pet-type")));
+                if (!NBTUtil.getString(stack, "pet-type").equals("")) {
+                    newLore.add(SUtil.colorize("&8" + NBTUtil.getString(stack, "pet-type")));
                     newLore.add("");
                 }
                 String prevS = "";
                 for (String s : statsformat) {
                     i++;
                     if (s.equals("blank")) {
-                        if(!prevS.equals("")) {
+                        if (!prevS.equals("")) {
                             newLore.add("");
                         }
                     } else {
@@ -221,11 +221,33 @@ public class SBItemStack extends ItemStack {
 
 
                 List<String> description = getDescription(stack);
-                if (!description.isEmpty()) {
+                LinkedHashMap<Integer, String> descriptionMap = getDescriptionWithLine(stack);
+                if (!descriptionMap.isEmpty()) {
+                    for (Integer bb : descriptionMap.keySet()) {
+                        int iter = newLore.size();
+                        if (bb > (iter - 1)) {
+                            for (int c = iter; c <= bb; c++) {
+                                newLore.add("can-overwrite");
+                            }
+                            newLore.add(bb,descriptionMap.get(bb));
+
+                        } else {
+                            if(newLore.get(bb).equals("can-overwrite")) {
+                                newLore.add(bb, descriptionMap.get(bb));
+                            } else {
+                                newLore.add(bb, descriptionMap.get(bb));
+                            }
+
+                        }
+
+                    }
+                    newLore.removeIf(s -> s.equals("can-overwrite"));
+                }
+                /*if (!description.isEmpty()) {
                     newLore.addAll(description);
                     newLore.add("");
                 } else {
-                    /*if (oldLore != null) {
+                    if (oldLore != null) {
                         List<String> oldLoreClone = new ArrayList<>(oldLore);
                         for (String s : oldLoreClone) {
                             for (String b : statsformat) {
@@ -239,8 +261,8 @@ public class SBItemStack extends ItemStack {
                             stack = addDescriptionLine(stack, d);
                             assert stack != null;
                         }
-                    }*/
-                }
+                    }
+                }*/
 
                 HashMap<String, String> abilityNames = new HashMap<>();
                 List<String> abilityType = new ArrayList<>();
@@ -273,15 +295,15 @@ public class SBItemStack extends ItemStack {
 
                 //if pet set XP bar
                 StringBuilder petLvl = new StringBuilder();
-                if(Boolean.parseBoolean(NBTUtil.getString(stack,"is-pet"))) {
+                if (Boolean.parseBoolean(NBTUtil.getString(stack, "is-pet"))) {
                     petLvl.append(SUtil.colorize("&7[Lvl"));
                     petLvl.append(NBTUtil.getInteger(stack, "pet-level"));
                     petLvl.append("] ");
-                    for(int b = 0;b<3;b++) {
-                        List<String> perkDescript = NBTUtil.getPetPerkDescription(stack,b+1);
-                        String perkName = NBTUtil.getPerkName(stack,b+1);
+                    for (int b = 0; b < 3; b++) {
+                        List<String> perkDescript = NBTUtil.getPetPerkDescription(stack, b + 1);
+                        String perkName = NBTUtil.getPerkName(stack, b + 1);
                         newLore.add(SUtil.colorize("&6" + ChatColor.stripColor(perkName)));
-                        if(!perkDescript.isEmpty()) {
+                        if (!perkDescript.isEmpty()) {
                             newLore.addAll(perkDescript);
                             newLore.add("");
                         }
@@ -290,7 +312,7 @@ public class SBItemStack extends ItemStack {
                     if (Boolean.parseBoolean(NBTUtil.getString(stack, "is-equipped"))) {
                         int totalXp = petXP[NBTUtil.getInteger(stack, "pet-level")];
                         if (totalXp != 0) {
-                            if(NBTUtil.getInteger(stack, "pet-level")<100) {
+                            if (NBTUtil.getInteger(stack, "pet-level") < 100) {
                                 int percent = NBTUtil.getInteger(stack, "pet-xp") * 100 / totalXp;
                                 double c = Math.round(percent * 10.0) / 10.0;
                                 newLore.add(SUtil.colorize("&7Progress to level " + (NBTUtil.getInteger(stack, "pet-level") + 1) + ": &e" + c + "%"));
@@ -328,7 +350,7 @@ public class SBItemStack extends ItemStack {
                 if (getString(stack, " reforgable").equals("true")) {
                     newLore.add(ChatColor.DARK_GRAY + "This stack can be reforged!");
                 }
-                if(rarity!=null) {
+                if (rarity != null) {
                     if (getInteger(stack, "rarity_upgrades") >= 1) {
                         String recombsymbol = rarity.getColor() + "" + ChatColor.MAGIC + "L" + ChatColor.stripColor("") + rarity.getColor() + "" + ChatColor.BOLD;
                         newLore.add(recombsymbol + " " + rarity.name() + " " + recombsymbol);
@@ -342,33 +364,33 @@ public class SBItemStack extends ItemStack {
                     masterStarAmt = starAmt;
                 }
                 stack.setItemMeta(meta);
-                if(starAmt==0 && masterStarAmt==0) {
-                    if(ChatColor.stripColor(meta.getDisplayName())==null || ChatColor.stripColor(meta.getDisplayName()).isEmpty()) {
-                        stack = NBTUtil.setString(stack,"null","item-name");
+                if (starAmt == 0 && masterStarAmt == 0) {
+                    if (ChatColor.stripColor(meta.getDisplayName()) == null || ChatColor.stripColor(meta.getDisplayName()).isEmpty()) {
+                        stack = NBTUtil.setString(stack, "null", "item-name");
                     } else {
-                        if(NBTUtil.getString(stack,"item-name").isEmpty()||NBTUtil.getString(stack,"item-name")==null) {
-                            stack = NBTUtil.setString(stack,meta.getDisplayName(),"item-name");
+                        if (NBTUtil.getString(stack, "item-name").isEmpty() || NBTUtil.getString(stack, "item-name") == null) {
+                            stack = NBTUtil.setString(stack, meta.getDisplayName(), "item-name");
                         }
                     }
 
                 }
                 StringBuilder builder = new StringBuilder();
                 for (int b = 0; b < starAmt; b++) {
-                    if(masterStarAmt>=b+1) {
+                    if (masterStarAmt >= b + 1) {
                         builder.append("§c✪");
                     } else {
                         builder.append("§6✪");
                     }
                 }
-                if(starAmt!=0||masterStarAmt!=0) {
+                if (starAmt != 0 || masterStarAmt != 0) {
                     builder.append(" ");
                 }
 
                 meta = stack.getItemMeta();
-                if(rarity!=null) {
-                    meta.setDisplayName(builder + petLvl.toString() + rarity.getColor() + SUtil.colorize(NBTUtil.getString(stack,"item-name")));
+                if (rarity != null) {
+                    meta.setDisplayName(builder + petLvl.toString() + rarity.getColor() + SUtil.colorize(NBTUtil.getString(stack, "item-name")));
                 } else {
-                    meta.setDisplayName(builder + petLvl.toString() + SUtil.colorize(NBTUtil.getString(stack,"item-name")));
+                    meta.setDisplayName(builder + petLvl.toString() + SUtil.colorize(NBTUtil.getString(stack, "item-name")));
                 }
                 meta.setLore(newLore);
                 stack.setItemMeta(meta);
@@ -673,6 +695,39 @@ public class SBItemStack extends ItemStack {
         return null;
     }
 
+    public ItemStack addDescriptionLine(String line, int lineindex) {
+        line = ChatColor.translateAlternateColorCodes('&', line);
+        if (this.stack != null) {
+            net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
+            NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+            NBTTagCompound data = tag.getCompound("ExtraAttributes");
+            NBTTagCompound description = data.getCompound("description");
+            LinkedHashMap<Integer,String> descriptMap = new LinkedHashMap<>(getDescriptionWithLine(stack));
+            int iter = descriptMap.size();
+            if (lineindex > (descriptMap.size() - 1)) {
+                for (int i = iter; i <= lineindex; i++) {
+                    descriptMap.put(i,null);
+                }
+                descriptMap.put(lineindex, line);
+
+            }
+
+            for(int i:descriptMap.keySet()) {
+                if(descriptMap.get(i)!=null) {
+                    description.setString(String.valueOf(i),descriptMap.get(i));
+                }
+            }
+            data.set("description", description);
+            tag.set("ExtraAttributes", data);
+
+            nmsItem.setTag(tag);
+            this.stack = CraftItemStack.asBukkitCopy(nmsItem);
+            return CraftItemStack.asBukkitCopy(nmsItem);
+        }
+        return null;
+
+    }
+
     public int getAbilAmount() {
         if (this.stack != null) {
             if (this.stack.hasItemMeta()) {
@@ -745,6 +800,22 @@ public class SBItemStack extends ItemStack {
         return null;
     }
 
+    public LinkedHashMap<Integer, String> getDescriptionWithLine(ItemStack host) {
+        if (host != null) {
+            net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(host);
+            NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+            NBTTagCompound data = tag.getCompound("ExtraAttributes");
+            NBTTagCompound description = data.getCompound("description");
+            Set<String> desc = description.c();
+            LinkedHashMap<Integer, String> descMap = new LinkedHashMap<>();
+            for (String s : desc) {
+                descMap.put(Integer.parseInt(s), description.getString(s));
+            }
+            return descMap;
+        }
+        return null;
+    }
+
     public boolean hasAbility() {
         net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(this.stack);
         NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
@@ -781,7 +852,7 @@ public class SBItemStack extends ItemStack {
         ItemMeta meta = stack.getItemMeta();
         meta.setDisplayName(SUtil.colorize(name));
         stack.setItemMeta(meta);
-        stack = setString(stack,SUtil.colorize(name),"item-name");
+        stack = setString(stack, SUtil.colorize(name), "item-name");
         return stack;
     }
 

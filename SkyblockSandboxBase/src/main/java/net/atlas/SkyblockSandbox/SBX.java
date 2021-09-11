@@ -95,7 +95,7 @@ public class SBX extends JavaPlugin {
     public static HashMap<EntityArmorStand, Integer> cooldownMap = new HashMap<>();
     public static HashMap<EntityArmorStand, Integer> counterMap = new HashMap<>();
     public static HashMap<EntityArmorStand, Vector> vMap = new HashMap<>();
-    public static HashMap<EntityArmorStand,Integer> angleMap = new HashMap<>();
+    public static HashMap<EntityArmorStand, Integer> angleMap = new HashMap<>();
     public static BukkitTask prevRunnable = null;
     public static HashMap<UUID, String> prevBarMessage = new HashMap<>();
     public static Map<Player, Boolean> abilityUsed = new HashMap<>();
@@ -117,7 +117,7 @@ public class SBX extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        getServer().getMessenger().registerOutgoingPluginChannel(this,"BungeeCord");
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         instance = this;
         framework = new SkyblockCommandFramework(this);
         createDataFiles();
@@ -162,7 +162,7 @@ public class SBX extends JavaPlugin {
         pm.registerEvents(new AbiltyListener(new HellShatter()), this);
         pm.registerEvents(new AbiltyListener(new WitherImpact()), this);
         pm.registerEvents(new LootListener(), this);
-        pm.registerEvents(new AbilityHandler(),this);
+        pm.registerEvents(new AbilityHandler(), this);
     }
 
     void registerCommands() {
@@ -408,24 +408,55 @@ public class SBX extends JavaPlugin {
                                 ItemStack bukkitStack = CraftItemStack.asBukkitCopy(itemStack);
                                 for (String s : lore) {
                                     String parsedStat = ChatColor.stripColor(s).replace(' ', '_').toUpperCase().split(":")[0];
-                                    for(String b:SBItemStack.statsformat) {
-                                        if(parsedStat.equalsIgnoreCase(b)) {
-                                            SBPlayer.PlayerStat stat = Enums.getIfPresent(SBPlayer.PlayerStat.class, parsedStat).orNull();
-                                            if (stat != null) {
-                                                try {
-                                                    if(s.contains("\\+") || s.contains("+")) {
-                                                        String split1 = ChatColor.stripColor(s).replace(' ', '_').toUpperCase().split("\\+")[1];
-                                                        int amt = Integer.parseInt(split1);
-                                                        if(amt!=0) {
-                                                            bukkitStack = NBTUtil.setInteger(bukkitStack,amt,stat.name());
-                                                        }
+                                    List<String> statsFormat = new ArrayList<>(Arrays.asList(SBItemStack.statsformat));
+                                    if (statsFormat.stream().anyMatch(parsedStat::equalsIgnoreCase)) {
+                                        SBPlayer.PlayerStat stat = Enums.getIfPresent(SBPlayer.PlayerStat.class, parsedStat).orNull();
+                                        if (stat != null) {
+                                            try {
+                                                String split1 = ChatColor.stripColor(s).replace(' ', '_').toUpperCase();
+                                                if(split1.contains("{")) {
+                                                    split1 = "0";
+                                                } else {
+                                                    if (split1.contains(":")) {
+                                                        split1 = split1.split(":")[1];
+                                                        System.out.println(split1);
                                                     }
-
-                                                } catch (NumberFormatException ignored) {
-
+                                                    if(split1.contains("_HP")) {
+                                                        split1 = split1.replace("_HP","");
+                                                    }
+                                                    if(split1.contains("%")) {
+                                                        split1 = split1.replace("%","");
+                                                    }
+                                                    if(split1.contains("+")) {
+                                                        split1 = split1.replace("+","");
+                                                    }
+                                                    if(split1.contains(".")) {
+                                                        split1 = split1.split("\\.")[0];
+                                                    }
+                                                    if(split1.contains("-")) {
+                                                        split1 = "0";
+                                                    }
+                                                    if(split1.contains(",")) {
+                                                        split1 = split1.replace(",","");
+                                                    }
+                                                    if(split1.contains("_")) {
+                                                        split1 = split1.replace("_","");
+                                                    }
+                                                    if(split1.contains("HEALTH") || split1.contains("PERSECOND")) {
+                                                        return;
+                                                    }
+                                                    int amt = Integer.parseInt(split1);
+                                                    if (amt != 0) {
+                                                        bukkitStack = NBTUtil.setInteger(bukkitStack, amt, stat.name());
+                                                    }
                                                 }
+                                            } catch (NumberFormatException ignored) {
+                                                ignored.printStackTrace();
                                             }
                                         }
+                                    } else {
+                                        SBItemStack stack = new SBItemStack(bukkitStack);
+                                        bukkitStack = stack.addDescriptionLine(s, lore.indexOf(s));
                                     }
 
                                 }
@@ -438,8 +469,7 @@ public class SBX extends JavaPlugin {
                             } catch (MojangsonParseException e) {
                                 e.printStackTrace();
                             }
-                        } catch (NullPointerException e) {
-                            continue;
+                        } catch (NullPointerException ignored) {
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }

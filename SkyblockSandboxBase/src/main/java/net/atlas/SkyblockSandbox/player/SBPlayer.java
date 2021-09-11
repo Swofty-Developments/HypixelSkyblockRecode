@@ -312,7 +312,8 @@ public class SBPlayer extends PluginPlayer {
         FARMING_FORTUNE("farming_fortune",0,false,makeColorfulSkullItem("&6Farming Fortune","http://textures.minecraft.net/texture/2ab879e1e590041146bc78c018af5877d39e5475eb7db368fcaf2acda373833d",1,"")),
         FORAGING_FORTUNE("foraging_fortune",0,false,makeColorfulSkullItem("&6Foraging Fortune","http://textures.minecraft.net/texture/4f960c639d4004d1882575aeba69f456fb3c744077935714947e19c1306d2733", 1,"")),
         PRISTINE("pristine",0,false,makeColorfulSkullItem("&5Pristine","http://textures.minecraft.net/texture/db6975af70724d6a44fd5946e60b2717737dfdb545b4dab1893351a9c9dd183c",1, "")),
-        DAMAGE("damage", 0, false,makeColorfulItem(Material.IRON_SWORD,"&cDamage",1,0,""));
+        DAMAGE("damage", 0, false,makeColorfulItem(Material.IRON_SWORD,"&cDamage",1,0,"")),
+        GEAR_SCORE("gear_score",0,false,makeColorfulItem(Material.INK_SACK,"&dGear Score",1,0,""));
 
 
         private String name;

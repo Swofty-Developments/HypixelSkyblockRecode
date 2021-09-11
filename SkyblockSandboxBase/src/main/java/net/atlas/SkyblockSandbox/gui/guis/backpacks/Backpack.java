@@ -13,6 +13,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -128,10 +129,12 @@ public class Backpack extends NormalGUI {
     }
 
     public void closeInv(InventoryCloseEvent event) {
-        String serialized = Serialization.toBase64(event.getInventory());
-        byte[] byteArray = serialized.getBytes();
-        ItemStack newBp = NBTUtil.setBytes(backpack, byteArray, "stored-items");
-        getOwner().setItemInHand(newBp);
+        if(getOwner().getPlayer()== event.getPlayer()) {
+            String serialized = Serialization.toBase64(event.getInventory());
+            byte[] byteArray = serialized.getBytes();
+            ItemStack newBp = NBTUtil.setBytes(backpack, byteArray, "stored-items");
+            getOwner().setItemInHand(newBp);
+        }
     }
 
 }
