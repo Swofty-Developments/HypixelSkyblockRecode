@@ -42,7 +42,6 @@ import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.NumberTruncation.NumberSuffix;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import net.atlas.SkyblockSandbox.util.StackUtils;
-import net.atlas.SkyblockSandbox.util.signGUI.SignGUI;
 import net.minecraft.server.v1_8_R3.*;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.*;
@@ -67,6 +66,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
+import signgui.SignManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -103,6 +103,7 @@ public class SBX extends JavaPlugin {
     public static HashMap<Player, List<EntityArmorStand>> thrownAxes = new HashMap<>();
     public static final TreeMap<String, ItemStack> hypixelItemMap = new TreeMap<>();
     public MySQL sql;
+    public SignManager signManager;
 
     private static SBX instance;
     SkyblockCommandFramework framework;
@@ -110,7 +111,6 @@ public class SBX extends JavaPlugin {
     public MongoStorage mongoStorage;
     public static MongoStorage storage = new MongoStorage();
     public Coins coins;
-    public SignGUI signGUI;
 
     private File dragonDataFile;
     private FileConfiguration dragonData;
@@ -124,13 +124,14 @@ public class SBX extends JavaPlugin {
         mongoStats = new MongoCoins();
         mongoStats.connect();
         new MongoAH().connect();
-        signGUI = new SignGUI(this);
         coins = new Coins();
         storage.connect();
 
         Data.initialize();
         sql = new MySQL();
         SQLBpCache.init();
+        signManager = new SignManager(this);
+        signManager.init();
         registerListeners();
         registerCommands();
         createIslandWorld();

@@ -14,6 +14,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import signgui.SignGUI;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -78,6 +79,21 @@ public class AuctionCreatorGUI extends NormalGUI implements Backable {
                 });
 
                  */
+                new SignGUI(SBX.getInstance().signManager, e-> {
+                    if (NumUtils.isInt(e.getLines()[0]))
+                    {
+                        Bukkit.getScheduler().runTaskLater(SBX.getInstance(), () ->
+                        {
+                            new AuctionCreatorGUI(getOwner(), false, Integer.parseInt(e.getLines()[0])).open();
+                        }, 3);
+                    }
+                    else
+                    {
+                        player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 0);
+                        player.sendMessage("§cThat's not a valid number!");
+                    }
+                }).withLines("","^^^^^^^^^^^^^^^","Auction starting", "bid price")
+                .open(player.getPlayer());
             }
         }
     }

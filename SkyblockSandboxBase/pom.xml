@@ -230,10 +230,5 @@
             <artifactId>json</artifactId>
             <version>20201115</version>
         </dependency>
-        <dependency>
-            <groupId>one.util</groupId>
-            <artifactId>streamex</artifactId>
-            <version>0.7.3</version>
-        </dependency>
     </dependencies>
 </project>
