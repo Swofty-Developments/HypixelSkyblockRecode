@@ -21,7 +21,7 @@ public class AuctionHouseGUI extends NormalGUI {
             getOwner().closeInventory();
         });
         setAction(15, event -> {
-            new AuctionCreatorGUI(getOwner(), false, 500).open();
+            new AuctionCreatorGUI(getOwner(), false, 500, 6).open();
         });
         return true;
     }

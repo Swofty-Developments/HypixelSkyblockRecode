@@ -8,13 +8,13 @@ import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.BukkitSerilization;
 import net.atlas.SkyblockSandbox.util.NumUtils;
+import net.atlas.SkyblockSandbox.util.signgui.SignGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import signgui.SignGUI;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -25,9 +25,11 @@ import java.util.UUID;
 public class AuctionCreatorGUI extends NormalGUI implements Backable {
     public static HashMap<UUID, String> PlayerItems = new HashMap<>();
     public double price;
-    public AuctionCreatorGUI(SBPlayer owner, boolean bin, double price) {
+    public int timeInHours;
+    public AuctionCreatorGUI(SBPlayer owner, boolean bin, double price, int timeInHours) {
         super(owner);
         this.price = price;
+        this.timeInHours = timeInHours;
     }
 
     @Override
@@ -84,7 +86,7 @@ public class AuctionCreatorGUI extends NormalGUI implements Backable {
                     {
                         Bukkit.getScheduler().runTaskLater(SBX.getInstance(), () ->
                         {
-                            new AuctionCreatorGUI(getOwner(), false, Integer.parseInt(e.getLines()[0])).open();
+                            new AuctionCreatorGUI(getOwner(), false, Integer.parseInt(e.getLines()[0]), 6).open();
                         }, 3);
                     }
                     else
@@ -127,6 +129,7 @@ public class AuctionCreatorGUI extends NormalGUI implements Backable {
         } else {
             setItem(29, makeColorfulItem(Material.STAINED_CLAY, "§cCreate", 1, 14, "§cCan't create auction!"));
         }
+        setItem(33, makeColorfulItem(Material.WATCH, "&fDuration: &e" + timeInHours, 1, 0));
     }
 
     @Override

@@ -1,4 +1,4 @@
-package signgui;
+package net.atlas.SkyblockSandbox.util.signgui;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;

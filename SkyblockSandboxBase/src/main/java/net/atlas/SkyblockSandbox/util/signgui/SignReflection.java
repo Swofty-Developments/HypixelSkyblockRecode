@@ -1,4 +1,4 @@
-package signgui;
+package net.atlas.SkyblockSandbox.util.signgui;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Field;

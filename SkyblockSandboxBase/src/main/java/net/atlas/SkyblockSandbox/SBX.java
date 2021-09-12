@@ -42,6 +42,7 @@ import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.NumberTruncation.NumberSuffix;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import net.atlas.SkyblockSandbox.util.StackUtils;
+import net.atlas.SkyblockSandbox.util.signgui.SignManager;
 import net.minecraft.server.v1_8_R3.*;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.*;
@@ -66,7 +67,6 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
-import signgui.SignManager;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package signgui;
+package net.atlas.SkyblockSandbox.util.signgui;
 
 import com.google.common.base.Preconditions;
 import net.minecraft.server.v1_8_R3.*;
