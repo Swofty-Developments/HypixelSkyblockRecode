@@ -1,6 +1,5 @@
 package net.atlas.SkyblockSandbox.command.commands;
 
-import net.atlas.SkyblockSandbox.AuctionHouse.guis.AuctionCreatorGUI;
 import net.atlas.SkyblockSandbox.AuctionHouse.guis.AuctionHouseGUI;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCommand;
@@ -8,10 +7,7 @@ import net.atlas.SkyblockSandbox.command.abstraction.SBCommandArgs;
 import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
 import net.atlas.SkyblockSandbox.gui.guis.TestPage;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
-import net.atlas.SkyblockSandbox.util.NumUtils;
-import net.atlas.SkyblockSandbox.util.signgui.SignGUI;
-import org.bukkit.Bukkit;
-import org.bukkit.Sound;
+import net.atlas.SkyblockSandbox.util.signGUI.SignGUI;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -40,7 +36,7 @@ public class Command_dev extends SkyblockCommandFramework {
             }
             case "sign": {
                 new SignGUI(SBX.getInstance().signManager, (e -> {
-                    p.sendMessage("&eYour output was" + e.getLines()[0]);
+                    p.sendMessage("&eYour output was: " + e.getLines()[0]);
                 }))
                 .withLines("","^^^^^^^^^^^^^^^","Auction starting", "bid price")
                 .open(p.getPlayer());

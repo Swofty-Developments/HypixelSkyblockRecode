@@ -1,10 +1,6 @@
 package net.atlas.SkyblockSandbox;
 
 import com.google.common.base.Enums;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCommandArgs;
@@ -13,8 +9,6 @@ import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
 import net.atlas.SkyblockSandbox.command.commands.*;
 import net.atlas.SkyblockSandbox.database.mongo.MongoAH;
 import net.atlas.SkyblockSandbox.database.mongo.MongoCoins;
-import net.atlas.SkyblockSandbox.database.mongo.MongoDB;
-import net.atlas.SkyblockSandbox.database.sql.BackpackData;
 import net.atlas.SkyblockSandbox.database.sql.MySQL;
 import net.atlas.SkyblockSandbox.database.sql.SQLBpCache;
 import net.atlas.SkyblockSandbox.economy.Coins;
@@ -28,6 +22,7 @@ import net.atlas.SkyblockSandbox.item.Rarity;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.item.ability.AbiltyListener;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.HellShatter;
+import net.atlas.SkyblockSandbox.item.ability.itemAbilities.ShortBowTerm;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.SoulCry;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.WitherImpact;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
@@ -42,7 +37,7 @@ import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.NumberTruncation.NumberSuffix;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import net.atlas.SkyblockSandbox.util.StackUtils;
-import net.atlas.SkyblockSandbox.util.signgui.SignManager;
+import net.atlas.SkyblockSandbox.util.signGUI.SignManager;
 import net.minecraft.server.v1_8_R3.*;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.*;
@@ -55,7 +50,6 @@ import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -65,14 +59,10 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GitHub;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
@@ -161,6 +151,7 @@ public class SBX extends JavaPlugin {
         pm.registerEvents(new AbiltyListener(new SoulCry()), this);
         pm.registerEvents(new AbiltyListener(new HellShatter()), this);
         pm.registerEvents(new AbiltyListener(new WitherImpact()), this);
+        pm.registerEvents(new AbiltyListener(new ShortBowTerm()), this);
         pm.registerEvents(new LootListener(), this);
         pm.registerEvents(new AbilityHandler(), this);
     }
@@ -255,10 +246,7 @@ public class SBX extends JavaPlugin {
         new BukkitRunnable() {
             @Override
             public void run() {
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    SBPlayer sbPlayer = new SBPlayer(p);
-                    sbPlayer.updateStats();
-                }
+                SBPlayer.updateStats();
             }
         }.runTaskTimer(SBX.getInstance(), 0L, 5L);
 
@@ -268,13 +256,12 @@ public class SBX extends JavaPlugin {
             @Override
             public void run() {
                 if (Bukkit.getOnlinePlayers().size() > 0) {
-
+                    if (i == 2) {
+                        SBPlayer.doRegenStats();
+                        i = 0;
+                    }
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         SBPlayer sbPlayer = new SBPlayer(p);
-                        if (i == 2) {
-                            sbPlayer.doRegenStats();
-                            i = 0;
-                        }
                         sbPlayer.sendBarMessage(getStatMessage(sbPlayer));
                         i++;
                     }
@@ -414,36 +401,41 @@ public class SBX extends JavaPlugin {
                                         if (stat != null) {
                                             try {
                                                 String split1 = ChatColor.stripColor(s).replace(' ', '_').toUpperCase();
-                                                if(split1.contains("{")) {
+                                                if (split1.contains("{")) {
                                                     split1 = "0";
                                                 } else {
                                                     if (split1.contains(":")) {
                                                         split1 = split1.split(":")[1];
-                                                        System.out.println(split1);
                                                     }
-                                                    if(split1.contains("_HP")) {
-                                                        split1 = split1.replace("_HP","");
+                                                    if (split1.contains("_HP")) {
+                                                        split1 = split1.replace("_HP", "");
                                                     }
-                                                    if(split1.contains("%")) {
-                                                        split1 = split1.replace("%","");
+                                                    if (split1.contains("%")) {
+                                                        split1 = split1.replace("%", "");
                                                     }
-                                                    if(split1.contains("+")) {
-                                                        split1 = split1.replace("+","");
+                                                    if (split1.contains("+")) {
+                                                        split1 = split1.replace("+", "");
                                                     }
-                                                    if(split1.contains(".")) {
+                                                    if (split1.contains(".")) {
                                                         split1 = split1.split("\\.")[0];
                                                     }
-                                                    if(split1.contains("-")) {
+                                                    if (split1.contains("-")) {
                                                         split1 = "0";
                                                     }
-                                                    if(split1.contains(",")) {
-                                                        split1 = split1.replace(",","");
+                                                    if (split1.contains(",")) {
+                                                        split1 = split1.replace(",", "");
                                                     }
-                                                    if(split1.contains("_")) {
-                                                        split1 = split1.replace("_","");
+                                                    if (split1.contains("_")) {
+                                                        split1 = split1.replace("_", "");
                                                     }
-                                                    if(split1.contains("HEALTH") || split1.contains("PERSECOND")) {
-                                                        return;
+                                                    if(split1.contains("?")) {
+                                                        split1 = split1.replace("?","");
+                                                    }
+                                                    if (split1.contains("HEALTH") || split1.contains("PERSECOND") || split1.contains("SPEED") || split1.contains("INTELLIGENCE") || split1.contains("DAMAGE")||split1.contains("STRENGTH")) {
+                                                        split1 = "0";
+                                                    }
+                                                    if(split1.contains("?")) {
+                                                        split1 = split1.replace("?","");
                                                     }
                                                     int amt = Integer.parseInt(split1);
                                                     if (amt != 0) {

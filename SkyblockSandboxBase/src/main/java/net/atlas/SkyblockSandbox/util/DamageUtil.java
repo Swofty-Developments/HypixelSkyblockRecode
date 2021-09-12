@@ -89,7 +89,7 @@ public class DamageUtil {
         if (damager instanceof Player) {
             ((CraftPlayer) (damager)).getHandle().playerConnection.sendPacket(packet);
         }
-        if(damagee instanceof Player) {
+        if (damagee instanceof Player) {
             ((CraftPlayer) damagee).getHandle().playerConnection.sendPacket(packet);
         }
         new BukkitRunnable() {
@@ -97,11 +97,11 @@ public class DamageUtil {
             public void run() {
                 PacketPlayOutEntityDestroy packetPlayOutEntityDestroy = new PacketPlayOutEntityDestroy(stand.getId());
                 stand.getBukkitEntity().remove();
-                if(damager instanceof Player) {
+                if (damager instanceof Player) {
                     ((CraftPlayer) damager).getHandle().playerConnection.sendPacket(packetPlayOutEntityDestroy);
                 }
 
-                if(damagee instanceof Player) {
+                if (damagee instanceof Player) {
                     ((CraftPlayer) damagee).getHandle().playerConnection.sendPacket(packetPlayOutEntityDestroy);
                 }
 
@@ -128,21 +128,21 @@ public class DamageUtil {
         double dmg = 0;
         if (isCrit) {
             dmg = init * mult * (1 + (cd / 100));
-            dmg = calculateDefense((LivingEntity) en,dmg);
+            dmg = calculateDefense((LivingEntity) en, dmg);
             if (checkHitShield(en, p, dmg)) {
                 dmg = 0;
             } else {
                 DamageUtil.spawnMarker(en, p, dmg, true);
-                ((LivingEntity)en).damage(0);
+                ((LivingEntity) en).damage(0);
             }
         } else {
             dmg = init * mult;
-            dmg = calculateDefense((LivingEntity) en,dmg);
+            dmg = calculateDefense((LivingEntity) en, dmg);
             if (checkHitShield(en, p, dmg)) {
                 dmg = 0;
             } else {
                 DamageUtil.spawnMarker(en, p, dmg, false);
-                ((LivingEntity)en).damage(0);
+                ((LivingEntity) en).damage(0);
             }
         }
 
@@ -152,8 +152,8 @@ public class DamageUtil {
     public static double calculateSingleHit(Entity damagee, Entity damager) {
         boolean isCrit = false;
         HashMap<SBPlayer.PlayerStat, Double> playerStats = new HashMap<>();
-        for(SBPlayer.PlayerStat stat: SBPlayer.PlayerStat.values()) {
-            playerStats.put(stat,stat.getBase());
+        for (SBPlayer.PlayerStat stat : SBPlayer.PlayerStat.values()) {
+            playerStats.put(stat, stat.getBase());
         }
         double cc = playerStats.get(SBPlayer.PlayerStat.CRIT_CHANCE);
         Random random = new Random();
@@ -169,19 +169,19 @@ public class DamageUtil {
         double dmg = 0;
         if (isCrit) {
             dmg = init * mult * (1 + (cd / 100));
-            dmg = calculateDefense((LivingEntity) damagee,dmg);
+            dmg = calculateDefense((LivingEntity) damagee, dmg);
             if (checkHitShield(damagee, dmg)) {
                 dmg = 0;
             } else {
-                ((LivingEntity)damagee).damage(0);
+                ((LivingEntity) damagee).damage(0);
             }
         } else {
             dmg = init * mult;
-            dmg = calculateDefense((LivingEntity) damagee,dmg);
+            dmg = calculateDefense((LivingEntity) damagee, dmg);
             if (checkHitShield(damagee, dmg)) {
                 dmg = 0;
             } else {
-                ((LivingEntity)damagee).damage(0);
+                ((LivingEntity) damagee).damage(0);
             }
         }
 
@@ -201,8 +201,14 @@ public class DamageUtil {
         return null;
     }
 
-    public static double calculateDefense(LivingEntity en,double beforeDmg) {
-        if(!en.getMetadata("defense").isEmpty()) {
+    public static double calculateDefense(LivingEntity en, double beforeDmg) {
+        if (en instanceof Player) {
+            SBPlayer p = new SBPlayer(((Player) en));
+            double def = p.getMaxStat(SBPlayer.PlayerStat.DEFENSE);
+            double dmgreduction = 1 - (def / (def + 100));
+            return beforeDmg * dmgreduction;
+        }
+        if (!en.getMetadata("defense").isEmpty()) {
             double def = en.getMetadata("defense").get(0).asInt();
             double dmgreduction = 1 - (def / (def + 100));
             //dmgreduction is just a percentage that i multiply total damage by.
@@ -221,7 +227,7 @@ public class DamageUtil {
             LivingEntity livingen = (LivingEntity) en;
             double pcnt = (livingen.getHealth() / livingen.getMaxHealth()) * 100;
             if (hitShield != 0) {
-                p.playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 1, hitShield/100f);
+                p.playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 1, hitShield / 100f);
                 en.setMetadata("hitshield", new FixedMetadataValue(SBX.getInstance(), hitShield - 1));
                 en.setMetadata("canDamage", new FixedMetadataValue(SBX.getInstance(), true));
                 if (hitShield - 1 <= 0) {
@@ -239,8 +245,8 @@ public class DamageUtil {
                     }
                 }
                 if (prevPhase != entityPhase.get((LivingEntity) en)) {
-                    SlayerTier tier = Enums.getIfPresent(SlayerTier.class,en.getMetadata(Slayers.ENDERMAN.toString()).get(0).asString()).orNull();
-                    if(tier!=null) {
+                    SlayerTier tier = Enums.getIfPresent(SlayerTier.class, en.getMetadata(Slayers.ENDERMAN.toString()).get(0).asString()).orNull();
+                    if (tier != null) {
                         switch (tier) {
                             case ONE:
                                 en.setMetadata("hitshield", new FixedMetadataValue(SBX.getInstance(), 10));
@@ -274,7 +280,7 @@ public class DamageUtil {
             LivingEntity livingen = (LivingEntity) en;
             double pcnt = (livingen.getHealth() / livingen.getMaxHealth()) * 100;
             if (hitShield != 0) {
-                p.playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 1, hitShield/100f);
+                p.playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 1, hitShield / 100f);
                 en.setMetadata("hitshield", new FixedMetadataValue(SBX.getInstance(), hitShield - 1));
                 en.setMetadata("canDamage", new FixedMetadataValue(SBX.getInstance(), true));
                 if (hitShield - 1 <= 0) {
@@ -292,8 +298,8 @@ public class DamageUtil {
                     }
                 }
                 if (prevPhase != entityPhase.get((LivingEntity) en)) {
-                    SlayerTier tier = Enums.getIfPresent(SlayerTier.class,en.getMetadata(Slayers.ENDERMAN.toString()).get(0).asString()).orNull();
-                    if(tier!=null) {
+                    SlayerTier tier = Enums.getIfPresent(SlayerTier.class, en.getMetadata(Slayers.ENDERMAN.toString()).get(0).asString()).orNull();
+                    if (tier != null) {
                         switch (tier) {
                             case ONE:
                                 en.setMetadata("hitshield", new FixedMetadataValue(SBX.getInstance(), 10));

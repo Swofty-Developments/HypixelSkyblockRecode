@@ -1,4 +1,4 @@
-package net.atlas.SkyblockSandbox.util.signgui;
+package net.atlas.SkyblockSandbox.util.signGUI;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
@@ -7,7 +7,6 @@ import io.netty.channel.ChannelPipeline;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.PacketPlayInUpdateSign;
-import net.minecraft.server.v1_8_R3.TileEntitySign;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;

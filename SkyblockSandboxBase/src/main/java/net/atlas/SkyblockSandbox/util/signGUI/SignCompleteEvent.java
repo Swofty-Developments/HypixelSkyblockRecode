@@ -1,4 +1,4 @@
-package net.atlas.SkyblockSandbox.util.signgui;
+package net.atlas.SkyblockSandbox.util.signGUI;
 
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import org.bukkit.entity.Player;

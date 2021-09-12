@@ -179,12 +179,17 @@ public class SBItemStack extends ItemStack {
                         int a = getInteger(stack, s.toUpperCase());
                         if (a != 0) {
                             prevS = s;
+                            PlayerStat stat = Enums.getIfPresent(PlayerStat.class, s.toUpperCase()).orNull();
                             s = s.replace('_', ' ');
-                            if (s.equals("Intelligence") || s.equals("Mining Speed")) {
-                                newLore.add(ChatColor.GRAY + s + ":" + ChatColor.GREEN + " +" + a);
-                            } else {
-                                newLore.add(ChatColor.GRAY + s + ":" + ChatColor.RED + " +" + a);
+                            if (stat != null) {
+                                if (stat.equals(GEAR_SCORE)) {
+                                    newLore.add(ChatColor.GRAY + s + ":" + stat.getColor() + " " + a);
+                                } else {
+                                    newLore.add(ChatColor.GRAY + s + ":" + stat.getColor() + " +" + a);
+                                }
                             }
+
+
                         }
                     }
                 }
@@ -222,26 +227,25 @@ public class SBItemStack extends ItemStack {
 
                 List<String> description = getDescription(stack);
                 LinkedHashMap<Integer, String> descriptionMap = getDescriptionWithLine(stack);
+                Map<Integer, String> map = new TreeMap<>(descriptionMap);
                 if (!descriptionMap.isEmpty()) {
-                    for (Integer bb : descriptionMap.keySet()) {
+                    for (Integer bb : map.keySet()) {
                         int iter = newLore.size();
                         if (bb > (iter - 1)) {
                             for (int c = iter; c <= bb; c++) {
                                 newLore.add("can-overwrite");
                             }
-                            newLore.add(bb,descriptionMap.get(bb));
-
-                        } else {
-                            if(newLore.get(bb).equals("can-overwrite")) {
-                                newLore.add(bb, descriptionMap.get(bb));
-                            } else {
-                                newLore.add(bb, descriptionMap.get(bb));
-                            }
 
                         }
+                        newLore.add(bb, descriptionMap.get(bb));
+
 
                     }
-                    newLore.removeIf(s -> s.equals("can-overwrite"));
+                    for (String s : newLore) {
+                        if (s.equals("can-overwrite")) {
+                            newLore.set(newLore.indexOf(s), "");
+                        }
+                    }
                 }
                 /*if (!description.isEmpty()) {
                     newLore.addAll(description);
@@ -702,20 +706,23 @@ public class SBItemStack extends ItemStack {
             NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
             NBTTagCompound data = tag.getCompound("ExtraAttributes");
             NBTTagCompound description = data.getCompound("description");
-            LinkedHashMap<Integer,String> descriptMap = new LinkedHashMap<>(getDescriptionWithLine(stack));
-            int iter = descriptMap.size();
+            LinkedHashMap<Integer, String> descriptMap = new LinkedHashMap<>(getDescriptionWithLine(stack));
+
+            /*int iter = descriptMap.size();
             if (lineindex > (descriptMap.size() - 1)) {
                 for (int i = iter; i <= lineindex; i++) {
-                    descriptMap.put(i,null);
+                    descriptMap.put(i,"");
                 }
                 descriptMap.put(lineindex, line);
 
-            }
+            }*/
 
-            for(int i:descriptMap.keySet()) {
-                if(descriptMap.get(i)!=null) {
-                    description.setString(String.valueOf(i),descriptMap.get(i));
-                }
+            descriptMap.put(lineindex, line);
+
+            for (int i : descriptMap.keySet()) {
+                /*if(descriptMap.get(i)!=null) {*/
+                description.setString(String.valueOf(i), descriptMap.get(i));
+                /*}*/
             }
             data.set("description", description);
             tag.set("ExtraAttributes", data);

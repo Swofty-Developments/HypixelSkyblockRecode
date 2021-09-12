@@ -76,12 +76,6 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                     newRng = (40 - 0);
                 }
                 newHealth = Math.floor(((p.getStat(SBPlayer.PlayerStat.HEALTH) - 0) * newRng) / oldrng);
-                if(damager instanceof Player) {
-                    SBPlayer pdamager = new SBPlayer(((Player) damager));
-                    Random random = new Random();
-                    double crit = random.nextDouble();
-                    DamageUtil.spawnMarker(damagee,damager,dmg,pdamager.getMaxStat(SBPlayer.PlayerStat.CRIT_CHANCE)/100>=crit);
-                }
             }
             if (newHealth <= 0) {
                 p.setHealth(p.getMaxHealth());

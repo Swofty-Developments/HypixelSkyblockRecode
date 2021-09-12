@@ -19,6 +19,8 @@ import net.atlas.SkyblockSandbox.sound.Jingle;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import org.bson.Document;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -110,86 +112,93 @@ public class SBPlayer extends PluginPlayer {
         return false;
     }
 
-    public void updateStats() {
-        HashMap<PlayerStat, Double> map = NBTUtil.getAllStats(sbPlayer);
+    public static void updateStats() {
+        for(Player p:Bukkit.getOnlinePlayers()) {
+            SBPlayer pl = new SBPlayer(p);
+            HashMap<PlayerStat, Double> map = NBTUtil.getAllStats(sbPlayer);
 
-        for (PlayerStat s : PlayerStat.values()) {
-            double stat = map.get(s);
-            if (getStat(s) < getMaxStat(s) && !s.isRegen()) {
-                setStat(s, getMaxStat(s));
-            }
-            setMaxStat(s, stat);
-            if (getStat(s) > getMaxStat(s)) {
-                if (s.isRegen()) {
-                    setStat(s, getMaxStat(s));
+            for (PlayerStat s : PlayerStat.values()) {
+                double stat = map.get(s);
+                if (pl.getStat(s) < pl.getMaxStat(s) && !s.isRegen()) {
+                    pl.setStat(s, pl.getMaxStat(s));
                 }
-            }
-            if (isSoulCryActive.containsKey(sbPlayer.getUniqueId())) {
-                if (isSoulCryActive.get(sbPlayer.getUniqueId())) {
-                    if (s.equals(PlayerStat.FEROCITY)) {
-                        setMaxStat(s, stat + 400);
+                pl.setMaxStat(s, stat);
+                if (pl.getStat(s) > pl.getMaxStat(s)) {
+                    if (s.isRegen()) {
+                        pl.setStat(s, pl.getMaxStat(s));
                     }
                 }
-            }
-
-
-        }
-
-        if(sbPlayer.getMaxStat(HEALTH)>100) {
-            double newHealth = 0;
-            double oldrng = (sbPlayer.getMaxStat(SBPlayer.PlayerStat.HEALTH) - 0);
-            if (oldrng == 0) {
-                newHealth = 0;
-            } else {
-                if(sbPlayer.getMaxStat(HEALTH)<=200) {
-                    newHealth = (sbPlayer.getMaxStat(HEALTH))/5;
-                } else {
-                    double newRng = (40 - 0);
-                    newHealth = Math.floor(((sbPlayer.getMaxStat(SBPlayer.PlayerStat.HEALTH) - 0) * newRng) / oldrng);
-
+                if (isSoulCryActive.containsKey(sbPlayer.getUniqueId())) {
+                    if (isSoulCryActive.get(sbPlayer.getUniqueId())) {
+                        if (s.equals(PlayerStat.FEROCITY)) {
+                            pl.setMaxStat(s, stat + 400);
+                        }
+                    }
                 }
-            }
-            getPlayer().setMaxHealth(Math.floor(newHealth));
-        } else {
-            getPlayer().setMaxHealth(20);
-        }
 
-        double newHealth;
-        double oldrng = (sbPlayer.getMaxStat(SBPlayer.PlayerStat.HEALTH) - 0);
-        if (oldrng == 0)
-            newHealth = 0;
-        else {
-            double newRng = 20;
-            if (sbPlayer.getMaxStat(SBPlayer.PlayerStat.HEALTH) >= 100 && sbPlayer.getMaxStat(HEALTH)<=200) {
-                newRng = (sbPlayer.getMaxStat(HEALTH)/5 - 0);
+
+            }
+
+            if (sbPlayer.getMaxStat(HEALTH) > 100) {
+                double newHealth = 0;
+                double oldrng = (sbPlayer.getMaxStat(SBPlayer.PlayerStat.HEALTH) - 0);
+                if (oldrng == 0) {
+                    newHealth = 0;
+                } else {
+                    if (sbPlayer.getMaxStat(HEALTH) <= 200) {
+                        newHealth = (sbPlayer.getMaxStat(HEALTH)) / 5;
+                    } else {
+                        double newRng = (40 - 0);
+                        newHealth = Math.floor(((sbPlayer.getMaxStat(SBPlayer.PlayerStat.HEALTH) - 0) * newRng) / oldrng);
+
+                    }
+                }
+                pl.getPlayer().setMaxHealth(Math.floor(newHealth));
             } else {
-                newRng = (40-0);
+                pl.getPlayer().setMaxHealth(20);
             }
-            newHealth = Math.ceil(((sbPlayer.getStat(SBPlayer.PlayerStat.HEALTH) - 0) * newRng) / oldrng);
-            if(newHealth> sbPlayer.getMaxHealth()) {
-                newHealth = sbPlayer.getMaxHealth();
+
+            double newHealth;
+            double oldrng = (sbPlayer.getMaxStat(SBPlayer.PlayerStat.HEALTH) - 0);
+            if (oldrng == 0)
+                newHealth = 0;
+            else {
+                double newRng = 20;
+                if (sbPlayer.getMaxStat(SBPlayer.PlayerStat.HEALTH) >= 100 && sbPlayer.getMaxStat(HEALTH) <= 200) {
+                    newRng = (sbPlayer.getMaxStat(HEALTH) / 5 - 0);
+                } else {
+                    newRng = (40 - 0);
+                }
+                newHealth = Math.ceil(((sbPlayer.getStat(SBPlayer.PlayerStat.HEALTH) - 0) * newRng) / oldrng);
+                if (newHealth > sbPlayer.getMaxHealth()) {
+                    newHealth = sbPlayer.getMaxHealth();
+                }
+                sbPlayer.setHealth(Math.ceil(newHealth));
             }
-            sbPlayer.setHealth(Math.ceil(newHealth));
+            //maxStats.put(sbPlayer.getUniqueId(),map);
         }
-        //maxStats.put(sbPlayer.getUniqueId(),map);
     }
 
-    public void doRegenStats() {
-        HashMap<PlayerStat, Double> map = NBTUtil.getAllStats(sbPlayer);
-        if (getStat(PlayerStat.INTELLIGENCE) < getMaxStat(PlayerStat.INTELLIGENCE)) {
-            double newintl = getStat(PlayerStat.INTELLIGENCE) + (getMaxStat(PlayerStat.INTELLIGENCE) * 0.1);
-            if (newintl > getMaxStat(PlayerStat.INTELLIGENCE)) {
-                newintl = getMaxStat(PlayerStat.INTELLIGENCE);
+    public static void doRegenStats() {
+        for(Player p: Bukkit.getOnlinePlayers()) {
+            SBPlayer pl = new SBPlayer(p);
+            if (pl.getStat(PlayerStat.INTELLIGENCE) < pl.getMaxStat(PlayerStat.INTELLIGENCE)) {
+                double newintl = pl.getStat(PlayerStat.INTELLIGENCE) + (pl.getMaxStat(PlayerStat.INTELLIGENCE) * 0.1);
+                if (newintl > pl.getMaxStat(PlayerStat.INTELLIGENCE)) {
+                    newintl = pl.getMaxStat(PlayerStat.INTELLIGENCE);
+                }
+                pl.setStat(INTELLIGENCE,newintl);
             }
-            setStat(INTELLIGENCE,newintl);
-        }
-        if (getStat(PlayerStat.HEALTH) < getMaxStat(PlayerStat.HEALTH)) {
-            double newhlth = getStat(PlayerStat.HEALTH) + (getMaxStat(PlayerStat.HEALTH) * 0.01 + 1.5);
-            if (newhlth > getMaxStat(PlayerStat.HEALTH)) {
-                newhlth = getMaxStat(PlayerStat.HEALTH);
+            if (pl.getStat(PlayerStat.HEALTH) < pl.getMaxStat(PlayerStat.HEALTH)) {
+                double newhlth = pl.getStat(PlayerStat.HEALTH) + (pl.getMaxStat(PlayerStat.HEALTH) * 0.01 + 1.5);
+                if (newhlth > pl.getMaxStat(PlayerStat.HEALTH)) {
+                    newhlth = pl.getMaxStat(PlayerStat.HEALTH);
+                }
+                pl.setStat(HEALTH,newhlth);
+                System.out.println(pl.getPlayer().getName());
             }
-            setStat(HEALTH,newhlth);
         }
+
     }
 
     public void setAllStats(HashMap<UUID, HashMap<PlayerStat, Double>> stats, PlayerStat... ignore) {
@@ -293,39 +302,49 @@ public class SBPlayer extends PluginPlayer {
     }
 
     public enum PlayerStat {
-        HEALTH("health", 100, true,makeColorfulItem(Material.GOLDEN_APPLE,"&cHealth",1,0,"")),
-        DEFENSE("defense", 0, false,makeColorfulItem(Material.IRON_CHESTPLATE,"&aDefense",1,0,"")),
+        HEALTH("&a","health", 100, true,makeColorfulItem(Material.GOLDEN_APPLE,"&cHealth",1,0,"")),
+        DEFENSE("&a","defense", 0, false,makeColorfulItem(Material.IRON_CHESTPLATE,"&aDefense",1,0,"")),
         STRENGTH("strength", 0, false,makeColorfulItem(Material.BLAZE_POWDER,"&cStrength",1,0,"")),
         SPEED("speed", 100, false,makeColorfulItem(Material.SUGAR,"&rSpeed",1,0,"")),
         CRIT_CHANCE("crit_chance", 30, false,makeColorfulSkullItem("&9Crit Chance","http://textures.minecraft.net/texture/3e4f49535a276aacc4dc84133bfe81be5f2a4799a4c04d9a4ddb72d819ec2b2b",1,"")),
         CRIT_DAMAGE("crit_damage", 50, false,makeColorfulSkullItem("&9Crit Damage","http://textures.minecraft.net/texture/ddafb23efc57f251878e5328d11cb0eef87b79c87b254a7ec72296f9363ef7c",1,"")),
-        INTELLIGENCE("intelligence", 100, true,makeColorfulItem(Material.ENCHANTED_BOOK,"&bIntelligence",1,0,"")),
-        MINING_SPEED("mining_speed",0,false,makeColorfulItem(Material.DIAMOND_PICKAXE,"&6Mining Speed",1,0,"")),
+        INTELLIGENCE("&a","intelligence", 100, true,makeColorfulItem(Material.ENCHANTED_BOOK,"&bIntelligence",1,0,"")),
+        MINING_SPEED("&a","mining_speed",0,false,makeColorfulItem(Material.DIAMOND_PICKAXE,"&6Mining Speed",1,0,"")),
         ATTACK_SPEED("attack_speed", 0, false,makeColorfulItem(Material.GOLD_AXE,"&eAttack Speed",1,0,"")),
         SEA_CREATURE_CHANCE("sea_creature_chance",0,false,makeColorfulItem(Material.PRISMARINE_CRYSTALS,"&3Sea Creature Chance",1,0,"")),
         MAGIC_FIND("magic_find",0,false,makeColorfulItem(Material.STICK,"&bMagic Find",1,0,"")),
         PET_LUCK("pet_luck",0,false,makeColorfulSkullItem("&dPet Luck","http://textures.minecraft.net/texture/93c8aa3fde295fa9f9c27f734bdbab11d33a2e43e855accd7465352377413b",1,"")),
         TRUE_DEFENSE("true_defense",0,false,makeColorfulItem(Material.INK_SACK,"&rTrue Defense",1, 15,"")),
-        FEROCITY("ferocity", 0, false,makeColorfulItem(Material.INK_SACK,"&cFerocity",1,1,"")),
+        FEROCITY("&a","ferocity", 0, false,makeColorfulItem(Material.INK_SACK,"&cFerocity",1,1,"")),
         ABILITY_DAMAGE("ability_damage",0,false,makeColorfulItem(Material.BEACON,"&cAbility Damage",1,0,"")),
         MINING_FORTUNE("mining_fortune",0,false,makeColorfulSkullItem("&6Mining Fortune","http://textures.minecraft.net/texture/f07dff657d61f302c7d2e725265d17b64aa73642391964fb48fc15be950831d8",1,"")),
         FARMING_FORTUNE("farming_fortune",0,false,makeColorfulSkullItem("&6Farming Fortune","http://textures.minecraft.net/texture/2ab879e1e590041146bc78c018af5877d39e5475eb7db368fcaf2acda373833d",1,"")),
         FORAGING_FORTUNE("foraging_fortune",0,false,makeColorfulSkullItem("&6Foraging Fortune","http://textures.minecraft.net/texture/4f960c639d4004d1882575aeba69f456fb3c744077935714947e19c1306d2733", 1,"")),
         PRISTINE("pristine",0,false,makeColorfulSkullItem("&5Pristine","http://textures.minecraft.net/texture/db6975af70724d6a44fd5946e60b2717737dfdb545b4dab1893351a9c9dd183c",1, "")),
         DAMAGE("damage", 0, false,makeColorfulItem(Material.IRON_SWORD,"&cDamage",1,0,"")),
-        GEAR_SCORE("gear_score",0,false,makeColorfulItem(Material.INK_SACK,"&dGear Score",1,0,""));
+        GEAR_SCORE("&d","gear_score",0,false,makeColorfulItem(Material.INK_SACK,"&dGear Score",1,0,""));
 
 
         private String name;
         private double base;
         private boolean isRegen;
         private ItemStack stack;
+        private String color;
+
+        PlayerStat(String color,String name, double base, boolean isRegen,ItemStack stack) {
+            this.name = name;
+            this.base = base;
+            this.isRegen = isRegen;
+            this.stack = stack;
+            this.color = color;
+        }
 
         PlayerStat(String name, double base, boolean isRegen,ItemStack stack) {
             this.name = name;
             this.base = base;
             this.isRegen = isRegen;
             this.stack = stack;
+            this.color = "&c";
         }
 
         public double getBase() {
@@ -338,6 +357,10 @@ public class SBPlayer extends PluginPlayer {
 
         public ItemStack getStack() {
             return stack;
+        }
+
+        public String getColor() {
+            return SUtil.colorize(color);
         }
     }
 

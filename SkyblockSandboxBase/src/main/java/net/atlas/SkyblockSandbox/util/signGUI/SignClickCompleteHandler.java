@@ -1,4 +1,4 @@
-package net.atlas.SkyblockSandbox.util.signgui;
+package net.atlas.SkyblockSandbox.util.signGUI;
 
 /**
  * File <b>SignClickEventHandler</b> located on fr.cleymax.signgui SignClickEventHandler is a part of SignGUI.
