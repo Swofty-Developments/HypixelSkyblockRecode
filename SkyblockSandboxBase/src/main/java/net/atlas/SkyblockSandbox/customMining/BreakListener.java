@@ -1,9 +1,9 @@
 package net.atlas.SkyblockSandbox.customMining;
 
 import com.comphenix.protocol.ProtocolManager;
-import net.maploop.items.Items;
-import net.maploop.items.user.User;
-import net.maploop.items.util.NBTUtil;
+import net.atlas.SkyblockSandbox.SBX;
+import net.atlas.SkyblockSandbox.player.SBPlayer;
+import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.minecraft.server.v1_8_R3.PacketPlayOutBlockBreakAnimation;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -26,12 +26,11 @@ import java.util.UUID;
 
 public class BreakListener implements Listener {
     private BukkitScheduler scheduler;
-    private final ProtocolManager protocolManager = Items.getProtocolManager();
     public static HashMap<UUID, MineTask> isClicking = new HashMap<>();
     int MAX_BREAK_SPEED = 6;
 
     public BreakListener() {
-        this.scheduler = Items.getInstance().getServer().getScheduler();
+        this.scheduler = SBX.getInstance().getServer().getScheduler();
     }
 
     @EventHandler
@@ -39,7 +38,7 @@ public class BreakListener implements Listener {
         e.setCancelled(true);
         Player p = e.getPlayer();
         if (p.getItemInHand() != null && !p.getItemInHand().getType().equals(Material.AIR)) {
-            String ID = NBTUtil.getString(p.getItemInHand(),"SB-name");
+            String ID = NBTUtil.getString(p.getItemInHand(),"item-type");
             if(ID!=null) {
                 if(ID.toUpperCase().contains("PICKAXE") || ID.toUpperCase().contains("DRILL")) {
                     Block b = e.getBlock();
@@ -50,7 +49,7 @@ public class BreakListener implements Listener {
                             previous.cancel();
                         }
 
-                        User user = new User(p);
+                        SBPlayer pl = new SBPlayer(p);
                         MiningBlock mb = new MiningBlock(b);
                         switch (b.getType()) {
                             case STONE:
@@ -84,10 +83,10 @@ public class BreakListener implements Listener {
 
                         int miningTime = -1;
                         if (mb.getBlockHP() != 0) {
-                            miningTime = (int) (mb.getBlockHP()/user.getTotalMiningSpeed());
+                            miningTime = (int) (mb.getBlockHP()/pl.getMaxStat(SBPlayer.PlayerStat.MINING_SPEED));
                         }
                         MineTask task = new MineTask(p,b,dimension,miningTime);
-                        int taskID = scheduler.scheduleSyncRepeatingTask(Items.getInstance(),task,0L,0L);
+                        int taskID = scheduler.scheduleSyncRepeatingTask(SBX.getInstance(),task,0L,0L);
                         task.setTaskID(taskID);
                         isClicking.put(p.getUniqueId(),task);
                     }

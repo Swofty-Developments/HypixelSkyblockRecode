@@ -1,12 +1,9 @@
 package net.atlas.SkyblockSandbox.customMining;
 
-import net.maploop.items.extras.Enchantment;
-import net.maploop.items.item.CustomItem;
-import net.maploop.items.item.ItemUtilities;
-import net.maploop.items.util.EnchantUtil;
-import net.maploop.items.util.IUtil;
-import net.maploop.items.util.NBTUtil;
-import org.bukkit.Material;
+
+import net.atlas.SkyblockSandbox.item.SBItemStack;
+import net.atlas.SkyblockSandbox.item.SkyblockItem;
+import net.atlas.SkyblockSandbox.item.enchant.Enchantment;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -41,15 +38,11 @@ public class MiningBlock {
         return blockHP;
     }
 
-    public void setDrops(CustomItem customItem, int max, int min) {
+    public void setDrops(SBItemStack customItem, int max, int min) {
         Random random = new Random();
         int dropAmt = random.nextInt(max) + min;
-        ItemStack i = new ItemStack(customItem.getMaterial(),dropAmt);
-        ItemMeta meta = i.getItemMeta();
-        meta.setDisplayName(customItem.getRarity().getColor() + customItem.getName());
-        List<String> lore = customItem.getLore(i);
-        meta.setLore(lore);
-        i.setItemMeta(meta);
+        ItemStack i = customItem.asBukkitItem();
+        i.setAmount(dropAmt);
         drops = i;
     }
 

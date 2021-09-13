@@ -18,7 +18,7 @@ import java.util.Set;
 
 public class MineUtil {
 
-    private static final ProtocolManager protocolManager = SBX.getProtocolManager();
+    private static final ProtocolManager protocolManager = SBX.getProtcolManager();
     public static HashMap<Player, Block> diggingBlocks = new HashMap<>();
     public static void setupPacketListeners() {
         protocolManager.addPacketListener(new PacketAdapter(SBX.getInstance(), ListenerPriority.NORMAL, PacketType.Play.Client.BLOCK_DIG) {
@@ -35,22 +35,16 @@ public class MineUtil {
                         public void run() {
                             if (event.getPlayer().getTargetBlock((Set<Material>) null, 5).getLocation().equals(diggingBlocks.get(event.getPlayer()).getLocation())) {
                                 BreakListener.setClickCanceled(event.getPlayer());
+                            } else {
+                                diggingBlocks.put(event.getPlayer(), event.getPlayer().getTargetBlock((Set<Material>) null,5));
                             }
 
                         }
                     }.runTaskLater(SBX.getInstance(),1L);
-                    diggingBlocks.put(event.getPlayer(), event.getPlayer().getTargetBlock((Set<Material>) null,5));
-
                 }
             }
         });
-        protocolManager.addPacketListener(new PacketAdapter(Items.getInstance(), ListenerPriority.NORMAL, PacketType.Play.Client.ARM_ANIMATION) {
-            @Override
-            public void onPacketReceiving(PacketEvent event){
-                PacketContainer packet = event.getPacket();
 
-            }
-        });
 
     }
 }

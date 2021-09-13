@@ -1,5 +1,8 @@
 package net.atlas.SkyblockSandbox;
 
+import com.comphenix.protocol.ProtocolLib;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import com.google.common.base.Enums;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
@@ -104,6 +107,7 @@ public class SBX extends JavaPlugin {
     public MongoStorage mongoStorage;
     public static MongoStorage storage = new MongoStorage();
     public Coins coins;
+    private static ProtocolManager protocolManager;
 
     private File dragonDataFile;
     private FileConfiguration dragonData;
@@ -116,6 +120,7 @@ public class SBX extends JavaPlugin {
         createDataFiles();
         mongoStats = new MongoCoins();
         mongoStats.connect();
+        protocolManager = ProtocolLibrary.getProtocolManager();
         new MongoAH().connect();
         coins = new Coins();
         storage.connect();
@@ -205,6 +210,10 @@ public class SBX extends JavaPlugin {
         createDragonDataFile();
         new DatabaseInformationFile().create();
         new IslandInfoFile().create();
+    }
+
+    public static ProtocolManager getProtcolManager() {
+        return protocolManager;
     }
 
     void startOnlineRunnables() {
