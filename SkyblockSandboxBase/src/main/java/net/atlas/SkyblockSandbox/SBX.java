@@ -43,6 +43,7 @@ import org.apache.commons.io.FileUtils;
 import org.bukkit.*;
 import org.bukkit.Material;
 import org.bukkit.WorldType;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -52,6 +53,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.messaging.Messenger;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
@@ -79,6 +81,7 @@ public class SBX extends JavaPlugin {
     public static HashMap<String, ItemStack> storedItem = new HashMap<>();
     public static HashMap<UUID, HashMap<Slayers, HashMap<SlayerTier, Double>>> activeSlayers = new HashMap<>();
     public static HashMap<UUID, HashMap<SkillType, Double>> cachedSkills = new HashMap<>();
+    public static HashMap<UUID, HashMap<SkillType, Integer>> cachedSkillLvls = new HashMap<>();
     public static HashMap<UUID, SkillEXPGainEvent> prevSkillEvent = new HashMap<>();
     public static HashMap<UUID, SkillEXPGainEvent> cachedEvent = new HashMap<>();
     public static LinkedHashMap<UUID, LinkedHashMap<String, Long>> queuedBarMessages = new LinkedHashMap<>();
@@ -135,6 +138,24 @@ public class SBX extends JavaPlugin {
         SkyblockEntity.registerEntities();
     }
 
+    @Override
+    public void onDisable() {
+        cacheSkills();
+    }
+
+    public static void cacheSkills() {
+        for (UUID uid : cachedSkills.keySet()) {
+            for (SkillType type : cachedSkills.get(uid).keySet()) {
+                double amt = cachedSkills.get(uid).get(type);
+                mongoStats.setData(uid, type.getName() + "_xp", amt);
+            }
+            for (SkillType type : cachedSkillLvls.get(uid).keySet()) {
+                int amt = cachedSkillLvls.get(uid).get(type);
+                mongoStats.setData(uid, type.getName() + "_lvl", amt);
+            }
+        }
+    }
+
     @SBCompleter(name = "spawnmob", aliases = {"spawncustommob"})
     public List<String> spawnMobComplete(SBCommandArgs args) {
         List<String> list = new ArrayList<String>();
@@ -187,6 +208,8 @@ public class SBX extends JavaPlugin {
     }
 
     void startOnlineRunnables() {
+        File file = new File("plugins/SkyblockSandboxBase-0.1.jar");
+        long lastMod = file.lastModified();
         BukkitTask runnable = new BukkitRunnable() {
             @Override
             public void run() {
@@ -252,22 +275,47 @@ public class SBX extends JavaPlugin {
 
         new BukkitRunnable() {
             int i = 0;
+            int ii = 0;
 
             @Override
             public void run() {
-                if (Bukkit.getOnlinePlayers().size() > 0) {
-                    if (i == 2) {
-                        SBPlayer.doRegenStats();
-                        i = 0;
-                    }
-                    for (Player p : Bukkit.getOnlinePlayers()) {
-                        SBPlayer sbPlayer = new SBPlayer(p);
-                        sbPlayer.sendBarMessage(getStatMessage(sbPlayer));
-                        i++;
+
+                if (i == 2) {
+                    SBPlayer.doRegenStats();
+                    i = 0;
+                }
+                if(ii==30) {
+                    File file2 = new File("plugins/SkyblockSandboxBase-0.1.jar");
+                    System.out.println(file.lastModified());
+                    System.out.println(file2.lastModified());
+                    if(lastMod!=file2.lastModified()) {
+                        updateServer();
+                    } else {
+                        ii = 0;
                     }
                 }
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    SBPlayer sbPlayer = new SBPlayer(p);
+                    sbPlayer.sendBarMessage(getStatMessage(sbPlayer));
+                }
+                i++;
+                ii++;
             }
         }.runTaskTimerAsynchronously(this, 0L, 10L);
+    }
+
+    public void updateServer() {
+        for(Player pl:Bukkit.getOnlinePlayers()) {
+            SBPlayer p = new SBPlayer(pl);
+            p.sendTitle(SUtil.colorize("&cGame Update"), SUtil.colorize("&eServer Restarting in: &c30"));
+        }
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
+                Bukkit.dispatchCommand(console, "stop");
+            }
+        }.runTaskLater(SBX.getInstance(),20*30L);
     }
 
     public static String getStatMessage(SBPlayer p) {
@@ -428,14 +476,14 @@ public class SBX extends JavaPlugin {
                                                     if (split1.contains("_")) {
                                                         split1 = split1.replace("_", "");
                                                     }
-                                                    if(split1.contains("?")) {
-                                                        split1 = split1.replace("?","");
+                                                    if (split1.contains("?")) {
+                                                        split1 = split1.replace("?", "");
                                                     }
-                                                    if (split1.contains("HEALTH") || split1.contains("PERSECOND") || split1.contains("SPEED") || split1.contains("INTELLIGENCE") || split1.contains("DAMAGE")||split1.contains("STRENGTH")) {
+                                                    if (split1.contains("HEALTH") || split1.contains("PERSECOND") || split1.contains("SPEED") || split1.contains("INTELLIGENCE") || split1.contains("DAMAGE") || split1.contains("STRENGTH")) {
                                                         split1 = "0";
                                                     }
-                                                    if(split1.contains("?")) {
-                                                        split1 = split1.replace("?","");
+                                                    if (split1.contains("?")) {
+                                                        split1 = split1.replace("?", "");
                                                     }
                                                     int amt = Integer.parseInt(split1);
                                                     if (amt != 0) {

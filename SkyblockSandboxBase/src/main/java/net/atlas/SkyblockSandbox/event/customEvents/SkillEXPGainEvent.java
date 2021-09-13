@@ -24,6 +24,13 @@ public class SkillEXPGainEvent extends Event implements Cancellable {
         this.e = e;
     }
 
+    public SkillEXPGainEvent(SBPlayer p, SkillType type, double expAmt) {
+        this.type = type;
+        this.expAmt = expAmt;
+        this.p = p;
+        this.e = null;
+    }
+
     public double getExpAmt() {
         return expAmt;
     }

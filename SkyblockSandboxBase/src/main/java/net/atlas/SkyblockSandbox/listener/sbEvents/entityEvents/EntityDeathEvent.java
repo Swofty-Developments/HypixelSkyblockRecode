@@ -41,7 +41,6 @@ public class EntityDeathEvent extends SkyblockListener<org.bukkit.event.entity.E
         if (!(event.getEntity() instanceof Player)) {
             if (event.getEntity().getKiller() != null) {
                 SBPlayer pl = new SBPlayer(event.getEntity().getKiller());
-                pl.playSound(pl.getLocation(), Sound.ORB_PICKUP, 2, 1.8f);
                 EntityDamageByEntityEvent ev = new EntityDamageByEntityEvent(event.getEntity().getKiller(),event.getEntity(), EntityDamageEvent.DamageCause.ENTITY_ATTACK,1);
                 SkillEXPGainEvent e = new SkillEXPGainEvent(pl, SkillType.COMBAT, 10,ev);
                 Bukkit.getPluginManager().callEvent(e);

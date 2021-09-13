@@ -1,10 +1,18 @@
 package net.atlas.SkyblockSandbox.listener.sbEvents;
 
+import net.atlas.SkyblockSandbox.SBX;
+import net.atlas.SkyblockSandbox.event.customEvents.SkillEXPGainEvent;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
+import net.atlas.SkyblockSandbox.player.skills.SkillType;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import static net.atlas.SkyblockSandbox.playerIsland.PlayerIslandHandler.dist;
 
@@ -12,6 +20,10 @@ public class BlockBreak extends SkyblockListener<BlockBreakEvent> {
     @EventHandler
     public void callEvent(BlockBreakEvent event) {
         SBPlayer pl = new SBPlayer(event.getPlayer());
+        Location loc = event.getBlock().getLocation();
+        Block block = event.getBlock();
+        byte data = block.getData();
+        Material mat = block.getType();
         if(pl.getItemInHand().getType().name().contains("SWORD")) {
             event.setCancelled(true);
             return;
@@ -27,5 +39,20 @@ public class BlockBreak extends SkyblockListener<BlockBreakEvent> {
             }
         }
         event.setCancelled(true);
+
+
+        if(event.getBlock().getType().name().contains("LOG")) {
+            SkillEXPGainEvent expGainEvent = new SkillEXPGainEvent(pl, SkillType.FORAGING,8.0D);
+            Bukkit.getPluginManager().callEvent(expGainEvent);
+            event.setCancelled(false);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    loc.getBlock().setType(mat);
+                    loc.getBlock().setData(data);
+                }
+            }.runTaskLater(SBX.getInstance(),20*10);
+        }
+
     }
 }

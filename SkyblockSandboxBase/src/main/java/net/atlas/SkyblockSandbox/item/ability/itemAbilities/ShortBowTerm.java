@@ -7,6 +7,7 @@ import net.atlas.SkyblockSandbox.item.ability.AbilityType;
 import net.atlas.SkyblockSandbox.item.ability.EnumAbilityData;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -74,6 +75,7 @@ public class ShortBowTerm extends Ability {
                     a3 = player.launchProjectile(Arrow.class);
 
                     a3.setCustomName("terminator");
+                    player.playSound(player.getLocation(), Sound.SHOOT_ARROW,1,1);
                     a3.setVelocity(rotateVector(a1.getVelocity(), -50.38));
                     new BukkitRunnable() {
                         @Override

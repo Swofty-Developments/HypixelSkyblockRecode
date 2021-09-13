@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import java.util.HashMap;
 import java.util.UUID;
 
+import static net.atlas.SkyblockSandbox.SBX.cachedSkills;
 import static net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat.*;
 
 public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
@@ -86,6 +87,17 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
         }
         for(SkillType t:SkillType.values()) {
             p.addSkillXP(t,0);
+            p.setSkillLvl(t,0);
+            Object lvl = SBX.getMongoStats().getData(p.getUniqueId(),t.getName() + "_lvl");
+            if(lvl instanceof Double) {
+                p.setSkillLvl(t, ((Double) lvl).intValue());
+            } else {
+                p.setSkillLvl(t, (Integer)lvl);
+            }
+
+            HashMap<SkillType,Double> temp = new HashMap<>(cachedSkills.get(p.getUniqueId()));
+            temp.put(t, (Double) SBX.getMongoStats().getData(p.getUniqueId(),t.getName() + "_xp"));
+            cachedSkills.put(p.getUniqueId(),temp);
         }
 
     }

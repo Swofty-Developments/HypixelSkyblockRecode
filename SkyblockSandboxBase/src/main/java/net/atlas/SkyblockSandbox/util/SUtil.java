@@ -1,5 +1,6 @@
 package net.atlas.SkyblockSandbox.util;
 
+import com.google.common.base.Strings;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.minecraft.server.v1_8_R3.ChatComponentText;
 import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
@@ -35,6 +36,24 @@ public class SUtil {
             colored.add(ChatColor.translateAlternateColorCodes('&', b));
         }
         return colored;
+    }
+
+    public static String getProgressBar(int current, int max, int totalBars, char symbol, ChatColor completedColor,
+                                 ChatColor notCompletedColor) {
+        float percent = (float) current / max;
+        int progressBars = (int) (totalBars * percent);
+
+        return Strings.repeat("" + completedColor + symbol, progressBars)
+                + Strings.repeat("" + notCompletedColor + symbol, totalBars - progressBars);
+    }
+
+    public static String getProgressBar(double current, int max, int totalBars, char symbol, ChatColor completedColor,
+                                        ChatColor notCompletedColor) {
+        float percent = (float) current / max;
+        int progressBars = (int) (totalBars * percent);
+
+        return Strings.repeat("" + completedColor + symbol, progressBars)
+                + Strings.repeat("" + notCompletedColor + symbol, totalBars - progressBars);
     }
 
     public static void sendActionText(SBPlayer player, String message) {

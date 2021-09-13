@@ -1,5 +1,6 @@
 package net.atlas.SkyblockSandbox.player;
 
+import com.google.common.base.Strings;
 import lombok.Setter;
 import com.xxmicloxx.NoteBlockAPI.model.RepeatMode;
 import com.xxmicloxx.NoteBlockAPI.model.Song;
@@ -18,12 +19,12 @@ import net.atlas.SkyblockSandbox.playerIsland.PlayerIslandHandler;
 import net.atlas.SkyblockSandbox.sound.Jingle;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.SUtil;
+import net.minecraft.server.v1_8_R3.IChatBaseComponent;
+import net.minecraft.server.v1_8_R3.PacketPlayOutTitle;
 import org.bson.Document;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -50,12 +51,27 @@ public class SBPlayer extends PluginPlayer {
         sbPlayer = this;
     }
 
+
+    /*public void sendTitle(String s,String s1,ChatColor sColor,ChatColor s1Color) {
+        IChatBaseComponent chatTitle = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + s + "\",color:" + sColor.name().toLowerCase() + "}");
+        IChatBaseComponent subTitle = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + s + "\",color:" + s1Color.name().toLowerCase() + "}");
+
+        PacketPlayOutTitle title = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE, chatTitle);
+        PacketPlayOutTitle title2 = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.SUBTITLE, chatTitle);
+        PacketPlayOutTitle length = new PacketPlayOutTitle(5, 20, 5);
+
+
+        ((CraftPlayer) sbPlayer.getPlayer()).getHandle().playerConnection.sendPacket(title);
+        ((CraftPlayer) sbPlayer.getPlayer()).getHandle().playerConnection.sendPacket(title2);
+        ((CraftPlayer) sbPlayer.getPlayer()).getHandle().playerConnection.sendPacket(length);
+    }*/
+
     public double getStat(PlayerStat stat) {
-        if(!bonusStats.containsKey(sbPlayer.getUniqueId())) {
-            if(!bonusStats.get(sbPlayer.getUniqueId()).containsKey(stat)) {
-                HashMap<PlayerStat,Double> temp = new HashMap<>(bonusStats.get(sbPlayer.getUniqueId()));
-                temp.put(stat,0D);
-                bonusStats.put(sbPlayer.getUniqueId(),temp);
+        if (!bonusStats.containsKey(sbPlayer.getUniqueId())) {
+            if (!bonusStats.get(sbPlayer.getUniqueId()).containsKey(stat)) {
+                HashMap<PlayerStat, Double> temp = new HashMap<>(bonusStats.get(sbPlayer.getUniqueId()));
+                temp.put(stat, 0D);
+                bonusStats.put(sbPlayer.getUniqueId(), temp);
             }
         }
         return bonusStats.get(sbPlayer.getUniqueId()).get(stat);
@@ -63,7 +79,7 @@ public class SBPlayer extends PluginPlayer {
 
     public double getMaxStat(PlayerStat stat) {
         if (!maxStats.containsKey(sbPlayer.getUniqueId())) {
-            if(!maxStats.get(sbPlayer.getUniqueId()).containsKey(stat)) {
+            if (!maxStats.get(sbPlayer.getUniqueId()).containsKey(stat)) {
                 HashMap<PlayerStat, Double> temp = new HashMap<>(maxStats.get(sbPlayer.getUniqueId()));
                 temp.put(stat, 0D);
                 maxStats.put(sbPlayer.getUniqueId(), temp);
@@ -113,7 +129,7 @@ public class SBPlayer extends PluginPlayer {
     }
 
     public static void updateStats() {
-        for(Player p:Bukkit.getOnlinePlayers()) {
+        for (Player p : Bukkit.getOnlinePlayers()) {
             SBPlayer pl = new SBPlayer(p);
             HashMap<PlayerStat, Double> map = NBTUtil.getAllStats(sbPlayer);
 
@@ -180,22 +196,21 @@ public class SBPlayer extends PluginPlayer {
     }
 
     public static void doRegenStats() {
-        for(Player p: Bukkit.getOnlinePlayers()) {
+        for (Player p : Bukkit.getOnlinePlayers()) {
             SBPlayer pl = new SBPlayer(p);
             if (pl.getStat(PlayerStat.INTELLIGENCE) < pl.getMaxStat(PlayerStat.INTELLIGENCE)) {
                 double newintl = pl.getStat(PlayerStat.INTELLIGENCE) + (pl.getMaxStat(PlayerStat.INTELLIGENCE) * 0.1);
                 if (newintl > pl.getMaxStat(PlayerStat.INTELLIGENCE)) {
                     newintl = pl.getMaxStat(PlayerStat.INTELLIGENCE);
                 }
-                pl.setStat(INTELLIGENCE,newintl);
+                pl.setStat(INTELLIGENCE, newintl);
             }
             if (pl.getStat(PlayerStat.HEALTH) < pl.getMaxStat(PlayerStat.HEALTH)) {
                 double newhlth = pl.getStat(PlayerStat.HEALTH) + (pl.getMaxStat(PlayerStat.HEALTH) * 0.01 + 1.5);
                 if (newhlth > pl.getMaxStat(PlayerStat.HEALTH)) {
                     newhlth = pl.getMaxStat(PlayerStat.HEALTH);
                 }
-                pl.setStat(HEALTH,newhlth);
-                System.out.println(pl.getPlayer().getName());
+                pl.setStat(HEALTH, newhlth);
             }
         }
 
@@ -212,24 +227,24 @@ public class SBPlayer extends PluginPlayer {
         }
     }
 
-    public void queueMiddleActionText(SBPlayer p,String s,long timeInTicks) {
+    public void queueMiddleActionText(SBPlayer p, String s, long timeInTicks) {
         s = SUtil.colorize(s);
-        if(queuedBarMessages.containsKey(p.getUniqueId())) {
-            LinkedHashMap<String,Long> temp = new LinkedHashMap<>(queuedBarMessages.get(p.getUniqueId()));
-            temp.put(s,timeInTicks);
-            queuedBarMessages.put(p.getUniqueId(),temp);
+        if (queuedBarMessages.containsKey(p.getUniqueId())) {
+            LinkedHashMap<String, Long> temp = new LinkedHashMap<>(queuedBarMessages.get(p.getUniqueId()));
+            temp.put(s, timeInTicks);
+            queuedBarMessages.put(p.getUniqueId(), temp);
             String finalS = s;
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    LinkedHashMap<String,Long> temp = new LinkedHashMap<>(queuedBarMessages.get(p.getUniqueId()));
+                    LinkedHashMap<String, Long> temp = new LinkedHashMap<>(queuedBarMessages.get(p.getUniqueId()));
                     temp.remove(finalS);
-                    queuedBarMessages.put(p.getUniqueId(),temp);
+                    queuedBarMessages.put(p.getUniqueId(), temp);
                 }
-            }.runTaskLater(SBX.getInstance(),timeInTicks);
+            }.runTaskLater(SBX.getInstance(), timeInTicks);
         } else {
-            LinkedHashMap<String,Long> map = new LinkedHashMap<>();
-            queuedBarMessages.put(p.getUniqueId(),map);
+            LinkedHashMap<String, Long> map = new LinkedHashMap<>();
+            queuedBarMessages.put(p.getUniqueId(), map);
         }
     }
 
@@ -254,23 +269,62 @@ public class SBPlayer extends PluginPlayer {
         SUtil.sendActionText(sbPlayer, SUtil.colorize(message));
     }
 
-    public void playJingle(Jingle j,boolean loop) {
-        j.send(sbPlayer.getPlayer(),loop);
+    public void playJingle(Jingle j, boolean loop) {
+        j.send(sbPlayer.getPlayer(), loop);
     }
 
-    public void playJingle(String file,boolean loop) {
+    public void playJingle(String file, boolean loop) {
         Song song = NBSDecoder.parse(new File(SBX.getInstance().getDataFolder().getPath() + "/Jingles/" + file + ".nbs"));
-        playSong(song,sbPlayer.getPlayer(),loop);
+        playSong(song, sbPlayer.getPlayer(), loop);
     }
 
     public double getCurrentSkillExp(SkillType type) {
         return cachedSkills.get(sbPlayer.getUniqueId()).get(type);
     }
 
-    public void playSong(Song song,Player p,boolean loop) {
+    public int getSkillLvl(SkillType type) {
+        return cachedSkillLvls.get(sbPlayer.getUniqueId()).get(type);
+    }
+
+    public void setSkillLvl(SkillType type, int lvl) {
+        HashMap<SkillType, Integer> temp;
+        if (cachedSkillLvls.containsKey(sbPlayer.getUniqueId())) {
+            temp = new HashMap<>(cachedSkillLvls.get(sbPlayer.getUniqueId()));
+        } else {
+            temp = new HashMap<>();
+        }
+        temp.put(type, lvl);
+        cachedSkillLvls.put(sbPlayer.getUniqueId(), temp);
+        //SBX.getMongoStats().setData(sbPlayer.getUniqueId(), type.getName() + "_lvl", lvl);
+    }
+
+    public void levelSkill(SkillType type) {
+        int curLvl = getSkillLvl(type);
+        if (curLvl != type.getMaxLvl()) {
+            setSkillLvl(type, curLvl + 1);
+            playSound(sbPlayer.getLocation(), Sound.LEVEL_UP, 2, 1);
+            for (String s : getLevelUpMessage(type, curLvl + 1)) {
+                sendMessage(s);
+            }
+        }
+    }
+
+    public List<String> getLevelUpMessage(SkillType type, int newLvl) {
+        ArrayList<String> strings = new ArrayList<>();
+        String border = "&3&l" + Strings.repeat("-", 64);
+        strings.add(border);
+        strings.add("&b&l SKILL LEVEL UP &r&3" + type.getName() + " &8" + (newLvl - 1) + "➜&3" + (newLvl));
+        strings.add("");
+        strings.add("&a&l REWARDS");
+        strings.add("&e  Coming soon!");
+        strings.add(border);
+        return SUtil.colorize(strings);
+    }
+
+    public void playSong(Song song, Player p, boolean loop) {
         RadioSongPlayer rsp = new RadioSongPlayer(song);
         rsp.addPlayer(p);
-        if(loop) {
+        if (loop) {
             rsp.setRepeatMode(RepeatMode.ALL);
         }
         rsp.setPlaying(true);
@@ -278,20 +332,21 @@ public class SBPlayer extends PluginPlayer {
 
     public void addSkillXP(SkillType type, double amt) {
         HashMap<SkillType, Double> map;
-        if(cachedSkills.containsKey(sbPlayer.getUniqueId())) {
+        if (cachedSkills.containsKey(sbPlayer.getUniqueId())) {
             map = new HashMap<>(cachedSkills.get(sbPlayer.getUniqueId()));
         } else {
             map = new HashMap<>();
         }
-        if(cachedSkills.containsKey(sbPlayer.getUniqueId())) {
-            map.put(type,map.get(type)+amt);
+        if (map.containsKey(type)) {
+            map.put(type, map.get(type) + amt);
         } else {
-            map.put(type,amt);
+            map.put(type, amt);
         }
-        cachedSkills.put(sbPlayer.getUniqueId(),map);
 
-
+        cachedSkills.put(sbPlayer.getUniqueId(), map);
+        sbPlayer.playSound(sbPlayer.getLocation(), Sound.ORB_PICKUP, 2, 1.8f);
     }
+
     public boolean hasAuctions() {
         for (Document doc : new MongoAH().getAllDocuments()) {
             if (doc.get("owner").equals(getUniqueId().toString()))
@@ -302,27 +357,27 @@ public class SBPlayer extends PluginPlayer {
     }
 
     public enum PlayerStat {
-        HEALTH("&a","health", 100, true,makeColorfulItem(Material.GOLDEN_APPLE,"&cHealth",1,0,"")),
-        DEFENSE("&a","defense", 0, false,makeColorfulItem(Material.IRON_CHESTPLATE,"&aDefense",1,0,"")),
-        STRENGTH("strength", 0, false,makeColorfulItem(Material.BLAZE_POWDER,"&cStrength",1,0,"")),
-        SPEED("speed", 100, false,makeColorfulItem(Material.SUGAR,"&rSpeed",1,0,"")),
-        CRIT_CHANCE("crit_chance", 30, false,makeColorfulSkullItem("&9Crit Chance","http://textures.minecraft.net/texture/3e4f49535a276aacc4dc84133bfe81be5f2a4799a4c04d9a4ddb72d819ec2b2b",1,"")),
-        CRIT_DAMAGE("crit_damage", 50, false,makeColorfulSkullItem("&9Crit Damage","http://textures.minecraft.net/texture/ddafb23efc57f251878e5328d11cb0eef87b79c87b254a7ec72296f9363ef7c",1,"")),
-        INTELLIGENCE("&a","intelligence", 100, true,makeColorfulItem(Material.ENCHANTED_BOOK,"&bIntelligence",1,0,"")),
-        MINING_SPEED("&a","mining_speed",0,false,makeColorfulItem(Material.DIAMOND_PICKAXE,"&6Mining Speed",1,0,"")),
-        ATTACK_SPEED("attack_speed", 0, false,makeColorfulItem(Material.GOLD_AXE,"&eAttack Speed",1,0,"")),
-        SEA_CREATURE_CHANCE("sea_creature_chance",0,false,makeColorfulItem(Material.PRISMARINE_CRYSTALS,"&3Sea Creature Chance",1,0,"")),
-        MAGIC_FIND("magic_find",0,false,makeColorfulItem(Material.STICK,"&bMagic Find",1,0,"")),
-        PET_LUCK("pet_luck",0,false,makeColorfulSkullItem("&dPet Luck","http://textures.minecraft.net/texture/93c8aa3fde295fa9f9c27f734bdbab11d33a2e43e855accd7465352377413b",1,"")),
-        TRUE_DEFENSE("true_defense",0,false,makeColorfulItem(Material.INK_SACK,"&rTrue Defense",1, 15,"")),
-        FEROCITY("&a","ferocity", 0, false,makeColorfulItem(Material.INK_SACK,"&cFerocity",1,1,"")),
-        ABILITY_DAMAGE("ability_damage",0,false,makeColorfulItem(Material.BEACON,"&cAbility Damage",1,0,"")),
-        MINING_FORTUNE("mining_fortune",0,false,makeColorfulSkullItem("&6Mining Fortune","http://textures.minecraft.net/texture/f07dff657d61f302c7d2e725265d17b64aa73642391964fb48fc15be950831d8",1,"")),
-        FARMING_FORTUNE("farming_fortune",0,false,makeColorfulSkullItem("&6Farming Fortune","http://textures.minecraft.net/texture/2ab879e1e590041146bc78c018af5877d39e5475eb7db368fcaf2acda373833d",1,"")),
-        FORAGING_FORTUNE("foraging_fortune",0,false,makeColorfulSkullItem("&6Foraging Fortune","http://textures.minecraft.net/texture/4f960c639d4004d1882575aeba69f456fb3c744077935714947e19c1306d2733", 1,"")),
-        PRISTINE("pristine",0,false,makeColorfulSkullItem("&5Pristine","http://textures.minecraft.net/texture/db6975af70724d6a44fd5946e60b2717737dfdb545b4dab1893351a9c9dd183c",1, "")),
-        DAMAGE("damage", 0, false,makeColorfulItem(Material.IRON_SWORD,"&cDamage",1,0,"")),
-        GEAR_SCORE("&d","gear_score",0,false,makeColorfulItem(Material.INK_SACK,"&dGear Score",1,0,""));
+        HEALTH("&a", "health", 100, true, makeColorfulItem(Material.GOLDEN_APPLE, "&cHealth", 1, 0, "")),
+        DEFENSE("&a", "defense", 0, false, makeColorfulItem(Material.IRON_CHESTPLATE, "&aDefense", 1, 0, "")),
+        STRENGTH("strength", 0, false, makeColorfulItem(Material.BLAZE_POWDER, "&cStrength", 1, 0, "")),
+        SPEED("speed", 100, false, makeColorfulItem(Material.SUGAR, "&rSpeed", 1, 0, "")),
+        CRIT_CHANCE("crit_chance", 30, false, makeColorfulSkullItem("&9Crit Chance", "http://textures.minecraft.net/texture/3e4f49535a276aacc4dc84133bfe81be5f2a4799a4c04d9a4ddb72d819ec2b2b", 1, "")),
+        CRIT_DAMAGE("crit_damage", 50, false, makeColorfulSkullItem("&9Crit Damage", "http://textures.minecraft.net/texture/ddafb23efc57f251878e5328d11cb0eef87b79c87b254a7ec72296f9363ef7c", 1, "")),
+        INTELLIGENCE("&a", "intelligence", 100, true, makeColorfulItem(Material.ENCHANTED_BOOK, "&bIntelligence", 1, 0, "")),
+        MINING_SPEED("&a", "mining_speed", 0, false, makeColorfulItem(Material.DIAMOND_PICKAXE, "&6Mining Speed", 1, 0, "")),
+        ATTACK_SPEED("attack_speed", 0, false, makeColorfulItem(Material.GOLD_AXE, "&eAttack Speed", 1, 0, "")),
+        SEA_CREATURE_CHANCE("sea_creature_chance", 0, false, makeColorfulItem(Material.PRISMARINE_CRYSTALS, "&3Sea Creature Chance", 1, 0, "")),
+        MAGIC_FIND("magic_find", 0, false, makeColorfulItem(Material.STICK, "&bMagic Find", 1, 0, "")),
+        PET_LUCK("pet_luck", 0, false, makeColorfulSkullItem("&dPet Luck", "http://textures.minecraft.net/texture/93c8aa3fde295fa9f9c27f734bdbab11d33a2e43e855accd7465352377413b", 1, "")),
+        TRUE_DEFENSE("true_defense", 0, false, makeColorfulItem(Material.INK_SACK, "&rTrue Defense", 1, 15, "")),
+        FEROCITY("&a", "ferocity", 0, false, makeColorfulItem(Material.INK_SACK, "&cFerocity", 1, 1, "")),
+        ABILITY_DAMAGE("ability_damage", 0, false, makeColorfulItem(Material.BEACON, "&cAbility Damage", 1, 0, "")),
+        MINING_FORTUNE("mining_fortune", 0, false, makeColorfulSkullItem("&6Mining Fortune", "http://textures.minecraft.net/texture/f07dff657d61f302c7d2e725265d17b64aa73642391964fb48fc15be950831d8", 1, "")),
+        FARMING_FORTUNE("farming_fortune", 0, false, makeColorfulSkullItem("&6Farming Fortune", "http://textures.minecraft.net/texture/2ab879e1e590041146bc78c018af5877d39e5475eb7db368fcaf2acda373833d", 1, "")),
+        FORAGING_FORTUNE("foraging_fortune", 0, false, makeColorfulSkullItem("&6Foraging Fortune", "http://textures.minecraft.net/texture/4f960c639d4004d1882575aeba69f456fb3c744077935714947e19c1306d2733", 1, "")),
+        PRISTINE("pristine", 0, false, makeColorfulSkullItem("&5Pristine", "http://textures.minecraft.net/texture/db6975af70724d6a44fd5946e60b2717737dfdb545b4dab1893351a9c9dd183c", 1, "")),
+        DAMAGE("damage", 0, false, makeColorfulItem(Material.IRON_SWORD, "&cDamage", 1, 0, "")),
+        GEAR_SCORE("&d", "gear_score", 0, false, makeColorfulItem(Material.INK_SACK, "&dGear Score", 1, 0, ""));
 
 
         private String name;
@@ -331,7 +386,7 @@ public class SBPlayer extends PluginPlayer {
         private ItemStack stack;
         private String color;
 
-        PlayerStat(String color,String name, double base, boolean isRegen,ItemStack stack) {
+        PlayerStat(String color, String name, double base, boolean isRegen, ItemStack stack) {
             this.name = name;
             this.base = base;
             this.isRegen = isRegen;
@@ -339,7 +394,7 @@ public class SBPlayer extends PluginPlayer {
             this.color = color;
         }
 
-        PlayerStat(String name, double base, boolean isRegen,ItemStack stack) {
+        PlayerStat(String name, double base, boolean isRegen, ItemStack stack) {
             this.name = name;
             this.base = base;
             this.isRegen = isRegen;
