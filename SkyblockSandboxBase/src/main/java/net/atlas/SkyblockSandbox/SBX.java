@@ -286,8 +286,6 @@ public class SBX extends JavaPlugin {
                 }
                 if(ii==30) {
                     File file2 = new File("plugins/SkyblockSandboxBase-0.1.jar");
-                    System.out.println(file.lastModified());
-                    System.out.println(file2.lastModified());
                     if(lastMod!=file2.lastModified()) {
                         updateServer();
                     } else {
