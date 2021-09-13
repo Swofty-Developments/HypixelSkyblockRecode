@@ -307,7 +307,7 @@ public class SBX extends JavaPlugin {
     public void updateServer() {
         for(Player pl:Bukkit.getOnlinePlayers()) {
             SBPlayer p = new SBPlayer(pl);
-            p.sendTitle(SUtil.colorize("&cGame Update"), SUtil.colorize("&eServer Restarting in: &c30"));
+            p.sendTitle(SUtil.colorize("&eSERVER REBOOT!"), SUtil.colorize("&aFor a game update &7(in &e30s&7)"));
         }
         new BukkitRunnable() {
             @Override
