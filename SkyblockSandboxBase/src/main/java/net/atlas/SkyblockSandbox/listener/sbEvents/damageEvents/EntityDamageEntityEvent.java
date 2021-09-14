@@ -9,6 +9,9 @@ import net.atlas.SkyblockSandbox.event.customEvents.PlayerCustomDeathEvent;
 import net.atlas.SkyblockSandbox.event.customEvents.SkillEXPGainEvent;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.LootListener;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.StartFight;
+import net.atlas.SkyblockSandbox.item.ItemType;
+import net.atlas.SkyblockSandbox.item.SBItemStack;
+import net.atlas.SkyblockSandbox.item.enchant.Enchantment;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
@@ -314,11 +317,26 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                         en.setMetadata("canDamage", new FixedMetadataValue(SBX.getInstance(), true));
                     }
                 }.runTaskLater(SBX.getInstance(), iframes);
+                dmg = calculateEnchants(p,en,event,dmg);
                 return dmg;
             }
         } else {
             en.setMetadata("canDamage", new FixedMetadataValue(SBX.getInstance(), true));
             calculateHit(p, en, event);
+        }
+        return 0;
+    }
+
+    public double calculateEnchants(SBPlayer p,LivingEntity en,EntityDamageByEntityEvent event,double curDmg) {
+        for(Enchantment ench:Enchantment.values()) {
+            if(ench.getItemType().equals(ItemType.SWORD)) {
+                int enchLvl = new SBItemStack(p.getItemInHand()).getEnchantment(ench);
+                if(enchLvl!=0) {
+                    EntityDamageByEntityEvent event1 = new EntityDamageByEntityEvent(p.getPlayer(), en, event.getCause(), curDmg);
+                    curDmg = ench.getDamageAction().apply(event1, (int) curDmg,enchLvl);
+                    return curDmg;
+                }
+            }
         }
         return 0;
     }

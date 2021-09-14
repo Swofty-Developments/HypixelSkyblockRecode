@@ -52,16 +52,16 @@ public class MiningBlock {
 
     public void giveDrops(Block b,Player p) {
         ItemStack pick = p.getItemInHand();
-        EnchantUtil eutil = new EnchantUtil(pick);
-        if(eutil.hasEnchant(Enchantment.TELEKINESIS)) {
+        //EnchantUtil eutil = new EnchantUtil(pick);
+        //if(eutil.hasEnchant(Enchantment.TELEKINESIS)) {
             if(hasAvaliableSlot(p)) {
                 p.getInventory().addItem(getDrops());
             } else {
                 b.getWorld().dropItem(b.getLocation(),getDrops());
             }
-        } else {
-            b.getWorld().dropItem(b.getLocation(),getDrops());
-        }
+        //} else {
+           // b.getWorld().dropItem(b.getLocation(),getDrops());
+        //}
 
     }
 

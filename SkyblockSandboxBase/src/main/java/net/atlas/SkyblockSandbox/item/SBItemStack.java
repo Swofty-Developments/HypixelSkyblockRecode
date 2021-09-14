@@ -8,6 +8,7 @@ import dev.triumphteam.gui.builder.item.ItemBuilder;
 import net.atlas.SkyblockSandbox.item.ability.Ability;
 import net.atlas.SkyblockSandbox.item.ability.AbilityType;
 import net.atlas.SkyblockSandbox.item.ability.EnumAbilityData;
+import net.atlas.SkyblockSandbox.item.enchant.Enchantment;
 import net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.NumUtils;
@@ -526,6 +527,23 @@ public class SBItemStack extends ItemStack {
             }
         }
         return "";
+    }
+
+    public int getEnchantment(Enchantment enchant) {
+        if (stack != null) {
+            if (stack.hasItemMeta()) {
+                net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
+                NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+                NBTTagCompound data = tag.getCompound("ExtraAttributes");
+                NBTTagCompound enchants = data.getCompound("enchantments");
+                if (enchants == null) {
+                    enchants = new NBTTagCompound();
+                }
+
+                return enchants.getInt(enchant.name());
+            }
+        }
+        return 0;
     }
 
     public ItemStack setAbilData(ItemStack stack, EnumAbilityData dataType, Object data, int index) {
