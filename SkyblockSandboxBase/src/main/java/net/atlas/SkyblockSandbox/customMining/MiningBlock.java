@@ -27,7 +27,7 @@ public class MiningBlock {
     private static double softCap;
 
     public double getSoftCap() {
-        return blockHP*6;
+        return blockHP * 6;
     }
 
     public void setBlockHP(double d) {
@@ -50,26 +50,26 @@ public class MiningBlock {
         return drops;
     }
 
-    public void giveDrops(Block b,Player p) {
+    public void giveDrops(Block b, Player p) {
         ItemStack pick = p.getItemInHand();
-        //EnchantUtil eutil = new EnchantUtil(pick);
-        //if(eutil.hasEnchant(Enchantment.TELEKINESIS)) {
-            if(hasAvaliableSlot(p)) {
+        SBItemStack item = new SBItemStack(pick);
+        if (item.getEnchantment(Enchantment.TELEKINESIS) != 0) {
+            if (hasAvaliableSlot(p)) {
                 p.getInventory().addItem(getDrops());
             } else {
-                b.getWorld().dropItem(b.getLocation(),getDrops());
+                b.getWorld().dropItem(b.getLocation(), getDrops());
             }
-        //} else {
-           // b.getWorld().dropItem(b.getLocation(),getDrops());
-        //}
+        } else {
+            b.getWorld().dropItem(b.getLocation(), getDrops());
+        }
 
     }
 
-    private boolean hasAvaliableSlot(Player p){
+    private boolean hasAvaliableSlot(Player p) {
         Inventory inv = p.getInventory();
-        boolean check=false;
-        for (ItemStack item: inv.getContents()) {
-            if(item == null) {
+        boolean check = false;
+        for (ItemStack item : inv.getContents()) {
+            if (item == null) {
                 check = true;
                 break;
             }

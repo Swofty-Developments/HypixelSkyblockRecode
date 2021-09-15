@@ -1,15 +1,17 @@
 package net.atlas.SkyblockSandbox;
 
-import com.comphenix.protocol.ProtocolLib;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.google.common.base.Enums;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.internal.expression.runtime.Break;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCommandArgs;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCompleter;
 import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
 import net.atlas.SkyblockSandbox.command.commands.*;
+import net.atlas.SkyblockSandbox.customMining.BreakListener;
+import net.atlas.SkyblockSandbox.customMining.MineUtil;
 import net.atlas.SkyblockSandbox.database.mongo.MongoAH;
 import net.atlas.SkyblockSandbox.database.mongo.MongoCoins;
 import net.atlas.SkyblockSandbox.database.sql.MySQL;
@@ -43,20 +45,18 @@ import net.atlas.SkyblockSandbox.util.StackUtils;
 import net.atlas.SkyblockSandbox.util.signGUI.SignManager;
 import net.minecraft.server.v1_8_R3.*;
 import org.apache.commons.io.FileUtils;
-import org.bukkit.*;
 import org.bukkit.Material;
 import org.bukkit.WorldType;
-import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.*;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
-import org.bukkit.entity.*;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.messaging.Messenger;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
@@ -67,7 +67,8 @@ import org.json.simple.parser.ParseException;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.*;
+import java.io.InputStream;
+import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
@@ -79,21 +80,18 @@ import static net.atlas.SkyblockSandbox.listener.sbEvents.entityEvents.EntitySpa
 import static net.atlas.SkyblockSandbox.listener.sbEvents.entityEvents.EntitySpawnEvent.holoMap2;
 
 public class SBX extends JavaPlugin {
-    List<String> flags = new ArrayList<>(Arrays.asList("--noteleport", "--noai"));
     public static HashMap<UUID, Boolean> isSoulCryActive = new HashMap<>();
     public static HashMap<String, ItemStack> storedItem = new HashMap<>();
     public static HashMap<UUID, HashMap<Slayers, HashMap<SlayerTier, Double>>> activeSlayers = new HashMap<>();
     public static HashMap<UUID, HashMap<SkillType, Double>> cachedSkills = new HashMap<>();
     public static HashMap<UUID, HashMap<SkillType, Integer>> cachedSkillLvls = new HashMap<>();
     public static HashMap<UUID, SkillEXPGainEvent> prevSkillEvent = new HashMap<>();
-    public static HashMap<UUID, SkillEXPGainEvent> cachedEvent = new HashMap<>();
     public static LinkedHashMap<UUID, LinkedHashMap<String, Long>> queuedBarMessages = new LinkedHashMap<>();
     public static HashMap<EntityArmorStand, Integer> cooldownMap = new HashMap<>();
     public static HashMap<EntityArmorStand, Integer> counterMap = new HashMap<>();
     public static HashMap<EntityArmorStand, Vector> vMap = new HashMap<>();
     public static HashMap<EntityArmorStand, Integer> angleMap = new HashMap<>();
     public static BukkitTask prevRunnable = null;
-    public static HashMap<UUID, String> prevBarMessage = new HashMap<>();
     public static Map<Player, Boolean> abilityUsed = new HashMap<>();
     public static HashMap<Player, Boolean> canfire = new HashMap<>();
     public static HashMap<Player, List<EntityArmorStand>> thrownAxes = new HashMap<>();
@@ -138,6 +136,8 @@ public class SBX extends JavaPlugin {
         startOnlineRunnables();
         createDataFiles();
 
+        MineUtil.setupPacketListeners();
+
 
         //registerEntity("Enderman", 58, EntityZombie.class, NoTeleportEnderman.class);
         SkyblockEntity.registerEntities();
@@ -180,6 +180,7 @@ public class SBX extends JavaPlugin {
         pm.registerEvents(new AbiltyListener(new ShortBowTerm()), this);
         pm.registerEvents(new LootListener(), this);
         pm.registerEvents(new AbilityHandler(), this);
+        pm.registerEvents(new BreakListener(),this);
     }
 
     void registerCommands() {
@@ -217,8 +218,6 @@ public class SBX extends JavaPlugin {
     }
 
     void startOnlineRunnables() {
-        File file = new File("plugins/SkyblockSandboxBase-0.1.jar");
-        long lastMod = file.lastModified();
         BukkitTask runnable = new BukkitRunnable() {
             @Override
             public void run() {
@@ -293,14 +292,6 @@ public class SBX extends JavaPlugin {
                     SBPlayer.doRegenStats();
                     i = 0;
                 }
-                if(ii==30) {
-                    File file2 = new File("plugins/SkyblockSandboxBase-0.1.jar");
-                    if(lastMod!=file2.lastModified()) {
-                        updateServer();
-                    } else {
-                        ii = 0;
-                    }
-                }
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     SBPlayer sbPlayer = new SBPlayer(p);
                     sbPlayer.sendBarMessage(getStatMessage(sbPlayer));
@@ -309,20 +300,6 @@ public class SBX extends JavaPlugin {
                 ii++;
             }
         }.runTaskTimerAsynchronously(this, 0L, 10L);
-    }
-
-    public void updateServer() {
-        for(Player pl:Bukkit.getOnlinePlayers()) {
-            SBPlayer p = new SBPlayer(pl);
-            p.sendTitle(SUtil.colorize("&eSERVER REBOOT!"), SUtil.colorize("&aFor a game update &7(in &e30s&7)"));
-        }
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
-                Bukkit.dispatchCommand(console, "stop");
-            }
-        }.runTaskLater(SBX.getInstance(),20*30L);
     }
 
     public static String getStatMessage(SBPlayer p) {
@@ -489,16 +466,13 @@ public class SBX extends JavaPlugin {
                                                     if (split1.contains("HEALTH") || split1.contains("PERSECOND") || split1.contains("SPEED") || split1.contains("INTELLIGENCE") || split1.contains("DAMAGE") || split1.contains("STRENGTH")) {
                                                         split1 = "0";
                                                     }
-                                                    if (split1.contains("?")) {
-                                                        split1 = split1.replace("?", "");
-                                                    }
                                                     int amt = Integer.parseInt(split1);
                                                     if (amt != 0) {
                                                         bukkitStack = NBTUtil.setInteger(bukkitStack, amt, stat.name());
                                                     }
                                                 }
-                                            } catch (NumberFormatException ignored) {
-                                                ignored.printStackTrace();
+                                            } catch (NumberFormatException ex) {
+                                                ex.printStackTrace();
                                             }
                                         }
                                     } else {

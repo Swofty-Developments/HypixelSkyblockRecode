@@ -30,17 +30,11 @@ public class MineUtil {
                     diggingBlocks.put(event.getPlayer(),event.getPlayer().getTargetBlock((Set<Material>) null, 5));
                 }
                 if(digType.equals(EnumWrappers.PlayerDigType.ABORT_DESTROY_BLOCK)) {
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            if (event.getPlayer().getTargetBlock((Set<Material>) null, 5).getLocation().equals(diggingBlocks.get(event.getPlayer()).getLocation())) {
-                                BreakListener.setClickCanceled(event.getPlayer());
-                            } else {
-                                diggingBlocks.put(event.getPlayer(), event.getPlayer().getTargetBlock((Set<Material>) null,5));
-                            }
-
-                        }
-                    }.runTaskLater(SBX.getInstance(),1L);
+                    if (event.getPlayer().getTargetBlock((Set<Material>) null, 5).getLocation().equals(diggingBlocks.get(event.getPlayer()).getLocation())) {
+                        BreakListener.setClickCanceled(event.getPlayer());
+                    } else {
+                        diggingBlocks.put(event.getPlayer(), event.getPlayer().getTargetBlock((Set<Material>) null,5));
+                    }
                 }
             }
         });
