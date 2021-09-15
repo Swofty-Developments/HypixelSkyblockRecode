@@ -9,6 +9,7 @@ import net.atlas.SkyblockSandbox.economy.Coins;
 import net.atlas.SkyblockSandbox.entity.SkyblockEntity;
 import net.atlas.SkyblockSandbox.event.customEvents.ManaEvent;
 import net.atlas.SkyblockSandbox.event.customEvents.SkillEXPGainEvent;
+import net.atlas.SkyblockSandbox.files.CfgFile;
 import net.atlas.SkyblockSandbox.files.DatabaseInformationFile;
 import net.atlas.SkyblockSandbox.files.IslandInfoFile;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.LootListener;
@@ -23,6 +24,7 @@ import net.atlas.SkyblockSandbox.mongo.MongoDB;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
 import net.atlas.SkyblockSandbox.playerIsland.Data;
+import net.atlas.SkyblockSandbox.playerIsland.MongoIslands;
 import net.atlas.SkyblockSandbox.slayer.SlayerTier;
 import net.atlas.SkyblockSandbox.slayer.Slayers;
 import net.atlas.SkyblockSandbox.storage.MongoStorage;
@@ -49,6 +51,7 @@ import java.util.*;
 
 import static net.atlas.SkyblockSandbox.listener.sbEvents.entityEvents.EntitySpawnEvent.holoMap;
 import static net.atlas.SkyblockSandbox.listener.sbEvents.entityEvents.EntitySpawnEvent.holoMap2;
+import static net.atlas.SkyblockSandbox.command.commands.Command_forward.MESSAGE_CHANNEL;
 
 public class SBX extends JavaPlugin {
     List<String> flags = new ArrayList<>(Arrays.asList("--noteleport", "--noai"));
@@ -73,6 +76,7 @@ public class SBX extends JavaPlugin {
     SkyblockCommandFramework framework;
     private static MongoCoins mongoStats;
     public MongoDB mongoStorage;
+    public MongoIslands mongoIslands;
     public Coins coins;
 
     private File dragonDataFile;
@@ -83,11 +87,13 @@ public class SBX extends JavaPlugin {
         getServer().getMessenger().registerOutgoingPluginChannel(this,"BungeeCord");
         instance = this;
         mongoStorage = new MongoStorage();
+        mongoIslands = new MongoIslands();
         framework = new SkyblockCommandFramework(this);
         createDataFiles();
         mongoStats = new MongoCoins();
         mongoStats.connect();
         mongoStorage.connect();
+        mongoIslands.connect();
         coins = new Coins();
 
         Data.initialize();
@@ -101,6 +107,7 @@ public class SBX extends JavaPlugin {
 
         //registerEntity("Enderman", 58, EntityZombie.class, NoTeleportEnderman.class);
         SkyblockEntity.registerEntities();
+        getServer().getMessenger().registerOutgoingPluginChannel(this, MESSAGE_CHANNEL);
     }
 
 
@@ -132,6 +139,7 @@ public class SBX extends JavaPlugin {
         framework.registerCommands(new Command_importhead(this));
         framework.registerCommands(new Command_sbmenu(this));
         framework.registerCommands(new Command_storage(this));
+        framework.registerCommands(new Command_forward(this));
         framework.registerHelp();
     }
 
@@ -146,6 +154,7 @@ public class SBX extends JavaPlugin {
         createDragonDataFile();
         new DatabaseInformationFile().create();
         new IslandInfoFile().create();
+        new CfgFile().create();
     }
 
     void startOnlineRunnables() {
