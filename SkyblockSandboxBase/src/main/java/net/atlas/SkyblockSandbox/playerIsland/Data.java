@@ -1,5 +1,6 @@
 package net.atlas.SkyblockSandbox.playerIsland;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import lombok.experimental.UtilityClass;
@@ -54,6 +55,12 @@ public class Data {
 
 		if (!f.exists()) {
 			try {
+				Log.info("Saving player island data in MongoDB...");
+
+				MongoIslands mongo = new MongoIslands();
+				mongo.setData(islandId.toUUID(), "owner", owner.getUniqueId().toString());
+				mongo.setList(islandId.toUUID(), "members", ImmutableList.of(members));
+
 				IslandInfoFile info = new IslandInfoFile();
 				double x = info.getConfiguration().getDouble("latest.location.x");
 				double y = 50.0D;

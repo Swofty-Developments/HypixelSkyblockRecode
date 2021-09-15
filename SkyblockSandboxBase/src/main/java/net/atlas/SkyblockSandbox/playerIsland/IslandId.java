@@ -17,6 +17,10 @@ public final class IslandId {
 		return base.toString();
 	}
 
+	public UUID toUUID() {
+		return base;
+	}
+
 	public static IslandId randomIslandId() {
 		return new IslandId(UUID.randomUUID());
 	}

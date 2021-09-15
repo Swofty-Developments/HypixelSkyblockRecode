@@ -20,6 +20,7 @@ import net.atlas.SkyblockSandbox.economy.Coins;
 import net.atlas.SkyblockSandbox.entity.SkyblockEntity;
 import net.atlas.SkyblockSandbox.event.customEvents.ManaEvent;
 import net.atlas.SkyblockSandbox.event.customEvents.SkillEXPGainEvent;
+import net.atlas.SkyblockSandbox.files.CfgFile;
 import net.atlas.SkyblockSandbox.files.DatabaseInformationFile;
 import net.atlas.SkyblockSandbox.files.IslandInfoFile;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.LootListener;
@@ -35,6 +36,7 @@ import net.atlas.SkyblockSandbox.listener.sbEvents.abilities.AbilityHandler;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
 import net.atlas.SkyblockSandbox.playerIsland.Data;
+import net.atlas.SkyblockSandbox.playerIsland.MongoIslands;
 import net.atlas.SkyblockSandbox.slayer.SlayerTier;
 import net.atlas.SkyblockSandbox.slayer.Slayers;
 import net.atlas.SkyblockSandbox.storage.MongoStorage;
@@ -78,6 +80,7 @@ import java.util.*;
 
 import static net.atlas.SkyblockSandbox.listener.sbEvents.entityEvents.EntitySpawnEvent.holoMap;
 import static net.atlas.SkyblockSandbox.listener.sbEvents.entityEvents.EntitySpawnEvent.holoMap2;
+import static net.atlas.SkyblockSandbox.command.commands.Command_forward.MESSAGE_CHANNEL;
 
 public class SBX extends JavaPlugin {
     public static HashMap<UUID, Boolean> isSoulCryActive = new HashMap<>();
@@ -114,14 +117,17 @@ public class SBX extends JavaPlugin {
     public void onEnable() {
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         instance = this;
+        mongoStorage = new MongoStorage();
+        mongoIslands = new MongoIslands();
         framework = new SkyblockCommandFramework(this);
         createDataFiles();
         mongoStats = new MongoCoins();
         mongoStats.connect();
         protocolManager = ProtocolLibrary.getProtocolManager();
         new MongoAH().connect();
+        mongoStorage.connect();
+        mongoIslands.connect();
         coins = new Coins();
-        storage.connect();
 
         Data.initialize();
         sql = new MySQL();
@@ -141,6 +147,7 @@ public class SBX extends JavaPlugin {
 
         //registerEntity("Enderman", 58, EntityZombie.class, NoTeleportEnderman.class);
         SkyblockEntity.registerEntities();
+        getServer().getMessenger().registerOutgoingPluginChannel(this, MESSAGE_CHANNEL);
     }
 
     @Override
@@ -197,6 +204,7 @@ public class SBX extends JavaPlugin {
         framework.registerCommands(new Command_items(this));
         framework.registerCommands(new Command_storage(this));
         framework.registerCommands(new Command_debugtest(this));
+        framework.registerCommands(new Command_forward(this));
         framework.registerHelp();
     }
 
@@ -211,6 +219,7 @@ public class SBX extends JavaPlugin {
         createDragonDataFile();
         new DatabaseInformationFile().create();
         new IslandInfoFile().create();
+        new CfgFile().create();
     }
 
     public static ProtocolManager getProtcolManager() {
@@ -283,7 +292,6 @@ public class SBX extends JavaPlugin {
 
         new BukkitRunnable() {
             int i = 0;
-            int ii = 0;
 
             @Override
             public void run() {
@@ -297,7 +305,6 @@ public class SBX extends JavaPlugin {
                     sbPlayer.sendBarMessage(getStatMessage(sbPlayer));
                 }
                 i++;
-                ii++;
             }
         }.runTaskTimerAsynchronously(this, 0L, 10L);
     }

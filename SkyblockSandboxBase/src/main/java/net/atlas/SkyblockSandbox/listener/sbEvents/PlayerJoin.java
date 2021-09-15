@@ -1,6 +1,7 @@
 package net.atlas.SkyblockSandbox.listener.sbEvents;
 
 import net.atlas.SkyblockSandbox.SBX;
+import net.atlas.SkyblockSandbox.files.CfgFile;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.StartFight;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
@@ -42,7 +43,8 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
         if(StartFight.fightActive) {
             StartFight.playerDMG.put(p.getPlayer(),0D);
         }
-        if(p.getServer().getServerName().equalsIgnoreCase("islands")) {
+        CfgFile cfg = new CfgFile();
+        if (cfg.getConfiguration().getBoolean("island-server")) {
             if(p.hasIsland()) {
                 Location teleLoc = p.getPlayerIsland().getCenter();
                 while (teleLoc.getBlock().getType()!= Material.AIR) {
@@ -57,6 +59,7 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
                 }
             }
         }
+
         HashMap<SBPlayer.PlayerStat,Double> maxStat = new HashMap<>();
         HashMap<SBPlayer.PlayerStat,Double> empty = new HashMap<>();
         for (SBPlayer.PlayerStat s : SBPlayer.PlayerStat.values()) {

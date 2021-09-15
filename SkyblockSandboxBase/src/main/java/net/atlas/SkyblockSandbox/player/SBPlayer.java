@@ -421,7 +421,7 @@ public class SBPlayer extends PluginPlayer {
 
     public PlayerIsland getPlayerIsland() {
         for (FileConfiguration cfg : Data.getAllIslandFiles()) {
-            if (cfg.getString("owner").equals(sbPlayer.getUniqueId().toString()))
+            if (cfg.getString("owner").equals(sbPlayer.getUniqueId().toString()) || cfg.getStringList("members").contains(sbPlayer.getUniqueId().toString()))
                 return new PlayerIslandHandler(IslandId.fromString(cfg.getString("id")));
         }
 

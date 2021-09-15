@@ -1,23 +1,33 @@
 package net.atlas.SkyblockSandbox.command.commands;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCommand;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCommandArgs;
 import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
+import net.atlas.SkyblockSandbox.files.CfgFile;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.playerIsland.Data;
 import net.atlas.SkyblockSandbox.playerIsland.IslandId;
+import net.atlas.SkyblockSandbox.playerIsland.PlayerIsland;
 import net.atlas.SkyblockSandbox.util.BungeeUtil;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.craftbukkit.libs.jline.internal.Log;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class Command_island extends SkyblockCommandFramework {
 
@@ -30,6 +40,8 @@ public class Command_island extends SkyblockCommandFramework {
         super(plugin);
     }
 
+    private final static Map<UUID, UUID> invited = new HashMap<>();
+
     @SBCommand(name = "island", aliases = {"is"}, description = "Command to island lol", usage = "/island <create/coop/delete>")
     public void islandCMD(SBCommandArgs cmd) {
         String[] args = cmd.getArgs();
@@ -41,14 +53,21 @@ public class Command_island extends SkyblockCommandFramework {
                 createProcess(player);
                 return;
             } else {
+                if (new CfgFile().getConfiguration().getBoolean("island-server")) {
+                    player.sendMessage("▼7Teleporting Home...");
+
+                    Location teleLoc = player.getPlayerIsland().getCenter();
+                    while (teleLoc.getBlock().getType()!= Material.AIR) {
+                        teleLoc.add(0,1,0);
+                    }
+                    player.teleport(teleLoc);
+
+                    return;
+                }
+
                 player.sendMessage("§7Teleporting home...");
-                BungeeUtil.sendPlayer(player, "islands");
+                BungeeUtil.sendPlayer(player, new CfgFile().getConfiguration().getString("island-server-name"));
             }
-			/*Location teleLoc = player.getPlayerIsland().getCenter();
-			while (teleLoc.getBlock().getType()!= Material.AIR) {
-				teleLoc.add(0,1,0);
-			}
-			player.teleport(teleLoc);*/
             return;
         }
 
@@ -73,14 +92,94 @@ public class Command_island extends SkyblockCommandFramework {
                     player.sendMessage("§7Teleporting home...");
                     BungeeUtil.sendPlayer(player, "islands");
                 }
-				/*player.sendPluginMessage(SBX.getInstance(), "BungeeCord", out.toByteArray());
-				Location teleLoc = player.getPlayerIsland().getCenter();
-				while (teleLoc.getBlock().getType()!= Material.AIR) {
-					teleLoc.add(0,1,0);
-				}
-				player.teleport(teleLoc);*/
 
                 break;
+        }
+
+        if (args.length == 2) {
+            switch (args[0]) {
+                case "coop": {
+                    if (!new CfgFile().getConfiguration().getBoolean("island-server")) {
+                        player.sendMessage("§eError occurred while performing this action: §cYou must be on your island to invite others!");
+
+                        return;
+                    }
+
+                    if (!player.hasIsland()) {
+                        player.sendMessage("§cYou must have an island in order to add people to it!");
+                        return;
+                    }
+
+                    Player target = Bukkit.getPlayer(args[1]);
+                    if (target == null) {
+                        player.sendMessage("§cUndefined target!");
+                        return;
+                    }
+
+                    invited.put(target.getUniqueId(), player.getUniqueId());
+
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "forwardcmdtobungeecord " + player.getName() + " inviteplayertoisland " + player.getName() + " " + target.getName());
+                    Log.info("Forwarded.");
+                    player.sendMessage("§7" + target.getName() + " §awas successfully added to your island.");
+
+                    break;
+                }
+                case "accept": {
+                    OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
+
+                    if (invited.containsKey(player.getUniqueId())) {
+                        if (!invited.get(player.getUniqueId()).equals(target.getUniqueId())) {
+                            player.sendMessage("§cInvalid destination (er=312)");
+                            Log.info("Invalid destination error occurred with " + player.getName() + "!\nstart=" + player.getUniqueId() + "\n" +
+                                    "destination=" + target.getUniqueId() + "\ner=312");
+                            return;
+                        }
+
+                        invited.remove(player.getUniqueId());
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                                "forwardcmdtobungeecord " + player.getName() + " joinplayerisland " + player.getName() + " " + target.getName());
+
+                        player.sendMessage("§7Waiting for owner confirmation...");
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    @SBCommand(name = "hub", aliases = "spawn", description = "Go to hub")
+    public void hubCommand(SBCommandArgs arguments) {
+        if (new CfgFile().getConfiguration().getBoolean("island-server")) {
+            arguments.getPlayer().sendMessage("§7Sending you to " +
+                    BungeeUtil.sendRandom(new SBPlayer(arguments.getPlayer()), new CfgFile().getConfiguration().getStringList("hub-server-names")) +
+                    "...");
+
+            return;
+        }
+
+        arguments.getPlayer().sendMessage("§c[▼] This action cannot be reached!");
+    }
+
+    @SBCommand(name = "cmdislandcmdaaa_nooneisgonnafindthiscommand_iswear_pleasedontfindit_tyvm")
+    public void addMemberCmd(SBCommandArgs arguments) {
+        SBPlayer player = new SBPlayer(arguments.getPlayer());
+        String[] args = arguments.getArgs();
+
+        if (arguments.getArgs().length == 1) {
+            if (new CfgFile().getConfiguration().getBoolean("island-server")) {
+                OfflinePlayer target = Bukkit.getPlayer(args[0]);
+
+                PlayerIsland island = player.getPlayerIsland();
+                island.addMember(target);
+
+                player.sendMessage("§aSuccessfully added + " + target.getName() + "to your island! ☻");
+
+                BungeeUtil.sendPlayer(new SBPlayer(target.getPlayer()), new CfgFile().getConfiguration().getString("island-server-name"));
+            } else {
+                player.sendMessage("§can undefined error occurred");
+            }
+        } else {
+            arguments.getPlayer().sendMessage("§cundefined");
         }
     }
 

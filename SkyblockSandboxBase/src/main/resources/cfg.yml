@@ -1,0 +1,6 @@
+island-server: false
+island-server-name: 'islands'
+
+# Change if needed.
+hub-server-names:
+  - 'hub'

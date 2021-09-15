@@ -70,8 +70,10 @@ public class PlayerIslandHandler implements PlayerIsland {
 	public void addMember(OfflinePlayer member) {
 		List<String> list = new ArrayList<>();
 
-		for (OfflinePlayer player : getMembers())
-			list.add(player.getUniqueId().toString());
+		if (getMembers() != null) {
+			for (OfflinePlayer player : getMembers())
+				list.add(player.getUniqueId().toString());
+		}
 
 		if (!list.contains(member.getUniqueId().toString())) {
 			list.add(member.getUniqueId().toString());
@@ -88,8 +90,10 @@ public class PlayerIslandHandler implements PlayerIsland {
 	public boolean removeMember(OfflinePlayer member) {
 		List<String> list = new ArrayList<>();
 
-		for (OfflinePlayer player : getMembers())
-			list.add(player.getUniqueId().toString());
+		if (getMembers() != null) {
+			for (OfflinePlayer player : getMembers())
+				list.add(player.getUniqueId().toString());
+		}
 
 		if (list.contains(member.getUniqueId().toString())) {
 			list.remove(member.getUniqueId().toString());
