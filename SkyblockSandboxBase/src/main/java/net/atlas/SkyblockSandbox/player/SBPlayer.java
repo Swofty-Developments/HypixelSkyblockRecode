@@ -312,7 +312,7 @@ public class SBPlayer extends PluginPlayer {
     public List<String> getLevelUpMessage(SkillType type, int newLvl) {
         ArrayList<String> strings = new ArrayList<>();
         String border = "&3&l" + Strings.repeat("-", 64);
-        strings.add(border);
+        strings.add(SUtil.colorize("&3&l" + border));
         strings.add("&b&l SKILL LEVEL UP &r&3" + type.getName() + " &8" + (newLvl - 1) + "➜&3" + (newLvl));
         strings.add("");
         strings.add("&a&l REWARDS");
@@ -344,7 +344,7 @@ public class SBPlayer extends PluginPlayer {
         }
 
         cachedSkills.put(sbPlayer.getUniqueId(), map);
-        sbPlayer.playSound(sbPlayer.getLocation(), Sound.ORB_PICKUP, 2, 1.8f);
+        sbPlayer.playSound(sbPlayer.getLocation(), Sound.ORB_PICKUP, 2, 2f);
     }
 
     public boolean hasAuctions() {

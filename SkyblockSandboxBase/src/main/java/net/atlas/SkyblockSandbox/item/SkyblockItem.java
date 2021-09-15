@@ -2,7 +2,10 @@ package net.atlas.SkyblockSandbox.item;
 
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.HellShatter;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.SoulCry;
+import net.atlas.SkyblockSandbox.player.SBPlayer;
+import net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
+import net.atlas.SkyblockSandbox.util.builders.SBItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -35,6 +38,7 @@ public interface SkyblockItem {
         for(Unobtainable i: Unobtainable.values()) {
             items.add(i.item());
         }
+
         return items;
     }
     static List<SBItemStack> getAllPublicItems() {
@@ -63,10 +67,11 @@ public interface SkyblockItem {
     }
 
     enum Default implements SkyblockItem {
-        BEDROCK(new SBItemStack("Bedrock","BEDROCK", Material.BEDROCK,0,true,false,null, type(), Rarity.LEGENDARY,5000,5000,144,60,100,8000,2300,100,50000)),
-        SUMMONING_EYE(new SBItemStack("Summoning Eye","SUMMONING_EYE",Material.SKULL_ITEM,3,false,false,"http://textures.minecraft.net/texture/daa8fc8de6417b48d48c80b443cf5326e3d9da4dbe9b25fcd49549d96168fc0",Rarity.EPIC,0,0,0,0,0,0,0,0,0)),
-        SLEEPING_EYE(new SBItemStack("Sleeping Eye","SLEEPING_EYE",Material.SKULL_ITEM,3,false,false,"http://textures.minecraft.net/texture/37c0d010dd0e512ffea108d7c5fe69d576c31ec266c884b51ec0b28cc457",Rarity.EPIC,0,0,0,0,0,0,0,0,0)),
-        SMALL_BACKPACK(new SBItemStack("Small Backpack","SMALL_BACKPACK",Material.SKULL_ITEM,3,false,false,"http://textures.minecraft.net/texture/58bc8fa716cadd004b828cb27cc0f6f6ade3be41511688ca9eceffd1647fb9",Rarity.UNCOMMON,0,0,0,0,0,0,0,0,0),"0000","stored-items");
+
+        BEDROCK(SBItemBuilder.init().name("Bedrock").id("BEDROCK").mat(Material.BEDROCK).rarity(Rarity.LEGENDARY).type(type()).stat(PlayerStat.DAMAGE,50000D).build()),
+        SUMMONING_EYE(SBItemBuilder.init().name("Summoning Eye").id("SUMMONING_EYE").mat(Material.SKULL_ITEM).rarity(Rarity.EPIC).type(type()).url("http://textures.minecraft.net/texture/daa8fc8de6417b48d48c80b443cf5326e3d9da4dbe9b25fcd49549d96168fc0").stackable(false).build()),
+        SLEEPING_EYE(SBItemBuilder.init().name("Sleeping Eye").id("SLEEPING_EYE").mat(Material.SKULL_ITEM).rarity(Rarity.EPIC).type(type()).url("http://textures.minecraft.net/texture/37c0d010dd0e512ffea108d7c5fe69d576c31ec266c884b51ec0b28cc457").build()),
+        SMALL_BACKPACK(SBItemBuilder.init().name("Small Backpack").id("SMALL_BACKPACK").mat(Material.SKULL_ITEM).rarity(Rarity.UNCOMMON).type(type()).url("http://textures.minecraft.net/texture/58bc8fa716cadd004b828cb27cc0f6f6ade3be41511688ca9eceffd1647fb9").build(),"0000","stored-items");
 
         private final SBItemStack item;
 
@@ -96,9 +101,9 @@ public interface SkyblockItem {
     }
 
     enum Sword implements SkyblockItem {
-        ASPECT_OF_DRAGONS(new SBItemStack("Aspect of the Dragons","ASPECT_OF_DRAGONS",Material.DIAMOND_SWORD,0,false,true, null,type(),Rarity.LEGENDARY,10000,8000,144,60,100,8000,2300,100,0)),
-        ATOMSPLIT_KATANA(new SBItemStack("Atomsplit Katana","ATOMSPLIT_KATANA",Material.DIAMOND_SWORD,0,false,true,new SoulCry(),type(),Rarity.LEGENDARY,5000,5000,2000,75,100,600,2345,74,5000)),
-        HELLS_COMPLEMENT(new SBItemStack("Hell's Complement","HELLS_COMPLEMENT",Material.BLAZE_ROD,0,false,true,new HellShatter(),type(),Rarity.MYTHIC,666,666,333,11,-66,66,0,0,66));
+        ASPECT_OF_DRAGONS(SBItemBuilder.init().name("Aspect of the Dragons").id("ASPECT_OF_DRAGONS").mat(Material.DIAMOND_SWORD).rarity(Rarity.LEGENDARY).type(type()).build()),
+        ATOMSPLIT_KATANA(SBItemBuilder.init().name("Atomsplit Katana").id("ATOMSPLIT_KATANA").mat(Material.DIAMOND_SWORD).ability(new SoulCry(),1).rarity(Rarity.LEGENDARY).type(type()).stat(PlayerStat.DAMAGE,5000D).build()),
+        HELLS_COMPLEMENT(SBItemBuilder.init().name("Hell's Complement").id("HELLS_COMPLEMENT").mat(Material.BLAZE_ROD).ability(new HellShatter(),1).rarity(Rarity.MYTHIC).type(type()).stat(PlayerStat.DAMAGE,666D).stat(PlayerStat.STRENGTH,666D).build());
 
         private final SBItemStack item;
 
@@ -144,6 +149,55 @@ public interface SkyblockItem {
             return ItemType.AXE;
         }
     }
+
+    enum Pickaxe implements SkyblockItem {
+        STONK(SBItemBuilder.init().mat(Material.GOLD_PICKAXE).id("STONK").name("Stonk").rarity(Rarity.EPIC).stat(PlayerStat.MINING_SPEED,60D).type(ItemType.ITEM).build());
+
+        private final SBItemStack item;
+
+        Pickaxe(SBItemStack item) {
+            this.item = item;
+        }
+
+        @Override
+        public SBItemStack item() {
+            return item;
+        }
+
+        @Override
+        public boolean isPublic() {
+            return true;
+        }
+
+        public static ItemType type() {
+            return ItemType.AXE;
+        }
+    }
+
+    enum Drill implements SkyblockItem {
+        ;
+
+        private final SBItemStack item;
+
+        Drill(SBItemStack item) {
+            this.item = item;
+        }
+
+        @Override
+        public SBItemStack item() {
+            return item;
+        }
+
+        @Override
+        public boolean isPublic() {
+            return true;
+        }
+
+        public static ItemType type() {
+            return ItemType.AXE;
+        }
+    }
+
 
 
     enum Dungeon implements SkyblockItem {

@@ -44,16 +44,17 @@ public class SBItemStack extends ItemStack {
         this.stack = stack;
     }
 
-    public SBItemStack(String name, Material mat, int durability, boolean stackable, boolean reforgeable, double damage, double strength, double intelligence, double ferocity, double health, double attack_speed, double defense) {
+    public SBItemStack(String name,String id, Material mat,Rarity rarity,ItemType type, int durability, boolean stackable, boolean reforgeable,HashMap<PlayerStat,Double> stats) {
         stack = new ItemStack(mat, 1);
+        itemID = id;
         setName(stack, name);
+        setString(stack,id.toUpperCase(),"ID");
+        setString(stack,rarity.name(),"RARITY");
+        setString(stack,"item-type",type.getValue());
         setDurability(stack, durability);
-        stack = setStat(stack, DAMAGE, damage);
-        stack = setStat(stack, STRENGTH, strength);
-        stack = setStat(stack, INTELLIGENCE, intelligence);
-        stack = setStat(stack, FEROCITY, ferocity);
-        stack = setStat(stack, ATTACK_SPEED, attack_speed);
-        stack = setStat(stack, DEFENSE, defense);
+        for(PlayerStat stat:stats.keySet()) {
+            stack = setStat(stack,stat,stats.get(stat));
+        }
         if (!stackable) {
             stack = setString(stack, UUID.randomUUID().toString(), "UUID");
         }
@@ -61,27 +62,22 @@ public class SBItemStack extends ItemStack {
 
     }
 
-    public SBItemStack(String name, Material mat, int durability, boolean stackable, boolean reforgeable, String url, Rarity rarity, double damage, double strength, double intelligence, double ferocity, double crit_chance, double crit_damage, double health, double attack_speed, double defense) {
+    public SBItemStack(String name,String id, Material mat,Rarity rarity,ItemType type,String url, int durability, boolean stackable, boolean reforgeable,HashMap<PlayerStat,Double> stats) {
         stack = new ItemStack(mat, 1);
-        setName(stack, rarity.getColor() + name);
+        itemID = id;
+        setName(stack, name);
         setDurability(stack, durability);
-        stack = setString(stack, rarity.getName(), "RARITY");
-        stack = setStat(stack, DAMAGE, damage);
-        stack = setStat(stack, STRENGTH, strength);
-        stack = setStat(stack, INTELLIGENCE, intelligence);
-        stack = setStat(stack, FEROCITY, ferocity);
-        stack = setStat(stack, CRIT_CHANCE, crit_chance);
-        stack = setStat(stack, CRIT_DAMAGE, crit_damage);
-        stack = setStat(stack, HEALTH, health);
-        stack = setStat(stack, ATTACK_SPEED, attack_speed);
-        stack = setStat(stack, DEFENSE, defense);
+        setString(stack,id.toUpperCase(),"ID");
+        setString(stack,rarity.name(),"RARITY");
+        setString(stack,type.getValue(),"item-type");
+        for(PlayerStat stat:stats.keySet()) {
+            stack = setStat(stack,stat,stats.get(stat));
+        }
+        stack = applyTexture(stack,url);
         if (!stackable) {
             stack = setString(stack, UUID.randomUUID().toString(), "UUID");
         }
         stack = setString(stack, Boolean.toString(reforgeable), "reforgeable");
-        this.itemID = name.toUpperCase().replace(' ', '_');
-        stack = setString(stack, this.itemID, "ID");
-        applyTexture(stack, url);
 
     }
 
@@ -89,56 +85,6 @@ public class SBItemStack extends ItemStack {
         this.stack = item;
         itemID = itemID.toUpperCase().replace(' ', '_');
         this.stack = setString(stack, itemID, "ID");
-    }
-
-    public SBItemStack(String name, String itemID, Material mat, int durability, boolean stackable, boolean reforgeable, String url, Rarity rarity, double damage, double strength, double intelligence, double ferocity, double crit_chance, double crit_damage, double health, double attack_speed, double defense) {
-        stack = new ItemStack(mat, 1);
-        setName(stack, rarity.getColor() + name);
-        setDurability(stack, durability);
-        stack = setString(stack, rarity.getName(), "RARITY");
-        stack = setStat(stack, DAMAGE, damage);
-        stack = setStat(stack, STRENGTH, strength);
-        stack = setStat(stack, INTELLIGENCE, intelligence);
-        stack = setStat(stack, FEROCITY, ferocity);
-        stack = setStat(stack, CRIT_CHANCE, crit_chance);
-        stack = setStat(stack, CRIT_DAMAGE, crit_damage);
-        stack = setStat(stack, HEALTH, health);
-        stack = setStat(stack, ATTACK_SPEED, attack_speed);
-        stack = setStat(stack, DEFENSE, defense);
-        if (!stackable) {
-            stack = setString(stack, UUID.randomUUID().toString(), "UUID");
-        }
-        stack = setString(stack, Boolean.toString(reforgeable), "reforgeable");
-        this.itemID = itemID;
-        stack = setString(stack, this.itemID, "ID");
-        applyTexture(stack, url);
-
-    }
-
-    public SBItemStack(String name, String itemID, Material mat, int durability, boolean stackable, boolean reforgeable, Ability ability, ItemType type, Rarity rarity, double damage, double strength, double intelligence, double ferocity, double crit_chance, double crit_damage, double health, double attack_speed, double defense) {
-        stack = new ItemStack(mat, 1);
-        setName(stack, rarity.getColor() + name);
-        setDurability(stack, durability);
-        if (ability != null) {
-            stack = setAbility(stack, ability, 1);
-        }
-        stack = setString(stack, rarity.getName(), "RARITY");
-        stack = setStat(stack, DAMAGE, damage);
-        stack = setStat(stack, STRENGTH, strength);
-        stack = setStat(stack, INTELLIGENCE, intelligence);
-        stack = setStat(stack, FEROCITY, ferocity);
-        stack = setStat(stack, CRIT_CHANCE, crit_chance);
-        stack = setStat(stack, CRIT_DAMAGE, crit_damage);
-        stack = setStat(stack, HEALTH, health);
-        stack = setStat(stack, ATTACK_SPEED, attack_speed);
-        stack = setStat(stack, DEFENSE, defense);
-        if (!stackable) {
-            stack = setString(stack, UUID.randomUUID().toString(), "UUID");
-        }
-        stack = setString(stack, Boolean.toString(reforgeable), "reforgeable");
-        this.itemID = itemID;
-        stack = setString(stack, this.itemID, "ID");
-
     }
 
     public SBItemStack(String name, Material mat, int amount) {

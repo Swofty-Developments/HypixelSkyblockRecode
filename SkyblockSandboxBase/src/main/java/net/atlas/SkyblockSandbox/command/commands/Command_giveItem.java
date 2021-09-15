@@ -6,6 +6,7 @@ import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.item.SkyblockItem;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
+import net.atlas.SkyblockSandbox.util.NumUtils;
 import org.bukkit.Sound;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
@@ -32,6 +33,11 @@ public class Command_giveItem extends SkyblockCommandFramework {
                     if(i.getItemID().equalsIgnoreCase(itemString)) {
                         SBItemStack ii = new SBItemStack(i.asBukkitItem());
                         ItemStack b = ii.refreshLore();
+                        if(args.length>=2) {
+                            if(NumUtils.isInt(args[1])) {
+                                b.setAmount(Integer.parseInt(args[1]));
+                            }
+                        }
                         p.getInventory().addItem(b);
                         p.playSound(p.getLocation(), Sound.ITEM_PICKUP,2,1);
                         break;

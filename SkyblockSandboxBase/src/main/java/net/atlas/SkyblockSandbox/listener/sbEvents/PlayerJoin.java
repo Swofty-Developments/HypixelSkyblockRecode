@@ -1,6 +1,7 @@
 package net.atlas.SkyblockSandbox.listener.sbEvents;
 
 import net.atlas.SkyblockSandbox.SBX;
+import net.atlas.SkyblockSandbox.island.islands.end.dragFight.StartFight;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
@@ -11,10 +12,16 @@ import net.atlas.SkyblockSandbox.storage.MongoStorage;
 import net.atlas.SkyblockSandbox.storage.StorageCache;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.SUtil;
+import net.minecraft.server.v1_8_R3.MobEffect;
+import net.minecraft.server.v1_8_R3.MobEffectList;
+import net.minecraft.server.v1_8_R3.PacketPlayOutEntityEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -32,7 +39,9 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
     public void callEvent(PlayerJoinEvent event) {
 
         SBPlayer p = new SBPlayer(event.getPlayer());
-        System.out.println(p.getServer().getName());
+        if(StartFight.fightActive) {
+            StartFight.playerDMG.put(p.getPlayer(),0D);
+        }
         if(p.getServer().getServerName().equalsIgnoreCase("islands")) {
             if(p.hasIsland()) {
                 Location teleLoc = p.getPlayerIsland().getCenter();
@@ -58,19 +67,26 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
         maxStats.put(p.getUniqueId(), maxStat);
         bonusStats.put(p.getUniqueId(),empty);
         SBX.getInstance().coins.loadCoins(p.getPlayer());
+
+        //loading storage
         MongoStorage mongoStorage = SBX.storage;
         mongoStorage.setPlayerData(p.getUniqueId().toString());
         StorageCache storage = new StorageCache(p);
         for (int i = 1; i <= 9; i++) {
             storage.refresh(i);
         }
+
+        //scoreboard
         DragonScoreboard scoreboard = new DragonScoreboard(SBX.getInstance());
         scoreboard.setScoreboard(p.getPlayer());
+
+        //stat loading
         for(SBPlayer.PlayerStat s: SBPlayer.PlayerStat.values()) {
             p.setStat(s,p.getMaxStat(s));
         }
-        p.updateStats();
 
+
+        //health loading
         if(p.getMaxStat(HEALTH)>100) {
             double newHealth;
             double oldrng = (p.getMaxStat(SBPlayer.PlayerStat.HEALTH) - 0);
@@ -85,6 +101,13 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
         } else {
             p.setMaxHealth(20);
         }
+
+        //clientside mining fatigue
+        p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, Integer.MAX_VALUE, 255, true, false));
+        PacketPlayOutEntityEffect entityEffect = new PacketPlayOutEntityEffect(p.getEntityId(), new MobEffect(MobEffectList.SLOWER_DIG.getId(), Integer.MAX_VALUE, -1, true, false));
+        ((CraftPlayer)p.getPlayer()).getHandle().playerConnection.sendPacket(entityEffect);
+
+        //loading skill cache
         for(SkillType t:SkillType.values()) {
             p.addSkillXP(t,0);
             p.setSkillLvl(t,0);

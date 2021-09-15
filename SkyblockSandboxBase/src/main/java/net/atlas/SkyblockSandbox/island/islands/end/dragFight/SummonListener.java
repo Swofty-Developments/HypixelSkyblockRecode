@@ -43,7 +43,11 @@ public class SummonListener {
                             ItemStack i = CraftItemStack.asBukkitCopy(nmsItem1);
                             p.setItemInHand(i);
                         } else {
-                            p.setItemInHand(new ItemStack(Material.AIR));
+                            if(p.getItemInHand().getAmount()>1) {
+                                p.getItemInHand().setAmount(p.getItemInHand().getAmount() - 1);
+                            } else {
+                                p.setItemInHand(new ItemStack(Material.AIR));
+                            }
                         }
                     }
                     for(Player pl: Bukkit.getOnlinePlayers()) {
