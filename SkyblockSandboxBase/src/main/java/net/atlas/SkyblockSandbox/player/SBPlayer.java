@@ -23,6 +23,7 @@ import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.PacketPlayOutTitle;
 import org.bson.Document;
 import org.bukkit.*;
+import org.bukkit.block.SkullOwner;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -354,6 +355,16 @@ public class SBPlayer extends PluginPlayer {
         }
 
         return false;
+    }
+
+    @Override
+    public SkullOwner.Texture getTexture() {
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> getData() {
+        return null;
     }
 
     public enum PlayerStat {

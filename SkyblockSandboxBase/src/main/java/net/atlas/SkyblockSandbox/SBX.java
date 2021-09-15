@@ -105,8 +105,9 @@ public class SBX extends JavaPlugin {
     private static SBX instance;
     SkyblockCommandFramework framework;
     private static MongoCoins mongoStats;
+    private MongoIslands mongoIslands;
     public MongoStorage mongoStorage;
-    public static MongoStorage storage = new MongoStorage();
+    public static MongoStorage storage;
     public Coins coins;
     private static ProtocolManager protocolManager;
 
@@ -205,6 +206,7 @@ public class SBX extends JavaPlugin {
         framework.registerCommands(new Command_storage(this));
         framework.registerCommands(new Command_debugtest(this));
         framework.registerCommands(new Command_forward(this));
+        framework.registerCommands(new Command_enchant(this));
         framework.registerHelp();
     }
 

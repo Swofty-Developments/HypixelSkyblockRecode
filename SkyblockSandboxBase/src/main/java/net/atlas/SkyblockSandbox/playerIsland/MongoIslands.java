@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableList;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
+import net.atlas.SkyblockSandbox.database.mongo.MongoDB;
 import net.atlas.SkyblockSandbox.files.DatabaseInformationFile;
-import net.atlas.SkyblockSandbox.mongo.MongoDB;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 

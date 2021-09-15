@@ -25,6 +25,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.lang.reflect.Field;
+import java.text.Collator;
 import java.text.DecimalFormat;
 import java.text.StringCharacterIterator;
 import java.util.*;
@@ -141,9 +142,8 @@ public class SBItemStack extends ItemStack {
                     }
                 }
 
-                /*EnchantUtil eutil = new EnchantUtil(stack);
-                if (eutil.hasAnyEnchant()) {
-                    HashMap<Enchantment, Integer> enchants = getItemEnchants(stack);
+                if (hasAnyEnchant()) {
+                    HashMap<Enchantment, Integer> enchants = getItemEnchants();
                     if (!enchants.isEmpty()) {
                         for (Enchantment e : enchants.keySet()) {
                             if (e.isUltimate()) {
@@ -169,7 +169,7 @@ public class SBItemStack extends ItemStack {
                         }
                         newLore.add("");
                     }
-                }*/
+                }
 
 
                 List<String> description = getDescription(stack);
@@ -190,7 +190,7 @@ public class SBItemStack extends ItemStack {
                     }
                     for (String s : newLore) {
                         if (s.equals("can-overwrite")) {
-                            newLore.set(newLore.indexOf(s), "");
+                            //newLore.set(newLore.indexOf(s), "");
                         }
                     }
                 }
@@ -383,6 +383,43 @@ public class SBItemStack extends ItemStack {
         return 0;
     }
 
+    public ItemStack addEnchantment(Enchantment enchantment,int lvl) {
+        if (stack != null) {
+            if (stack.hasItemMeta()) {
+                net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
+                NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+                NBTTagCompound data = tag.getCompound("ExtraAttributes");
+                NBTTagCompound enchants = data.getCompound("enchantments");
+                if (enchants == null) {
+                    enchants = new NBTTagCompound();
+                }
+
+                enchants.setInt(enchantment.name(),lvl);
+                data.set("enchantments",enchants);
+                tag.set("ExtraAttributes",data);
+                nmsItem.setTag(tag);
+                return CraftItemStack.asBukkitCopy(nmsItem);
+            }
+        }
+        return stack;
+    }
+
+    public boolean hasAnyEnchant() {
+        if (stack != null) {
+            if (stack.hasItemMeta()) {
+                net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
+                NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+                NBTTagCompound data = tag.getCompound("ExtraAttributes");
+                NBTTagCompound enchants = data.getCompound("enchantments");
+                if (enchants == null) {
+                    enchants = new NBTTagCompound();
+                }
+                return enchants.c().size() != 0;
+            }
+        }
+        return false;
+    }
+
     public ItemStack setStat(ItemStack stack, PlayerStat stat, Double v) {
         if (stack != null) {
             if (stack.hasItemMeta()) {
@@ -490,6 +527,17 @@ public class SBItemStack extends ItemStack {
             }
         }
         return 0;
+    }
+
+    public HashMap<Enchantment,Integer> getItemEnchants() {
+        HashMap<Enchantment,Integer> enchants = new HashMap<>();
+        for(Enchantment enchant:Enchantment.values()) {
+            int lvl = getEnchantment(enchant);
+            if(lvl!=0) {
+                enchants.put(enchant, lvl);
+            }
+        }
+        return enchants;
     }
 
     public ItemStack setAbilData(ItemStack stack, EnumAbilityData dataType, Object data, int index) {

@@ -14,14 +14,14 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public enum Enchantment {
-    ANGLER("Angler", 5, ItemType.ITEM, (sbPlayer, lvl) -> {
+    ANGLER("Angler", 5, ItemType.ITEM,false, (sbPlayer, lvl) -> {
         sbPlayer.setMaxStat(SBPlayer.PlayerStat.SEA_CREATURE_CHANCE, sbPlayer.getMaxStat(SBPlayer.PlayerStat.SEA_CREATURE_CHANCE) + (lvl));
         return 1;
     }),
-    AQUA_AFFINITY("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    AQUA_AFFINITY("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    BANE_OF_ARTHROPODS("Bane of Arthropods", 6, ItemType.SWORD, (event, dmg, lvl) -> {
+    BANE_OF_ARTHROPODS("Bane of Arthropods", 6, ItemType.SWORD, false, (event, dmg, lvl) -> {
         if (event.getDamager() instanceof Player) {
             int mult = lvl * 8;
             return new Integer((int) Math.ceil((dmg * (1 + (mult / 100D)))));
@@ -29,113 +29,113 @@ public enum Enchantment {
         return 1;
 
     }),
-    BIG_BRAIN("Big Brain", 5, ItemType.HELMET, (sbPlayer, lvl) -> {
+    BIG_BRAIN("Big Brain", 5, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         sbPlayer.setMaxStat(SBPlayer.PlayerStat.INTELLIGENCE, sbPlayer.getMaxStat(SBPlayer.PlayerStat.INTELLIGENCE) + (5 * lvl));
         return 1;
     }),
-    BLAST_PROTECTION("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    BLAST_PROTECTION("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    BLESSING("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    BLESSING("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    CASTER("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    CASTER("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    CHANCE("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    CHANCE("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    CLEAVE("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    CLEAVE("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    COMPACT("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    COMPACT("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    COUNTER_STRIKE("Counter-Strike", 3, ItemType.CHESPLATE, (event, dmg, lvl) ->{
+    COUNTER_STRIKE("Counter-Strike", 3, ItemType.CHESPLATE,false, (event, dmg, lvl) ->{
         return 1;
     }),
-    CRITICAL("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    CRITICAL("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    CUBISM("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    CUBISM("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    CULTIVATING("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    CULTIVATING("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    DELICATE("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    DELICATE("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    DEPTH_STRIDER("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    DEPTH_STRIDER("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    DRAGON_HUNTER("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    DRAGON_HUNTER("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    DRAGON_TRACER("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    DRAGON_TRACER("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Efficiency("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Efficiency("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Ender_Slayer("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Ender_Slayer("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Execute("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Execute("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Experience("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Experience("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Expertise("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Expertise("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Feather_Falling("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Feather_Falling("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Fire_Aspect("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Fire_Aspect("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Fire_Protection("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Fire_Protection("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    First_Strike("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    First_Strike("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Flame("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Flame("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Fortune("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Fortune("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Frail("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Frail("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Frost_Walker("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Frost_Walker("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Giant_Killer("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Giant_Killer("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Growth("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Growth("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Harvesting_Pristine("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Harvesting_Pristine("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Impaling("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Impaling("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Infinite_Quiver("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Infinite_Quiver("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Knockback("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Knockback("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Lethality("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Lethality("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    LIFE_STEAL("Life Steal", 5, ItemType.SWORD, (event, dmg, lvl) -> {
+    LIFE_STEAL("Life Steal", 5, ItemType.SWORD, false, (event, dmg, lvl) -> {
         if (event.getDamager() instanceof Player) {
             SBPlayer p = new SBPlayer((Player) event.getDamager());
             double mult = (0.5 * lvl) / 100;
@@ -146,119 +146,119 @@ public enum Enchantment {
         }
         return 1;
     }),
-    Looting("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Looting("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Luck("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Luck("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Luck_of_the_Sea("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Luck_of_the_Sea("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Lure("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Lure("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Mana_Steal("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Mana_Steal("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Magnet("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Magnet("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Overload("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Overload("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Piercing("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Piercing("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Power("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Power("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Projectile_Protection("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Projectile_Protection("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Prosecute("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Prosecute("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Protection("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Protection("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
-    }), Punch("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
-        return 1;
-    }),
-    Rainbow("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    }), Punch("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Rejuvenate("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Rainbow("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Replenish("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Rejuvenate("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Respiration("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Replenish("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Respite("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Respiration("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Scavenger("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Respite("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    SHARPNESS("Sharpness", 7, ItemType.SWORD, (event, dmg, lvl) -> {
+    Scavenger("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+        return 1;
+    }),
+    SHARPNESS("Sharpness", 7, ItemType.SWORD, false, (event, dmg, lvl) -> {
         if (event.getDamager() instanceof Player) {
             int mult = lvl * 5;
             return new Integer((int) Math.ceil((dmg * (1 + (mult / 100D)))));
         }
         return 1;
     }),
-    Silk_Touch("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Silk_Touch("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Smelting_Touch("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Smelting_Touch("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Smarty_Pants("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Smarty_Pants("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    SMITE("Smite", 7, ItemType.SWORD, (event, dmg, lvl) -> {
+    SMITE("Smite", 7, ItemType.SWORD, false, (event, dmg, lvl) -> {
         if (event.getDamager() instanceof Player) {
             int mult = lvl * 8;
             return new Integer((int) Math.ceil((dmg * (1 + (mult / 100D)))));
         }
         return 1;
     }),
-    Snipe("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    Snipe("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    SPIKED_HOOK("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    SPIKED_HOOK("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    SUGAR_RUSH("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    SUGAR_RUSH("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    SYPHON("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    SYPHON("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    TELEKINESIS("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    TELEKINESIS("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    THORNS("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    THORNS("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    THUNDERBOLT("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    THUNDERBOLT("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    THUNDERLORD("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    THUNDERLORD("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    TITAN_KILLER("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    TITAN_KILLER("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    TRIPLE_STRIKE("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    TRIPLE_STRIKE("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    TRUE_PROTECTION("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    TRUE_PROTECTION("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    VAMPIRISM("Vampirism", 6, ItemType.SWORD, (event, dmg, lvl) -> {
+    VAMPIRISM("Vampirism", 6, ItemType.SWORD, false, (event, dmg, lvl) -> {
         if (event.getDamager() instanceof Player) {
             if (event.getEntity() instanceof LivingEntity) {
                 if (dmg > ((LivingEntity) event.getEntity()).getHealth()) {
@@ -270,30 +270,41 @@ public enum Enchantment {
         }
         return dmg;
     }),
-    VENOMOUS("Aqua Affinity", 3, ItemType.HELMET, (sbPlayer, lvl) -> {
+    VENOMOUS("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    VICIOUS("Vicious", 5, ItemType.SWORD, (sbPlayer, lvl) -> lvl);
+    VICIOUS("Vicious", 5, ItemType.SWORD, false, (sbPlayer, lvl) -> lvl);
 
     private String name;
     private int maxLvl;
     private ItemType type;
     private TriFunction<EntityDamageByEntityEvent, Integer, Integer, Integer> action2;
     private BiFunction<SBPlayer, Integer, Integer> action3;
+    private boolean isUlt;
 
 
-    Enchantment(String name, int maxLvl, ItemType type, TriFunction<EntityDamageByEntityEvent, Integer, Integer, Integer> action) {
+    Enchantment(String name, int maxLvl, ItemType type,boolean isUlt, TriFunction<EntityDamageByEntityEvent, Integer, Integer, Integer> action) {
         this.name = name;
         this.maxLvl = maxLvl;
         this.type = type;
         this.action2 = action;
+        this.isUlt = isUlt;
     }
 
-    Enchantment(String name, int maxLvl, ItemType type, BiFunction<SBPlayer, Integer, Integer> action) {
+    Enchantment(String name, int maxLvl, ItemType type,boolean isUlt, BiFunction<SBPlayer, Integer, Integer> action) {
         this.name = name;
         this.maxLvl = maxLvl;
         this.type = type;
         this.action3 = action;
+        this.isUlt = isUlt;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public boolean isUltimate() {
+        return isUlt;
     }
 
     public ItemType getItemType() {
