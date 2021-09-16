@@ -31,7 +31,7 @@ public class StorageCache
 	 */
 	@Deprecated
 	public void refresh() {
-		MongoDB mongoDB = SBX.storage;
+		MongoDB mongoDB = SBX.getInstance().mongoStorage;
 
 		if (mongoDB.getData(player.getUniqueId(), "enderchest_page_1") == null) {
 			for (int i = 0; i < 9; i++) {
@@ -56,7 +56,7 @@ public class StorageCache
 	 * ONLY RUN THIS METHOD WHEN PLAYER JOINS AND THEIR DATA IS NOT ALREADY CACHED!!!!
 	 */
 	public void refresh(int page) {
-		MongoDB mongoDB = SBX.storage;
+		MongoDB mongoDB = SBX.getInstance().mongoStorage;
 		if (mongoDB.getData(player.getUniqueId(), "enderchest_page_1") != null) {
 			switch (page) {
 				case 1:

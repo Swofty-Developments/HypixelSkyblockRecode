@@ -25,6 +25,9 @@ public class RomanNumber {
     }
 
     public static String toRoman(int number) {
+        if(number>100000000) {
+            return String.valueOf(number);
+        }
         int l =  map.floorKey(number);
         if ( number == l ) {
             return map.get(number);

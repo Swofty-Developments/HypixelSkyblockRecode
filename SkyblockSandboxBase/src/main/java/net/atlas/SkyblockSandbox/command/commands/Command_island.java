@@ -13,7 +13,9 @@ import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.playerIsland.Data;
 import net.atlas.SkyblockSandbox.playerIsland.IslandId;
 import net.atlas.SkyblockSandbox.playerIsland.PlayerIsland;
+import net.atlas.SkyblockSandbox.playerIsland.SBLocations;
 import net.atlas.SkyblockSandbox.util.BungeeUtil;
+import net.atlas.SkyblockSandbox.util.SUtil;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -154,10 +156,11 @@ public class Command_island extends SkyblockCommandFramework {
                     BungeeUtil.sendRandom(new SBPlayer(arguments.getPlayer()), new CfgFile().getConfiguration().getStringList("hub-server-names")) +
                     "...");
 
-            return;
+        } else {
+            SBLocations.HUB.teleport(arguments.getPlayer());
         }
+        return;
 
-        arguments.getPlayer().sendMessage("§c[▼] This action cannot be reached!");
     }
 
     @SBCommand(name = "cmdislandcmdaaa_nooneisgonnafindthiscommand_iswear_pleasedontfindit_tyvm")

@@ -51,7 +51,7 @@ public class SBItemStack extends ItemStack {
         setName(stack, name);
         setString(stack,id.toUpperCase(),"ID");
         setString(stack,rarity.name(),"RARITY");
-        setString(stack,"item-type",type.getValue());
+        setString(stack,type.getValue(),"item-type");
         setDurability(stack, durability);
         for(PlayerStat stat:stats.keySet()) {
             stack = setStat(stack,stat,stats.get(stat));

@@ -4,6 +4,8 @@ package net.atlas.SkyblockSandbox.customMining;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.item.SkyblockItem;
 import net.atlas.SkyblockSandbox.item.enchant.Enchantment;
+import net.atlas.SkyblockSandbox.player.skills.SkillType;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -25,6 +27,8 @@ public class MiningBlock {
     private ItemStack drops;
     private static double blockHP;
     private static double softCap;
+    private SkillType type = SkillType.MINING;
+    private double xpAmt = 10;
 
     public double getSoftCap() {
         return blockHP * 6;
@@ -32,6 +36,22 @@ public class MiningBlock {
 
     public void setBlockHP(double d) {
         blockHP = d;
+    }
+
+    public void setXPType(SkillType type) {
+        this.type = type;
+    }
+
+    public void setXPAmt(double amt) {
+        this.xpAmt = amt;
+    }
+
+    public double getXpAmt() {
+        return xpAmt;
+    }
+
+    public SkillType getSkillType() {
+        return type;
     }
 
     public double getBlockHP() {

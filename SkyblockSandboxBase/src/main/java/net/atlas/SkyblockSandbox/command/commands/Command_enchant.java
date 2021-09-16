@@ -34,10 +34,10 @@ public class Command_enchant extends SkyblockCommandFramework
             if (args.length >= 2) {
                 Enchantment enchant = Enums.getIfPresent(Enchantment.class,args[0].toUpperCase()).orNull();
                 if(enchant!=null) {
-                    if(NumUtils.isInt(args[2])) {
+                    if(NumUtils.isInt(args[1])) {
                         SBPlayer player = new SBPlayer(((Player) sender));
                         SBItemStack stack = new SBItemStack(player.getItemInHand());
-                        ItemStack newItem = stack.addEnchantment(enchant,Integer.parseInt(args[2]));
+                        ItemStack newItem = stack.addEnchantment(enchant,Integer.parseInt(args[1]));
                         player.setItemInHand(newItem);
                         player.playSound(player.getLocation(), Sound.ITEM_PICKUP,1,1);
                         player.sendMessage(SUtil.colorize("&aEnchanting succeeded!"));

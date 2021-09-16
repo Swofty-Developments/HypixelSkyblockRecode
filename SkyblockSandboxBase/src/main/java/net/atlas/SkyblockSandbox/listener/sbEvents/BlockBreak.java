@@ -1,6 +1,8 @@
 package net.atlas.SkyblockSandbox.listener.sbEvents;
 
 import net.atlas.SkyblockSandbox.SBX;
+import net.atlas.SkyblockSandbox.customMining.MiningBlock;
+import net.atlas.SkyblockSandbox.customMining.MiningBlocks;
 import net.atlas.SkyblockSandbox.event.customEvents.SkillEXPGainEvent;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
@@ -19,6 +21,7 @@ import static net.atlas.SkyblockSandbox.playerIsland.PlayerIslandHandler.dist;
 public class BlockBreak extends SkyblockListener<BlockBreakEvent> {
 
     public static HashMap<Location, Material> brokenBlocks = new HashMap<>();
+    public static HashMap<Location,Byte> blockData = new HashMap<>();
 
     @EventHandler
     public void callEvent(BlockBreakEvent event) {
@@ -59,23 +62,29 @@ public class BlockBreak extends SkyblockListener<BlockBreakEvent> {
                     }
                 }.runTaskLater(SBX.getInstance(), 20 * 10);
             } else {
-                brokenBlocks.put(event.getBlock().getLocation(), event.getBlock().getType());
-                pl.playEffect(pl.getLocation(), Effect.STEP_SOUND, event.getBlock().getType().getId());
-                event.getBlock().setType(Material.BEDROCK);
-                SkillEXPGainEvent expGainEvent = new SkillEXPGainEvent(pl, SkillType.MINING, 10D);
-                Bukkit.getPluginManager().callEvent(expGainEvent);
+                if(MiningBlocks.isMineable(event.getBlock())) {
+                    MiningBlock mb = MiningBlocks.toMiningBlock(event.getBlock());
+                    brokenBlocks.put(event.getBlock().getLocation(), event.getBlock().getType());
+                    blockData.put(event.getBlock().getLocation(),event.getBlock().getData());
+                    pl.playEffect(pl.getLocation(), Effect.STEP_SOUND, event.getBlock().getType().getId());
+                    event.getBlock().setType(Material.BEDROCK);
+                    SkillEXPGainEvent expGainEvent = new SkillEXPGainEvent(pl, mb.getSkillType(), mb.getXpAmt());
+                    Bukkit.getPluginManager().callEvent(expGainEvent);
 
-                new BukkitRunnable() {
-                    final Block b = event.getBlock();
+                    new BukkitRunnable() {
+                        final Block b = event.getBlock();
 
-                    @Override
-                    public void run() {
-                        if(brokenBlocks.get(b.getLocation())!=null) {
-                            b.setType(brokenBlocks.get(b.getLocation()));
-                            brokenBlocks.remove(b.getLocation());
+                        @Override
+                        public void run() {
+                            if (brokenBlocks.get(b.getLocation()) != null) {
+                                b.setType(brokenBlocks.get(b.getLocation()));
+                                b.setData(blockData.get(b.getLocation()));
+                                brokenBlocks.remove(b.getLocation());
+                                blockData.remove(b.getLocation());
+                            }
                         }
-                    }
-                }.runTaskLater(SBX.getInstance(), 40L);
+                    }.runTaskLater(SBX.getInstance(), 40L);
+                }
             }
         }
 

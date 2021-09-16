@@ -2,6 +2,9 @@ package net.atlas.SkyblockSandbox.util;
 
 import com.google.common.base.Enums;
 import net.atlas.SkyblockSandbox.SBX;
+import net.atlas.SkyblockSandbox.item.ItemType;
+import net.atlas.SkyblockSandbox.item.SBItemStack;
+import net.atlas.SkyblockSandbox.item.enchant.Enchantment;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.slayer.SlayerTier;
 import net.atlas.SkyblockSandbox.slayer.Slayers;
@@ -15,6 +18,8 @@ import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.*;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -123,11 +128,12 @@ public class DamageUtil {
         double wpDmg = playerStats.get(SBPlayer.PlayerStat.DAMAGE);
         double str = playerStats.get(SBPlayer.PlayerStat.STRENGTH);
         double cd = playerStats.get(SBPlayer.PlayerStat.CRIT_DAMAGE);
-        double init = (wpDmg + 5) * (1 + (str / 100));
-        double mult = 1 + (/*combat lvl*/0 * 0.04); /*+enchants + weaponbonus*/
+        double init = (wpDmg + 5D) * (1D + (str / 100D));
+        double mult = 1 + (/*combat lvl*/0 * 0.04);
         double dmg = 0;
         if (isCrit) {
-            dmg = init * mult * (1 + (cd / 100));
+            dmg = init * mult * (1 + (cd / 100D));
+            dmg = calculateEnchants(p, (LivingEntity) en, dmg);
             dmg = calculateDefense((LivingEntity) en, dmg);
             if (checkHitShield(en, p, dmg)) {
                 dmg = 0;
@@ -137,6 +143,7 @@ public class DamageUtil {
             }
         } else {
             dmg = init * mult;
+            dmg = calculateEnchants(p, (LivingEntity) en, dmg);
             dmg = calculateDefense((LivingEntity) en, dmg);
             if (checkHitShield(en, p, dmg)) {
                 dmg = 0;
@@ -169,20 +176,14 @@ public class DamageUtil {
         double dmg = 0;
         if (isCrit) {
             dmg = init * mult * (1 + (cd / 100));
-            dmg = calculateDefense((LivingEntity) damagee, dmg);
-            if (checkHitShield(damagee, dmg)) {
-                dmg = 0;
-            } else {
-                ((LivingEntity) damagee).damage(0);
-            }
         } else {
             dmg = init * mult;
-            dmg = calculateDefense((LivingEntity) damagee, dmg);
-            if (checkHitShield(damagee, dmg)) {
-                dmg = 0;
-            } else {
-                ((LivingEntity) damagee).damage(0);
-            }
+        }
+        dmg = calculateDefense((LivingEntity) damagee, dmg);
+        if (checkHitShield(damagee, dmg)) {
+            dmg = 0;
+        } else {
+            ((LivingEntity) damagee).damage(0);
         }
 
         return dmg;
@@ -336,5 +337,19 @@ public class DamageUtil {
         }
 
         return result.toString();
+    }
+
+    public static double calculateEnchants(SBPlayer p, LivingEntity en, double curDmg) {
+
+        for (Enchantment ench : Enchantment.values()) {
+            if (ench.getItemType().equals(ItemType.SWORD) || ench.getItemType().equals(ItemType.ITEM)) {
+                int enchLvl = new SBItemStack(p.getItemInHand()).getEnchantment(ench);
+                if (enchLvl != 0) {
+                    EntityDamageByEntityEvent event1 = new EntityDamageByEntityEvent(p.getPlayer(), en, EntityDamageEvent.DamageCause.CUSTOM, curDmg);
+                    curDmg = ench.getDamageAction().apply(event1, (int) curDmg, enchLvl);
+                }
+            }
+        }
+        return curDmg;
     }
 }

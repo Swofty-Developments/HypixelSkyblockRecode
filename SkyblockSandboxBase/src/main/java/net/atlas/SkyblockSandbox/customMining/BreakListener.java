@@ -34,7 +34,7 @@ public class BreakListener implements Listener {
 
     @EventHandler
     public void blockBreak(BlockDamageEvent e) {
-        e.setCancelled(true);
+        //e.setCancelled(true);
         Player p = e.getPlayer();
         if (p.getItemInHand() != null && !p.getItemInHand().getType().equals(Material.AIR)) {
             String ID = NBTUtil.getString(p.getItemInHand(),"item-type");
@@ -48,36 +48,7 @@ public class BreakListener implements Listener {
                         }
 
                         SBPlayer pl = new SBPlayer(p);
-                        MiningBlock mb = new MiningBlock(b);
-                        switch (b.getType()) {
-                            case STONE:
-                                mb.setBlockHP(15);
-                                break;
-                            case COBBLESTONE:
-                                mb.setBlockHP(20);
-                                break;
-                            case COAL_ORE:
-                            case IRON_ORE:
-                            case GOLD_ORE:
-                            case EMERALD_ORE:
-                            case DIAMOND_ORE:
-                            case ENDER_STONE:
-                                mb.setBlockHP(60);
-                                break;
-                            case DIAMOND_BLOCK:
-                                mb.setBlockHP(100);
-                                break;
-                            case OBSIDIAN:
-                                mb.setBlockHP(1000);
-                                break;
-                            case PRISMARINE:
-                                mb.setBlockHP(800);
-                                break;
-                            default:
-                                mb.setBlockHP(0);
-                                break;
-                        }
-
+                        MiningBlock mb = MiningBlocks.toMiningBlock(b);
 
                         MineTask task = new MineTask(pl,b,mb);
                         int taskID = scheduler.scheduleSyncRepeatingTask(SBX.getInstance(),task,0L,0L);

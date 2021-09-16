@@ -72,7 +72,7 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
         SBX.getInstance().coins.loadCoins(p.getPlayer());
 
         //loading storage
-        MongoStorage mongoStorage = SBX.storage;
+        MongoStorage mongoStorage = SBX.getInstance().mongoStorage;
         mongoStorage.setPlayerData(p.getUniqueId().toString());
         StorageCache storage = new StorageCache(p);
         for (int i = 1; i <= 9; i++) {

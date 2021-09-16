@@ -107,7 +107,6 @@ public class SBX extends JavaPlugin {
     private static MongoCoins mongoStats;
     private MongoIslands mongoIslands;
     public MongoStorage mongoStorage;
-    public static MongoStorage storage;
     public Coins coins;
     private static ProtocolManager protocolManager;
 

@@ -55,6 +55,26 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
             damagee = DamageUtil.getEntityByUniqueID(UUID.fromString(damagee.getMetadata("entity-tag").get(0).asString()));
             event = new EntityDamageByEntityEvent(damager, damagee, event.getCause(), event.getDamage());
         }
+        boolean isBothPlayers = false;
+        if (damager instanceof Player) {
+            event.setCancelled(true);
+            SBPlayer p = new SBPlayer(((Player) damager));
+            if (damagee instanceof LivingEntity) {
+                if(damagee instanceof Player) {
+                    isBothPlayers = true;
+                }
+                LivingEntity en = (LivingEntity) damagee;
+                if (en.getMetadata("summon").isEmpty()) {
+                    calculateHit(p, en, event);
+                    int timeshit = 0;
+                    if(en.getMetadata("times-hit").size()>=1) {
+                        timeshit = en.getMetadata("times-hit").get(0).asInt();
+                    }
+                    en.setMetadata("times-hit",new FixedMetadataValue(SBX.getInstance(),timeshit+1));
+                }
+            }
+
+        }
         if (damagee instanceof Player) {
             SBPlayer p = new SBPlayer((Player) damagee);
             double def = p.getMaxStat(SBPlayer.PlayerStat.DEFENSE);
@@ -66,7 +86,11 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                     dmg = Slayers.ENDERMAN.getSlayerClass().getDPS().get(tier) / 2D * dmgreduction;
                 }
             } else {
-                dmg = DamageUtil.calculateSingleHit(damagee,new SBPlayer((Player) damager))/* * dmgreduction*/;
+                if(isBothPlayers) {
+                    dmg = DamageUtil.calculateSingleHit(damagee, new SBPlayer((Player) damager))/* * dmgreduction*/;
+                } else {
+                    dmg = DamageUtil.calculateSingleHit(damagee,damager);
+                }
             }
             p.setStat(SBPlayer.PlayerStat.HEALTH, p.getStat(SBPlayer.PlayerStat.HEALTH) - dmg);
             double newHealth = Math.ceil((p.getStat(SBPlayer.PlayerStat.HEALTH) / 100) * 20);
@@ -102,17 +126,6 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                     event.setCancelled(true);
                     calculateHit(p, en, event);
                     arrow.remove();
-                }
-            }
-
-        }
-        if (damager instanceof Player) {
-            event.setCancelled(true);
-            SBPlayer p = new SBPlayer(((Player) damager));
-            if (damagee instanceof LivingEntity) {
-                LivingEntity en = (LivingEntity) damagee;
-                if (en.getMetadata("summon").isEmpty()) {
-                    calculateHit(p, en, event);
                 }
             }
 
@@ -317,7 +330,6 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                         en.setMetadata("canDamage", new FixedMetadataValue(SBX.getInstance(), true));
                     }
                 }.runTaskLater(SBX.getInstance(), iframes);
-                dmg = calculateEnchants(p,en,event,dmg);
                 return dmg;
             }
         } else {
@@ -327,17 +339,5 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
         return 0;
     }
 
-    public double calculateEnchants(SBPlayer p,LivingEntity en,EntityDamageByEntityEvent event,double curDmg) {
-        for(Enchantment ench:Enchantment.values()) {
-            if(ench.getItemType().equals(ItemType.SWORD)) {
-                int enchLvl = new SBItemStack(p.getItemInHand()).getEnchantment(ench);
-                if(enchLvl!=0) {
-                    EntityDamageByEntityEvent event1 = new EntityDamageByEntityEvent(p.getPlayer(), en, event.getCause(), curDmg);
-                    curDmg = ench.getDamageAction().apply(event1, (int) curDmg,enchLvl);
-                    return curDmg;
-                }
-            }
-        }
-        return 0;
-    }
+
 }

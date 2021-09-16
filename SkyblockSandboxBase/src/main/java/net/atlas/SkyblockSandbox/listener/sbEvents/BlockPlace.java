@@ -3,6 +3,7 @@ package net.atlas.SkyblockSandbox.listener.sbEvents;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.SUtil;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -24,6 +25,8 @@ public class BlockPlace extends SkyblockListener<BlockPlaceEvent> {
                 return;
             }
         }
-        event.setCancelled(true);
+        if(!event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
+            event.setCancelled(true);
+        }
     }
 }

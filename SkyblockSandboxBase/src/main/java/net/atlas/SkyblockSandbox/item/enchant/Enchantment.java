@@ -1,5 +1,8 @@
 package net.atlas.SkyblockSandbox.item.enchant;
 
+import net.atlas.SkyblockSandbox.SBX;
+import net.atlas.SkyblockSandbox.economy.CoinEvent;
+import net.atlas.SkyblockSandbox.economy.Coins;
 import net.atlas.SkyblockSandbox.item.ItemType;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
@@ -7,6 +10,7 @@ import net.atlas.SkyblockSandbox.util.TriFunction;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -24,9 +28,9 @@ public enum Enchantment {
     BANE_OF_ARTHROPODS("Bane of Arthropods", 6, ItemType.SWORD, false, (event, dmg, lvl) -> {
         if (event.getDamager() instanceof Player) {
             int mult = lvl * 8;
-            return new Integer((int) Math.ceil((dmg * (1 + (mult / 100D)))));
+            return Integer.valueOf((int) Math.ceil((dmg * (1 + (mult / 100D)))));
         }
-        return 1;
+        return dmg;
 
     }),
     BIG_BRAIN("Big Brain", 5, ItemType.HELMET, false, (sbPlayer, lvl) -> {
@@ -99,8 +103,20 @@ public enum Enchantment {
     Fire_Protection("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    First_Strike("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
-        return 1;
+    FIRST_STRIKE("First Strike", 5, ItemType.SWORD, false, (event,dmg,lvl) -> {
+        if(event.getDamager() instanceof Player) {
+            SBPlayer p = new SBPlayer(((Player) event.getDamager()));
+            double mult = (lvl*0.25);
+            int timeshit = 0;
+            LivingEntity en = (LivingEntity) event.getEntity();
+            if(en.getMetadata("times-hit").size()>=1) {
+                timeshit = en.getMetadata("times-hit").get(0).asInt();
+            }
+            if(timeshit==0) {
+                return Integer.valueOf((int) (dmg *mult));
+            }
+        }
+        return dmg;
     }),
     Flame("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
@@ -144,7 +160,7 @@ public enum Enchantment {
                 p.setStat(SBPlayer.PlayerStat.HEALTH, health);
             }
         }
-        return 1;
+        return dmg;
     }),
     Looting("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
@@ -158,8 +174,16 @@ public enum Enchantment {
     Lure("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Mana_Steal("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
-        return 1;
+    Mana_Steal("Mana Steal", 3, ItemType.SWORD, false, (event,dmg,lvl) -> {
+        if (event.getDamager() instanceof Player) {
+            SBPlayer p = new SBPlayer((Player) event.getDamager());
+            double mult = ((0.3 * lvl)-0.1) / 100;
+            double intel = p.getStat(SBPlayer.PlayerStat.INTELLIGENCE) + (p.getMaxStat(SBPlayer.PlayerStat.INTELLIGENCE) * mult);
+            if (!(intel > p.getMaxStat(SBPlayer.PlayerStat.INTELLIGENCE))) {
+                p.setStat(SBPlayer.PlayerStat.INTELLIGENCE, intel);
+            }
+        }
+        return dmg;
     }),
     Magnet("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
@@ -199,15 +223,23 @@ public enum Enchantment {
     Respite("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Scavenger("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
-        return 1;
+    SCAVENGER("Scavenger", 3, ItemType.HELMET, false, (event,dmg,lvl) -> {
+        if (event.getDamager() instanceof Player) {
+            SBPlayer p = new SBPlayer((Player) event.getDamager());
+            if(((LivingEntity)event.getEntity()).getHealth()<=dmg) {
+                double mult = ((0.3 * lvl)*50);
+                Coins coins = SBX.getInstance().coins;
+                coins.addCoins(p.getPlayer(),mult, CoinEvent.MOB);
+            }
+        }
+        return dmg;
     }),
     SHARPNESS("Sharpness", 7, ItemType.SWORD, false, (event, dmg, lvl) -> {
         if (event.getDamager() instanceof Player) {
             int mult = lvl * 5;
-            return new Integer((int) Math.ceil((dmg * (1 + (mult / 100D)))));
+            return Integer.valueOf((int) Math.ceil((dmg * (1 + (mult / 100D)))));
         }
-        return 1;
+        return dmg;
     }),
     Silk_Touch("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
@@ -215,13 +247,14 @@ public enum Enchantment {
     Smelting_Touch("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Smarty_Pants("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    SMARTY_PANTS("Smarty Pants", 3, ItemType.LEGGINGS, false, (sbPlayer, lvl) -> {
+        sbPlayer.setMaxStat(SBPlayer.PlayerStat.INTELLIGENCE, sbPlayer.getMaxStat(SBPlayer.PlayerStat.INTELLIGENCE) + (5 * lvl));
         return 1;
     }),
     SMITE("Smite", 7, ItemType.SWORD, false, (event, dmg, lvl) -> {
         if (event.getDamager() instanceof Player) {
             int mult = lvl * 8;
-            return new Integer((int) Math.ceil((dmg * (1 + (mult / 100D)))));
+            return Integer.valueOf((int) Math.ceil((dmg * (1 + (mult / 100D)))));
         }
         return 1;
     }),
