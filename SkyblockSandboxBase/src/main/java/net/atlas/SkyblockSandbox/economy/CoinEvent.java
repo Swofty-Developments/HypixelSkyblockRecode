@@ -3,6 +3,7 @@ package net.atlas.SkyblockSandbox.economy;
 public enum CoinEvent {
     MOB("mob_kill"),
     PICKUP("coin_pickup"),
+    AH("auction_house"),
     DEPOSIT("deposit_coin"),
     WITHDRAW("withdraw_coin"),
     SELL("sell_item"),
