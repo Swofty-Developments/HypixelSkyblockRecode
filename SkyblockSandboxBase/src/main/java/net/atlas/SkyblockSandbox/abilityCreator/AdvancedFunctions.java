@@ -20,6 +20,7 @@ import org.bukkit.Sound;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -264,6 +265,10 @@ public abstract class AdvancedFunctions extends NormalGUI {
                 enumGui.open();
             }
         }
+    }
+
+    public static void handleFunctions(ClickType type) {
+
     }
 
     @Override

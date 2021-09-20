@@ -94,6 +94,9 @@ public class FissureZombie extends EntityZombie {
             Location rand = null;
             @Override
             public void run() {
+                if(zombie.getWorld()!=p.getWorld()) {
+                    this.cancel();
+                }
                 if(zombie.getLocation().distance(p.getLocation())>=10) {
                     boolean flag = zombie.getLocation().distance(p.getLocation()) >= 20;
                     Random random = new Random();
@@ -109,6 +112,9 @@ public class FissureZombie extends EntityZombie {
                     } else {
                         moveTo(rand, zombie);
                     }
+                }
+                if(zombie.isDead()) {
+                    this.cancel();
                 }
 
             }

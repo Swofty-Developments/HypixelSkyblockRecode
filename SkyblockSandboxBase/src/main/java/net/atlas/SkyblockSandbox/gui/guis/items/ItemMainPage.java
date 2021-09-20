@@ -39,7 +39,7 @@ public class ItemMainPage extends NormalGUI {
 
     @Override
     public String getTitle() {
-        return "Items main page";
+        return "Items Main Page";
     }
 
     @Override

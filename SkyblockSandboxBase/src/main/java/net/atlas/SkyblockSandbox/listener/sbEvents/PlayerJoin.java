@@ -3,6 +3,7 @@ package net.atlas.SkyblockSandbox.listener.sbEvents;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.files.CfgFile;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.StartFight;
+import net.atlas.SkyblockSandbox.item.Rarity;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
@@ -13,6 +14,7 @@ import net.atlas.SkyblockSandbox.storage.MongoStorage;
 import net.atlas.SkyblockSandbox.storage.StorageCache;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.SUtil;
+import net.atlas.SkyblockSandbox.util.builders.SBItemBuilder;
 import net.minecraft.server.v1_8_R3.MobEffect;
 import net.minecraft.server.v1_8_R3.MobEffectList;
 import net.minecraft.server.v1_8_R3.PacketPlayOutEntityEffect;
@@ -40,6 +42,7 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
     public void callEvent(PlayerJoinEvent event) {
 
         SBPlayer p = new SBPlayer(event.getPlayer());
+        p.getInventory().setItem(8, SBItemBuilder.init().name("&aSkyblock Menu &7(Right Click)").mat(Material.NETHER_STAR).id("SKYBLOCK_MENU").stackable(false).rarity(Rarity.SKYBLOCK_MENU).build().asBukkitItem());
         if(StartFight.fightActive) {
             StartFight.playerDMG.put(p.getPlayer(),0D);
         }

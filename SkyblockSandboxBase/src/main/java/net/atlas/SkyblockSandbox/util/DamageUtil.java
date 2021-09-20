@@ -346,7 +346,9 @@ public class DamageUtil {
                 int enchLvl = new SBItemStack(p.getItemInHand()).getEnchantment(ench);
                 if (enchLvl != 0) {
                     EntityDamageByEntityEvent event1 = new EntityDamageByEntityEvent(p.getPlayer(), en, EntityDamageEvent.DamageCause.CUSTOM, curDmg);
-                    curDmg = ench.getDamageAction().apply(event1, (int) curDmg, enchLvl);
+                    if(ench.getDamageAction()!=null) {
+                        curDmg = ench.getDamageAction().apply(event1, (int) curDmg, enchLvl);
+                    }
                 }
             }
         }

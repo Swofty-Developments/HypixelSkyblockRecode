@@ -20,10 +20,11 @@ public enum MiningBlocks {
     OUTER_MITHRIL_ORE("Outer Mithril Ore",Material.WOOL,45,500, DyeColor.GRAY.getData()),
     INNER_MITHRIL_ORE("Inner Mithril Ore",Material.PRISMARINE,45,800,(byte) 0),
     CENTER_MITHRIL_ORE("Center Mithril Ore",Material.WOOL,45,1500,DyeColor.LIGHT_BLUE.getData()),
-    TITANIUM_ORE("Titanium Ore",Material.STONE,100,15,(byte) 4),
+    TITANIUM_ORE("Titanium Ore",Material.STONE,100,2000,(byte) 4),
     RUBY_GEMSTONE("Ruby Gemstone",Material.STAINED_GLASS,80,2500,(byte) 14),
     TOPAZ_GEMSTONE("Topaz Gemstone",Material.STAINED_GLASS,80,4000,(byte) 4),
-    JASPER_GEMSTONE("Jasper Gemstone",Material.STAINED_GLASS,80,5000,(byte) 2);
+    JASPER_GEMSTONE("Jasper Gemstone",Material.STAINED_GLASS,80,5000,(byte) 2),
+    OAK_LOG("Oak Log",Material.LOG,8,SkillType.FORAGING,80,(byte) 1);
 
 
 

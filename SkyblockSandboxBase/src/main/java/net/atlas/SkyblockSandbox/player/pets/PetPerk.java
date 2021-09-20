@@ -38,6 +38,9 @@ public class PetPerk {
     }
 
     public void addDescript(String... descript) {
+        if(this.descript==null) {
+            this.descript = new ArrayList<>();
+        }
         List<String> copy = new ArrayList<>(this.descript);
         List<String> supported = new ArrayList<>(SUtil.colorize(descript));
         copy.addAll(supported);

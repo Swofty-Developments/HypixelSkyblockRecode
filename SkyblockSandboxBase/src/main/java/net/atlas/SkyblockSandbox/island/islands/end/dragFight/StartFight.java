@@ -16,7 +16,7 @@ import java.util.HashMap;
 public class StartFight {
     public static boolean fightActive = false;
     public static HashMap<Player, Double> playerDMG = new HashMap<>();
-    public static final Location spawnLoc = new Location(Bukkit.getWorlds().get(0), -671, 69, -277);
+    public static Location spawnLoc = new Location(Bukkit.getWorlds().get(0), -671, 69, -277);
     public static HashMap<Location, Player> placedEyes = new HashMap<>();
     public static AbstractDragon activeDrag;
     public static HashMap<Player, Double> weight = new HashMap<>();

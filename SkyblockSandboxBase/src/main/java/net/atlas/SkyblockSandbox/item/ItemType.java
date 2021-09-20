@@ -16,6 +16,7 @@ public enum ItemType {
     AXE("AXE"),
     SHEARS("SHEARS"),
     PICKAXE("PICKAXE"),
+    DRILL("DRILL"),
     HOE("HOE"),
     SUMMONING("SUMMONING ITEM");
 

@@ -66,23 +66,27 @@ public class SBPlayer extends PluginPlayer {
     }*/
 
     public double getStat(PlayerStat stat) {
-        if (!bonusStats.containsKey(sbPlayer.getUniqueId())) {
-            if (!bonusStats.get(sbPlayer.getUniqueId()).containsKey(stat)) {
-                HashMap<PlayerStat, Double> temp = new HashMap<>(bonusStats.get(sbPlayer.getUniqueId()));
-                temp.put(stat, 0D);
-                bonusStats.put(sbPlayer.getUniqueId(), temp);
-            }
+        boolean flag = !bonusStats.containsKey(sbPlayer.getUniqueId());
+        if (!flag && !bonusStats.get(sbPlayer.getUniqueId()).containsKey(stat)) {
+            flag = true;
+        }
+        if(flag) {
+            HashMap<PlayerStat, Double> temp = new HashMap<>(bonusStats.get(sbPlayer.getUniqueId()));
+            temp.put(stat, 0D);
+            bonusStats.put(sbPlayer.getUniqueId(), temp);
         }
         return bonusStats.get(sbPlayer.getUniqueId()).get(stat);
     }
 
     public double getMaxStat(PlayerStat stat) {
-        if (!maxStats.containsKey(sbPlayer.getUniqueId())) {
-            if (!maxStats.get(sbPlayer.getUniqueId()).containsKey(stat)) {
-                HashMap<PlayerStat, Double> temp = new HashMap<>(maxStats.get(sbPlayer.getUniqueId()));
-                temp.put(stat, 0D);
-                maxStats.put(sbPlayer.getUniqueId(), temp);
-            }
+        boolean flag = !maxStats.containsKey(sbPlayer.getUniqueId());
+        if (!flag && !maxStats.get(sbPlayer.getUniqueId()).containsKey(stat)) {
+            flag = true;
+        }
+        if (flag) {
+            HashMap<PlayerStat, Double> temp = new HashMap<>(maxStats.get(sbPlayer.getUniqueId()));
+            temp.put(stat, 0D);
+            maxStats.put(sbPlayer.getUniqueId(), temp);
         }
         return maxStats.get(sbPlayer.getUniqueId()).get(stat);
     }
@@ -169,15 +173,7 @@ public class SBPlayer extends PluginPlayer {
                     }
                 }
                 pl.getPlayer().setMaxHealth(Math.floor(newHealth));
-            } else {
-                pl.getPlayer().setMaxHealth(20);
-            }
-
-            double newHealth;
-            double oldrng = (sbPlayer.getMaxStat(SBPlayer.PlayerStat.HEALTH) - 0);
-            if (oldrng == 0)
-                newHealth = 0;
-            else {
+                oldrng = (sbPlayer.getMaxStat(SBPlayer.PlayerStat.HEALTH) - 0);
                 double newRng = 20;
                 if (sbPlayer.getMaxStat(SBPlayer.PlayerStat.HEALTH) >= 100 && sbPlayer.getMaxStat(HEALTH) <= 200) {
                     newRng = (sbPlayer.getMaxStat(HEALTH) / 5 - 0);
@@ -189,7 +185,11 @@ public class SBPlayer extends PluginPlayer {
                     newHealth = sbPlayer.getMaxHealth();
                 }
                 sbPlayer.setHealth(Math.ceil(newHealth));
+
+            } else {
+                pl.getPlayer().setMaxHealth(20);
             }
+
             //maxStats.put(sbPlayer.getUniqueId(),map);
         }
     }

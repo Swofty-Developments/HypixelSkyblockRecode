@@ -179,17 +179,17 @@ public class NoTeleportEnderman extends EntityEnderman {
 
     @Override
     protected String z() {
-        return this.co() ? "mob.zombie.idle" : "mob.zombie.idle";
+        return this.co() ? "mob.enderman.idle" : "mob.enderman.idle";
     }
 
     @Override
     protected String bo() {
-        return "mob.silverfish.hit";
+        return "mob.enderman.hit";
     }
 
     @Override
     protected String bp() {
-        return "mob.zombie.idle";
+        return "mob.enderman.idle";
     }
 
     @Override

@@ -4,6 +4,7 @@ import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.gui.AnvilGUI;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
+import net.atlas.SkyblockSandbox.player.pets.PetPerk;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -40,6 +41,7 @@ public class PerkBuilderGUI extends NormalGUI {
                         new PerkBuilderGUI(getOwner(),index).open();
                     }
                 }.runTaskLater(SBX.getInstance(), 1);
+                event1.setWillClose(true);
             });
 
             gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, makeColorfulItem(Material.PAPER, "Enter value", 1, 0));

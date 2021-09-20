@@ -136,7 +136,11 @@ public enum Enchantment {
     Growth("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Harvesting_Pristine("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    HARVESTING("Harvesting",6,ItemType.HOE,false,(sbPlayer, lvl) -> {
+        sbPlayer.setMaxStat(SBPlayer.PlayerStat.FARMING_FORTUNE, sbPlayer.getMaxStat(SBPlayer.PlayerStat.FARMING_FORTUNE) + (lvl*12.5));
+        return 1;
+    }),
+    PRISTINE("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
     Impaling("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
@@ -174,7 +178,7 @@ public enum Enchantment {
     Lure("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Mana_Steal("Mana Steal", 3, ItemType.SWORD, false, (event,dmg,lvl) -> {
+    MANA_STEAL("Mana Steal", 3, ItemType.SWORD, false, (event,dmg,lvl) -> {
         if (event.getDamager() instanceof Player) {
             SBPlayer p = new SBPlayer((Player) event.getDamager());
             double mult = ((0.3 * lvl)-0.1) / 100;
@@ -223,7 +227,7 @@ public enum Enchantment {
     Respite("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    SCAVENGER("Scavenger", 3, ItemType.HELMET, false, (event,dmg,lvl) -> {
+    SCAVENGER("Scavenger", 3, ItemType.SWORD, false, (event,dmg,lvl) -> {
         if (event.getDamager() instanceof Player) {
             SBPlayer p = new SBPlayer((Player) event.getDamager());
             if(((LivingEntity)event.getEntity()).getHealth()<=dmg) {
@@ -270,7 +274,7 @@ public enum Enchantment {
     SYPHON("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    TELEKINESIS("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    TELEKINESIS("Telekinesis", 3, ItemType.ITEM, false, (sbPlayer, lvl) -> {
         return 1;
     }),
     THORNS("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {

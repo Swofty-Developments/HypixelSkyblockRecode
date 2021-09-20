@@ -24,6 +24,7 @@ import net.minecraft.server.v1_8_R3.*;
 import org.bson.BsonSymbol;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEnderDragon;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
@@ -52,8 +53,14 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
         Entity damagee = event.getEntity();
         Entity damager = event.getDamager();
         if (damagee.hasMetadata("entity-tag")) {
-            damagee = DamageUtil.getEntityByUniqueID(UUID.fromString(damagee.getMetadata("entity-tag").get(0).asString()));
-            event = new EntityDamageByEntityEvent(damager, damagee, event.getCause(), event.getDamage());
+            event.setCancelled(true);
+            if(DamageUtil.getEntityByUniqueID(UUID.fromString(damagee.getMetadata("entity-tag").get(0).asString()))!=null) {
+                damagee = DamageUtil.getEntityByUniqueID(UUID.fromString(damagee.getMetadata("entity-tag").get(0).asString()));
+                event = new EntityDamageByEntityEvent(damager, damagee, event.getCause(), event.getDamage());
+                callEvent(event);
+                return;
+            }
+
         }
         boolean isBothPlayers = false;
         if (damager instanceof Player) {
@@ -120,9 +127,10 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
         if (damager instanceof Arrow) {
             Arrow arrow = (Arrow) damager;
             if (arrow.getShooter() instanceof Player) {
+                SBPlayer p = new SBPlayer((Player) arrow.getShooter());
+                p.playSound(p.getLocation(), Sound.SUCCESSFUL_HIT,1,1);
                 if (damagee instanceof LivingEntity) {
                     LivingEntity en = (LivingEntity) damagee;
-                    SBPlayer p = new SBPlayer((Player) arrow.getShooter());
                     event.setCancelled(true);
                     calculateHit(p, en, event);
                     arrow.remove();
@@ -144,6 +152,9 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
         double chance = random.nextDouble();
         if ((fero / 100) >= chance) {
             if (fero > 100) {
+                if(fero>5000) {
+                    fero = 5000;
+                }
                 fero -= 100;
                 double finalFero = fero;
                 new BukkitRunnable() {
@@ -173,12 +184,13 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                                 @Override
                                 public void run() {
                                     damagee.setNoDamageTicks(0);
-                                    PacketPlayOutEntityStatus packet = new PacketPlayOutEntityStatus(((CraftEntity) damagee).getHandle(), (byte) 2);
-                                    ((CraftPlayer) p.getPlayer()).getHandle().playerConnection.sendPacket(packet);
+                                    damagee.setMaximumNoDamageTicks(0);
+                                    if(!damagee.hasMetadata(Slayers.ENDERMAN.toString())) {
+                                        PacketPlayOutEntityStatus packet = new PacketPlayOutEntityStatus(((CraftEntity) damagee).getHandle(), (byte) 2);
+                                        ((CraftPlayer) p.getPlayer()).getHandle().playerConnection.sendPacket(packet);
+                                    }
                                 }
                             }.runTaskLater(SBX.getInstance(), 1L);
-                        } else {
-                            //damagee.damage(0);
                         }
                         p.playJingle(Jingle.FEROCITY,false);
                     }
@@ -193,6 +205,9 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
         double chance = random.nextDouble();
         if ((fero / 100) >= chance) {
             if (fero > 100) {
+                if(fero>5000) {
+                    fero = 5000;
+                }
                 fero -= 100;
                 double finalFero = fero;
                 new BukkitRunnable() {
@@ -218,8 +233,11 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                         @Override
                         public void run() {
                             damagee.setNoDamageTicks(0);
-                            PacketPlayOutEntityStatus packet = new PacketPlayOutEntityStatus(((CraftEntity) damagee).getHandle(), (byte) 2);
-                            ((CraftPlayer) p.getPlayer()).getHandle().playerConnection.sendPacket(packet);
+                            damagee.setMaximumNoDamageTicks(0);
+                            if(!damagee.hasMetadata(Slayers.ENDERMAN.toString())) {
+                                PacketPlayOutEntityStatus packet = new PacketPlayOutEntityStatus(((CraftEntity) damagee).getHandle(), (byte) 2);
+                                ((CraftPlayer) p.getPlayer()).getHandle().playerConnection.sendPacket(packet);
+                            }
                         }
                     }.runTaskLater(SBX.getInstance(), 1L);
                 } else {
@@ -235,6 +253,7 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
             @Override
             public void run() {
                 damagee.setNoDamageTicks(0);
+                damagee.setMaximumNoDamageTicks(0);
             }
         }.runTaskLater(SBX.getInstance(), 1L);
         double dmg = DamageUtil.calculateSingleHit(damagee, damager);
@@ -256,6 +275,7 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                     @Override
                     public void run() {
                         en.setNoDamageTicks(0);
+                        en.setMaximumNoDamageTicks(0);
                     }
                 }.runTaskLater(SBX.getInstance(), 1L);
                 //calculating and doing ferocity hits, checks if its greater than 0

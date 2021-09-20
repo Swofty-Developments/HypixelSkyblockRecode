@@ -96,7 +96,7 @@ public class ShortBowTerm extends Ability {
                         public void run() {
                             canfire.put(player, true);
                         }
-                    }.runTaskLater(SBX.getInstance(), 60 / 13);
+                    }.runTaskLater(SBX.getInstance(), 87 / 13);
 
                 }
             }

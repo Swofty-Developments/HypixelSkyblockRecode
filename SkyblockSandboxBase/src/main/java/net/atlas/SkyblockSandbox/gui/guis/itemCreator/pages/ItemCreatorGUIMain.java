@@ -3,6 +3,7 @@ package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.gui.AnvilGUI;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
+import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemTypeGUI;
 import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.AbilityEditorGUI;
 import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.petbuilder.PetBuilderGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
@@ -112,6 +113,9 @@ public class ItemCreatorGUIMain extends NormalGUI {
                 player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1f, 0f);
             }
         });
+        setAction(20,event -> {
+            new ItemTypeGUI(getOwner()).open();
+        });
         setAction(21,event -> {
             new PetBuilderGUI(getOwner()).open();
         });
@@ -143,6 +147,7 @@ public class ItemCreatorGUIMain extends NormalGUI {
         setItem(21,makeColorfulItem(Material.BARRIER,"&aPet Builder",1,0,SUtil.colorize("&7Create your own custom pet!","","&eClick to create!")));
         setItem(22, makeColorfulItem(Material.ENCHANTED_BOOK, "§aEdit Item Tags", 1, 0, SUtil.colorize("&7Edit the tags the item has!", "&7Including Unbreakable, Enchant tag,", "&7Glowing tag, and the Damage Tag!", "", "&eClick to edit!")));
         setItem(11, makeColorfulItem(Material.INK_SACK, "§aSet item color", 1, 5, SUtil.colorize("&7Edit the color of the item!", "&7you can change any item", "&7from: &aWool &7, &aStained_Clay &7, ", "&aStained_Glass_Panes &7, &aStained_Glass  ", "&7or &aINK_SACK(DYES)")));
+        setItem(20,makeColorfulItem(Material.GOLD_AXE,"&aSet item type",1,0,"&7Set the item type!","","&eClick to set the item type!"));
 
     }
 }

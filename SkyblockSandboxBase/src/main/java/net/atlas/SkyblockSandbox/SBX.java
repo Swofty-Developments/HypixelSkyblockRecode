@@ -206,6 +206,9 @@ public class SBX extends JavaPlugin {
         framework.registerCommands(new Command_debugtest(this));
         framework.registerCommands(new Command_forward(this));
         framework.registerCommands(new Command_enchant(this));
+        framework.registerCommands(new Command_trade(this));
+        framework.registerCommands(new Command_dupe(this));
+        framework.registerCommands(new Command_rename(this));
         framework.registerHelp();
     }
 

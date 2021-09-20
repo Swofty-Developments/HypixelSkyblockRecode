@@ -161,6 +161,7 @@ public class PetBuilder {
         stack = NBTUtil.setInteger(stack,xp,"pet-xp");
         stack = NBTUtil.setString(stack,"true","is-pet");
         stack = NBTUtil.setString(stack,"false","is-equipped");
+        stack = NBTUtil.setString(stack,"true","non-legacy");
 
         return stack;
     }

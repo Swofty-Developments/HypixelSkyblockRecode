@@ -5,6 +5,7 @@ import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.storage.StorageCache;
 import net.atlas.SkyblockSandbox.util.BukkitSerilization;
+import net.atlas.SkyblockSandbox.util.NBTUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -29,18 +30,18 @@ public class EnderChestPage extends NormalGUI
 		if (event.getSlot() < 9 && event.getCurrentItem().getType() == Material.STAINED_GLASS_PANE)
 			event.setCancelled(true);
 
-		if (event.getSlot() == 0 && event.getCurrentItem().getType() == Material.ARROW) {
+		if (event.getRawSlot() == 0 && event.getCurrentItem().getType() == Material.ARROW) {
 			event.setCancelled(true);
 			Bukkit.getScheduler().scheduleSyncDelayedTask(SBX.getInstance(), () -> new StorageGUI(getOwner()).open(), 3);
 		}
 
-		if (event.getSlot() == 7 && event.getCurrentItem().getType().equals(Material.SKULL_ITEM)) {
+		if (event.getRawSlot() == 7 && event.getCurrentItem().getType().equals(Material.SKULL_ITEM)) {
 			event.setCancelled(true);
 			Bukkit.getScheduler().scheduleSyncDelayedTask(SBX.getInstance(), () -> new EnderChestPage(getOwner(), page - 1).open(), 3);
 			getOwner().playSound(getOwner().getLocation(), Sound.CHICKEN_EGG_POP, 1, 1);
 		}
 
-		if (event.getSlot() == 8 && event.getCurrentItem().getType().equals(Material.SKULL_ITEM)) {
+		if (event.getRawSlot() == 8 && event.getCurrentItem().getType().equals(Material.SKULL_ITEM)) {
 			event.setCancelled(true);
 			Bukkit.getScheduler().scheduleSyncDelayedTask(SBX.getInstance(), () -> new EnderChestPage(getOwner(), page + 1).open(), 3);
 			getOwner().playSound(getOwner().getLocation(), Sound.CHICKEN_EGG_POP, 1, 1);
@@ -78,8 +79,12 @@ public class EnderChestPage extends NormalGUI
 			getOwner().sendMessage("§cFailed to fetch your inventory data. §7(If this isn't your first time opening this ender chest page §ereport this!§7)");
 		}
 
-		if (!contents.isEmpty())
+		if (!contents.isEmpty()) {
+			for(ItemStack i:new ArrayList<>(contents)) {
+				contents.set(contents.indexOf(i), NBTUtil.removeTag(i,"mf-gui"));
+			}
 			setContents(contents.toArray(new ItemStack[0]));
+		}
 
 		for (int i = 0; i < 9; i++) {
 			setItem(i, FILLER_GLASS);

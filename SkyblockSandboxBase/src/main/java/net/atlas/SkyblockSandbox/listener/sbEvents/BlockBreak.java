@@ -26,6 +26,10 @@ public class BlockBreak extends SkyblockListener<BlockBreakEvent> {
     @EventHandler
     public void callEvent(BlockBreakEvent event) {
         if(event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
+            if (event.getPlayer().getItemInHand().getType().name().contains("SWORD")) {
+                event.setCancelled(true);
+                return;
+            }
             event.getBlock().breakNaturally();
             event.setCancelled(true);
         } else {

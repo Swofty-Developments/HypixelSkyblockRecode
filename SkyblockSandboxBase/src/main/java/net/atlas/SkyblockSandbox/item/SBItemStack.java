@@ -45,16 +45,21 @@ public class SBItemStack extends ItemStack {
         this.stack = stack;
     }
 
-    public SBItemStack(String name,String id, Material mat,Rarity rarity,ItemType type, int durability, boolean stackable, boolean reforgeable,HashMap<PlayerStat,Double> stats) {
+    public SBItemStack(String name, String id, Material mat, Rarity rarity, ItemType type, int durability, boolean stackable, boolean reforgeable, HashMap<PlayerStat, Double> stats) {
         stack = new ItemStack(mat, 1);
         itemID = id;
         setName(stack, name);
-        setString(stack,id.toUpperCase(),"ID");
-        setString(stack,rarity.name(),"RARITY");
-        setString(stack,type.getValue(),"item-type");
+        setString(stack, id.toUpperCase(), "ID");
+        setString(stack, rarity.name(), "RARITY");
+        setString(stack, "true", "non-legacy");
+        if (type != null) {
+            setString(stack, type.getValue(), "item-type");
+        } else {
+            setString(stack, ItemType.ITEM.getValue(), "item-type");
+        }
         setDurability(stack, durability);
-        for(PlayerStat stat:stats.keySet()) {
-            stack = setStat(stack,stat,stats.get(stat));
+        for (PlayerStat stat : stats.keySet()) {
+            stack = setStat(stack, stat, stats.get(stat));
         }
         if (!stackable) {
             stack = setString(stack, UUID.randomUUID().toString(), "UUID");
@@ -63,18 +68,19 @@ public class SBItemStack extends ItemStack {
 
     }
 
-    public SBItemStack(String name,String id, Material mat,Rarity rarity,ItemType type,String url, int durability, boolean stackable, boolean reforgeable,HashMap<PlayerStat,Double> stats) {
+    public SBItemStack(String name, String id, Material mat, Rarity rarity, ItemType type, String url, int durability, boolean stackable, boolean reforgeable, HashMap<PlayerStat, Double> stats) {
         stack = new ItemStack(mat, 1);
         itemID = id;
         setName(stack, name);
         setDurability(stack, durability);
-        setString(stack,id.toUpperCase(),"ID");
-        setString(stack,rarity.name(),"RARITY");
-        setString(stack,type.getValue(),"item-type");
-        for(PlayerStat stat:stats.keySet()) {
-            stack = setStat(stack,stat,stats.get(stat));
+        setString(stack, id.toUpperCase(), "ID");
+        setString(stack, rarity.name(), "RARITY");
+        setString(stack, type.getValue(), "item-type");
+        setString(stack, "true", "non-legacy");
+        for (PlayerStat stat : stats.keySet()) {
+            stack = setStat(stack, stat, stats.get(stat));
         }
-        stack = applyTexture(stack,url);
+        stack = applyTexture(stack, url);
         if (!stackable) {
             stack = setString(stack, UUID.randomUUID().toString(), "UUID");
         }
@@ -98,10 +104,76 @@ public class SBItemStack extends ItemStack {
         stack = setName(stack, name);
     }
 
+    public ItemStack refreshName() {
+
+        StringBuilder petLvl = new StringBuilder();
+        if (Boolean.parseBoolean(NBTUtil.getString(stack, "is-pet"))) {
+            petLvl.append(SUtil.colorize("&7[Lvl"));
+            petLvl.append(NBTUtil.getInteger(stack, "pet-level"));
+            petLvl.append("] ");
+        }
+
+        String s = NBTUtil.getString(stack, "RARITY");
+        Rarity rarity;
+        if (!s.equals("")) {
+            rarity = Enums.getIfPresent(Rarity.class, s.toUpperCase().replace(' ', '_')).orNull();
+            if (rarity == null) {
+                s = NBTUtil.getString(stack, "rarity");
+                if (!s.equals("")) {
+                    rarity = Enums.getIfPresent(Rarity.class, s.toUpperCase().replace(' ', '_')).orNull();
+                    if (rarity == null) {
+                        rarity = Rarity.COMMON;
+                    }
+                } else {
+                    rarity = Rarity.COMMON;
+                }
+            }
+        } else {
+            rarity = null;
+        }
+
+        int starAmt = NBTUtil.getInteger(stack, starKey);
+        int masterStarAmt = NBTUtil.getInteger(stack, masterStarKey);
+        if (masterStarAmt > starAmt) {
+            masterStarAmt = starAmt;
+        }
+        ItemMeta meta = stack.getItemMeta();
+        if (starAmt == 0 && masterStarAmt == 0) {
+            if (ChatColor.stripColor(meta.getDisplayName()) == null || ChatColor.stripColor(meta.getDisplayName()).isEmpty()) {
+                stack = NBTUtil.setString(stack, "null", "item-name");
+            } else {
+                if (NBTUtil.getString(stack, "item-name").isEmpty() || NBTUtil.getString(stack, "item-name") == null) {
+                    stack = NBTUtil.setString(stack, meta.getDisplayName(), "item-name");
+                }
+            }
+
+        }
+        StringBuilder builder = new StringBuilder();
+        for (int b = 0; b < starAmt; b++) {
+            if (masterStarAmt >= b + 1) {
+                builder.append("§c✪");
+            } else {
+                builder.append("§6✪");
+            }
+        }
+        if (starAmt != 0 || masterStarAmt != 0) {
+            builder.append(" ");
+        }
+
+        meta = stack.getItemMeta();
+        if (rarity != null) {
+            meta.setDisplayName(builder + petLvl.toString() + rarity.getColor() + SUtil.colorize(NBTUtil.getString(stack, "item-name")));
+        } else {
+            meta.setDisplayName(builder + petLvl.toString() + SUtil.colorize(NBTUtil.getString(stack, "item-name")));
+        }
+        stack.setItemMeta(meta);
+        return stack;
+    }
+
     public ItemStack refreshLore() {
         if (stack != null) {
-            if (NBTUtil.getString(stack, "is-hypixel").equals("true")) {
-                //return stack;
+            if (!NBTUtil.getString(stack, "non-legacy").equals("true")) {
+                return stack;
             }
             if (stack.hasItemMeta()) {
                 ItemMeta meta = stack.getItemMeta();
@@ -176,21 +248,20 @@ public class SBItemStack extends ItemStack {
                 LinkedHashMap<Integer, String> descriptionMap = getDescriptionWithLine(stack);
                 Map<Integer, String> map = new TreeMap<>(descriptionMap);
                 if (!descriptionMap.isEmpty()) {
+                    int prevnum = -1;
                     for (Integer bb : map.keySet()) {
                         int iter = newLore.size();
-                        if (bb > (iter - 1)) {
-                            for (int c = iter; c <= bb; c++) {
+                        if (prevnum != -1 && prevnum != bb - 1) {
+                            for (int ii = prevnum; ii < bb - 1; ii++) {
                                 newLore.add("can-overwrite");
                             }
-
                         }
-                        newLore.add(bb, descriptionMap.get(bb));
-
-
+                        newLore.add(descriptionMap.get(bb));
+                        prevnum = bb;
                     }
                     for (String s : newLore) {
                         if (s.equals("can-overwrite")) {
-                            //newLore.set(newLore.indexOf(s), "");
+                            newLore.set(newLore.indexOf(s), "");
                         }
                     }
                 }
@@ -229,7 +300,10 @@ public class SBItemStack extends ItemStack {
                         newLore.add(ChatColor.GOLD + "Item Ability: " + s + " " + ChatColor.YELLOW + ChatColor.BOLD + abilityType.get(j - 1).replace('_', ' '));
                         newLore.addAll(getAbilityDescription(stack, j));
                         DecimalFormat format = new DecimalFormat("#");
-                        Integer d = new Double(abilityNames.get(s)).intValue();
+                        Integer d = 0;
+                        if (!abilityNames.get(s).isEmpty()) {
+                            d = new Double(abilityNames.get(s)).intValue();
+                        }
                         String manacost = format.format(d);
                         if (!manacost.equals("0.0")) {
                             if (!manacost.equals("")) {
@@ -298,53 +372,23 @@ public class SBItemStack extends ItemStack {
                 } else {
                     rarity = null;
                 }
-                if (getString(stack, " reforgable").equals("true")) {
-                    newLore.add(ChatColor.DARK_GRAY + "This stack can be reforged!");
+                if (getString(stack, "reforgable").equals("true")) {
+                    newLore.add(ChatColor.DARK_GRAY + "This item can be reforged!");
                 }
                 if (rarity != null) {
+                    ItemType type = Enums.getIfPresent(ItemType.class, NBTUtil.getString(stack, "item-type")).or(ItemType.ITEM);
                     if (getInteger(stack, "rarity_upgrades") >= 1) {
                         String recombsymbol = rarity.getColor() + "" + ChatColor.MAGIC + "L" + ChatColor.stripColor("") + rarity.getColor() + "" + ChatColor.BOLD;
-                        newLore.add(recombsymbol + " " + rarity.name() + " " + recombsymbol);
+                        newLore.add(recombsymbol + " " + rarity.name() + " " + type.getValue() + " " + recombsymbol);
                     } else {
-                        newLore.add(rarity.getColor() + "" + ChatColor.BOLD + rarity.name());
+                        newLore.add(rarity.getColor() + "" + ChatColor.BOLD + rarity.name() + " " + type.getValue());
                     }
-                }
-                int starAmt = NBTUtil.getInteger(stack, starKey);
-                int masterStarAmt = NBTUtil.getInteger(stack, masterStarKey);
-                if (masterStarAmt > starAmt) {
-                    masterStarAmt = starAmt;
-                }
-                stack.setItemMeta(meta);
-                if (starAmt == 0 && masterStarAmt == 0) {
-                    if (ChatColor.stripColor(meta.getDisplayName()) == null || ChatColor.stripColor(meta.getDisplayName()).isEmpty()) {
-                        stack = NBTUtil.setString(stack, "null", "item-name");
-                    } else {
-                        if (NBTUtil.getString(stack, "item-name").isEmpty() || NBTUtil.getString(stack, "item-name") == null) {
-                            stack = NBTUtil.setString(stack, meta.getDisplayName(), "item-name");
-                        }
-                    }
-
-                }
-                StringBuilder builder = new StringBuilder();
-                for (int b = 0; b < starAmt; b++) {
-                    if (masterStarAmt >= b + 1) {
-                        builder.append("§c✪");
-                    } else {
-                        builder.append("§6✪");
-                    }
-                }
-                if (starAmt != 0 || masterStarAmt != 0) {
-                    builder.append(" ");
                 }
 
-                meta = stack.getItemMeta();
-                if (rarity != null) {
-                    meta.setDisplayName(builder + petLvl.toString() + rarity.getColor() + SUtil.colorize(NBTUtil.getString(stack, "item-name")));
-                } else {
-                    meta.setDisplayName(builder + petLvl.toString() + SUtil.colorize(NBTUtil.getString(stack, "item-name")));
-                }
+
                 meta.setLore(newLore);
                 stack.setItemMeta(meta);
+                stack = refreshName();
                 return stack;
             }
         }
@@ -383,7 +427,7 @@ public class SBItemStack extends ItemStack {
         return 0;
     }
 
-    public ItemStack addEnchantment(Enchantment enchantment,int lvl) {
+    public ItemStack addEnchantment(Enchantment enchantment, int lvl) {
         if (stack != null) {
             if (stack.hasItemMeta()) {
                 net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
@@ -394,9 +438,9 @@ public class SBItemStack extends ItemStack {
                     enchants = new NBTTagCompound();
                 }
 
-                enchants.setInt(enchantment.name(),lvl);
-                data.set("enchantments",enchants);
-                tag.set("ExtraAttributes",data);
+                enchants.setInt(enchantment.name(), lvl);
+                data.set("enchantments", enchants);
+                tag.set("ExtraAttributes", data);
                 nmsItem.setTag(tag);
                 return CraftItemStack.asBukkitCopy(nmsItem);
             }
@@ -529,11 +573,11 @@ public class SBItemStack extends ItemStack {
         return 0;
     }
 
-    public HashMap<Enchantment,Integer> getItemEnchants() {
-        HashMap<Enchantment,Integer> enchants = new HashMap<>();
-        for(Enchantment enchant:Enchantment.values()) {
+    public HashMap<Enchantment, Integer> getItemEnchants() {
+        HashMap<Enchantment, Integer> enchants = new HashMap<>();
+        for (Enchantment enchant : Enchantment.values()) {
             int lvl = getEnchantment(enchant);
-            if(lvl!=0) {
+            if (lvl != 0) {
                 enchants.put(enchant, lvl);
             }
         }

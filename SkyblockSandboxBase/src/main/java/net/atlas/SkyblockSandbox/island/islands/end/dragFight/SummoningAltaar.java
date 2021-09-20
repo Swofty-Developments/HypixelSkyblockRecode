@@ -3,6 +3,7 @@ package net.atlas.SkyblockSandbox.island.islands.end.dragFight;
 import net.atlas.SkyblockSandbox.SBX;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -20,7 +21,7 @@ public enum SummoningAltaar {
     BACK_LEFT(new Location(Bukkit.getWorlds().get(0), -673, 9, -275)),
     BACK_RIGHT(new Location(Bukkit.getWorlds().get(0), -673, 9, -277));
 
-    private final Location location;
+    private Location location;
 
     SummoningAltaar(Location location) {
         File f = new File(SBX.getInstance().getDataFolder() + "/dragon_data.yml");
@@ -36,5 +37,10 @@ public enum SummoningAltaar {
     public Location getLoc() {
         return location;
     }
+
+    public void setWorld(World world) {
+        location = new Location(world,location.getX(),location.getY(),location.getZ());
+    }
+
 
 }

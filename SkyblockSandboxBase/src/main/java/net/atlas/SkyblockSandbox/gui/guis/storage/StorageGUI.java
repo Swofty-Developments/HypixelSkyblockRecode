@@ -30,11 +30,9 @@ public class StorageGUI extends NormalGUI
 
 		}*/
 
-		switch (event.getCurrentItem().getType()) {
-			case PAPER:
-				new EnderChestPage(getOwner(), event.getSlot() - 8).open();
-				getOwner().playSound(player.getLocation(), Sound.CHEST_OPEN, 1, 0);
-				break;
+		if (event.getCurrentItem().getType() == Material.PAPER) {
+			new EnderChestPage(getOwner(), event.getSlot() - 8).open();
+			getOwner().playSound(player.getLocation(), Sound.CHEST_OPEN, 1, 0);
 		}
 	}
 
