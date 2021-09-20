@@ -1,9 +1,11 @@
 package net.atlas.SkyblockSandbox.abilityCreator;
 
 import com.google.common.base.Enums;
+import net.atlas.SkyblockSandbox.abilityCreator.AbilityValue.FunctionType;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
+import net.atlas.SkyblockSandbox.util.SUtil;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -21,10 +23,27 @@ public class AbilityHandler extends SkyblockListener<PlayerInteractEvent> {
         if(getGenericAbilityString(craftItem,"has-ability").equalsIgnoreCase("true")) {
             for (int i = 0; i < getAbilityAmount(craftItem); i++) {
                 String abilName = getAbilityString(craftItem,i,AbilityValue.NAME.name());
-                String clickTypeString = getAbilityString(craftItem,i,AbilityValue.CLICK_TYPE.name());
+                String clickTypeString = getAbilityData(craftItem,i,AbilityValue.CLICK_TYPE);
                 ClickType type = Enums.getIfPresent(ClickType.class,clickTypeString).orNull();
-
+                if(type!=null) {
+                    if(event.getAction().name().contains(type.name())) {
+                        for(int ii=0;ii<FunctionUtil.getFunctionAmount(craftItem,i);i++) {
+                            Function func = getFunction(p, craftItem, i, ii);
+                            func.applyFunction();
+                        }
+                    }
+                }
             }
         }
+    }
+
+    public Function getFunction(SBPlayer p,ItemStack item,int abilIndex,int funcIndex) {
+            String funcType = FunctionUtil.getFunctionString(item,abilIndex,funcIndex,"FUNCTION_TYPE");
+            FunctionType type = Enums.getIfPresent(FunctionType.class,funcType).orNull();
+            if(type==null) {
+                p.sendMessage(SUtil.colorize("&cSomething went wrong while parsing functions! Please contact an admin if this issue persists."));
+                return null;
+            }
+            return type.getFunction(p,item,abilIndex,funcIndex);
     }
 }
