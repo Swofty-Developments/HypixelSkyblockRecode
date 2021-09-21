@@ -4,7 +4,7 @@ import com.google.common.base.Enums;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.abilityCreator.Function;
 import net.atlas.SkyblockSandbox.abilityCreator.FunctionUtil;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.SoundChooserGUI;
+import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.functionCreator.functionTypes.SoundChooserGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.ClickType;

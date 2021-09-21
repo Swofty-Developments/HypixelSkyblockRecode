@@ -1,12 +1,9 @@
-package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator;
+package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.functionCreator;
 
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import net.atlas.SkyblockSandbox.abilityCreator.*;
-import net.atlas.SkyblockSandbox.abilityCreator.functions.Implosion;
-import net.atlas.SkyblockSandbox.abilityCreator.functions.Particle;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
-import net.atlas.SkyblockSandbox.util.Particles;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -38,6 +35,11 @@ public class FunctionSelectorGUI extends NormalGUI {
     public void handleMenu(InventoryClickEvent event) {
         event.setCancelled(true);
         SBPlayer player = new SBPlayer((Player) event.getWhoClicked());
+        setAction(10,event1 -> {
+            ItemStack i = FunctionUtil.setFunctionData(player.getItemInHand(),index,funcIndex,Function.FunctionValues.NAME, AbilityValue.FunctionType.TELEPORT.name());
+            player.setItemInHand(i);
+            new FunctionsEditorGUI(getOwner(), AbilityValue.FunctionType.TELEPORT,index,funcIndex).open();
+        });
         setAction(11,event1 -> {
             ItemStack i = FunctionUtil.setFunctionData(player.getItemInHand(),index,funcIndex,Function.FunctionValues.NAME, AbilityValue.FunctionType.IMPLOSION.name());
             player.setItemInHand(i);
@@ -48,8 +50,13 @@ public class FunctionSelectorGUI extends NormalGUI {
             player.setItemInHand(i);
             new FunctionsEditorGUI(getOwner(),AbilityValue.FunctionType.PARTICLE,index,funcIndex).open();
         });
+        setAction(13,event1 -> {
+            ItemStack i = FunctionUtil.setFunctionData(player.getItemInHand(),index,funcIndex,Function.FunctionValues.NAME, AbilityValue.FunctionType.SOUND.name());
+            player.setItemInHand(i);
+            new FunctionsEditorGUI(getOwner(),AbilityValue.FunctionType.SOUND,index,funcIndex).open();
+        });
         if (event.getSlot() == 31) {
-            new FunctionsGUI(player, index).open();
+            new FunctionsMainGUI(player, index).open();
         }
     }
 

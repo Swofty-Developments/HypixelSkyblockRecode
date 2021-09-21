@@ -1,8 +1,10 @@
-package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator;
+package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.functionCreator.functionTypes;
 
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import net.atlas.SkyblockSandbox.abilityCreator.AbilityValue;
 import net.atlas.SkyblockSandbox.gui.PaginatedGUI;
+import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.functionCreator.FunctionSelectorGUI;
+import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.functionCreator.FunctionsEditorGUI;
 import net.atlas.SkyblockSandbox.item.ability.AbilityData;
 import net.atlas.SkyblockSandbox.item.ability.functions.EnumFunctionsData;
 import net.atlas.SkyblockSandbox.player.SBPlayer;

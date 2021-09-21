@@ -1,8 +1,11 @@
 package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator;
 
 import net.atlas.SkyblockSandbox.SBX;
+import net.atlas.SkyblockSandbox.abilityCreator.AbilityUtil;
+import net.atlas.SkyblockSandbox.abilityCreator.AbilityValue;
 import net.atlas.SkyblockSandbox.gui.AnvilGUI;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
+import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.functionCreator.FunctionsMainGUI;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.item.ability.EnumAbilityData;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
@@ -14,7 +17,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -143,13 +145,12 @@ public class AbilityCreatorGUI extends NormalGUI {
                 break;
             }
             case COMMAND: {
-                new FunctionsGUI(getOwner(), index).open();
+                new FunctionsMainGUI(getOwner(), index).open();
                 break;
             }
             case FEATHER: {
                 SBItemStack i = new SBItemStack(player.getItemInHand());
-                i.setAbilData(player.getItemInHand(),EnumAbilityData.FUNCTION,event.getClick().toString().toUpperCase() + "_CLICK",index);
-                player.setItemInHand(i.asBukkitItem());
+                player.setItemInHand(AbilityUtil.setAbilityData(player.getItemInHand(),index, AbilityValue.CLICK_TYPE,event.getClick().toString().toUpperCase() + "_CLICK"));
                 updateItems();
                 break;
             }
@@ -237,11 +238,13 @@ public class AbilityCreatorGUI extends NormalGUI {
         setItem(30,makeColorfulItem(Material.BOOK_AND_QUILL, ChatColor.GREEN + "Add ability description",1,0,ChatColor.GRAY + "Set the ability description."));
         setItem(31, makeColorfulItem(Material.COMMAND, "§aAdvanced Functions", 1, 0, "§7You can add functions to","§7your item to make it weirder!","§7You can add up to §a5","§7functions to your items.","","§eClick to view!"));
         SBItemStack item = new SBItemStack(getOwner().getItemInHand());
-        setItem(14, makeColorfulItem(Material.FEATHER,"&aSet Click Type",1,0,"&7Set the click type of your","&7ability","&7Currently set: " + item.getAbilData(EnumAbilityData.FUNCTION,index).toString() +  "","","&eMake any click to set!"));
+        getOwner().setItemInHand(AbilityUtil.setGenericAbilityString(item.asBukkitItem(),"has-ability","true"));
+        setItem(14, makeColorfulItem(Material.FEATHER,"&aSet Click Type",1,0,"&7Set the click type of your","&7ability","&7Currently set: " + AbilityUtil.getAbilityData(item.asBukkitItem(),index,AbilityValue.CLICK_TYPE) +  "","","&eMake any click to set!"));
 
         if(String.valueOf(item.getAbilData(EnumAbilityData.BASE_ABILITY, index)).equals("INSTANT_TRANSMISSION")) {
             setItem(32, makeColorfulItem(Material.SUGAR, "§aSet Speed after teleport", 1, 0, SUtil.colorize("&7Set the speed that's given to players","&7after teleporting!","&7Only works with Instant Transmission","","&eClick to set!")));
         }
+
     }
 
 

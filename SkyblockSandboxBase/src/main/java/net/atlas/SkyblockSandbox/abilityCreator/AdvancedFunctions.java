@@ -6,7 +6,7 @@ import lombok.Setter;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.gui.AnvilGUI;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.FunctionSelectorGUI;
+import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.functionCreator.FunctionSelectorGUI;
 import net.atlas.SkyblockSandbox.item.ability.AbilityData;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.NBTUtil;

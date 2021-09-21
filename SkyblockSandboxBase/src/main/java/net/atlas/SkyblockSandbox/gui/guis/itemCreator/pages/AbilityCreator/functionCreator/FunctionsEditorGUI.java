@@ -1,7 +1,6 @@
-package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator;
+package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.functionCreator;
 
 import com.google.common.base.Enums;
-import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.abilityCreator.AbilityValue;
 import net.atlas.SkyblockSandbox.abilityCreator.Function;
 import net.atlas.SkyblockSandbox.abilityCreator.FunctionUtil;
@@ -11,7 +10,6 @@ import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.item.ability.AbilityData;
 import net.atlas.SkyblockSandbox.item.ability.functions.EnumFunctionsData;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
-import net.atlas.SkyblockSandbox.util.NumUtils;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
@@ -19,10 +17,8 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class FunctionsEditorGUI extends NormalGUI {
     private final int index;
@@ -58,7 +54,7 @@ public class FunctionsEditorGUI extends NormalGUI {
         if (event.getClickedInventory().equals(getOwner().getInventory())) return;
         event.setCancelled(true);
         SBPlayer player = getOwner();
-        setAction(31,event1 -> new FunctionsGUI(getOwner(), index).open());
+        setAction(31,event1 -> new FunctionsMainGUI(getOwner(), index).open());
 
     }
 

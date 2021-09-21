@@ -22,10 +22,10 @@ public class AbilityHandler {
         SBPlayer p = new SBPlayer(event.getPlayer());
         ItemStack craftItem = event.getItem();
         SBItemStack sbItem = new SBItemStack(craftItem);
-
         if(getGenericAbilityString(craftItem,"has-ability").equalsIgnoreCase("true")) {
             for (int i = 0; i < getAbilityAmount(craftItem); i++) {
                 String abilName = getAbilityString(craftItem,i,AbilityValue.NAME.name());
+
                 String clickTypeString = getAbilityData(craftItem,i,AbilityValue.CLICK_TYPE);
                 clickTypeString = clickTypeString.split("_")[0];
                 ClickType type = Enums.getIfPresent(ClickType.class,clickTypeString).orNull();

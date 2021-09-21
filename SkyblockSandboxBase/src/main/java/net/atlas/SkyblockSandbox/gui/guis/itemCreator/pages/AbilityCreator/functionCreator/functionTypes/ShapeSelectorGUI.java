@@ -1,4 +1,4 @@
-package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator;
+package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.functionCreator.functionTypes;
 
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
@@ -6,14 +6,14 @@ import net.atlas.SkyblockSandbox.util.Particles;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
-public class ShapeSlectorGUI extends NormalGUI {
+public class ShapeSelectorGUI extends NormalGUI {
     private final int index;
     private final String function;
     private final int count;
     private final boolean update;
     private final Particles particle;
     private SBPlayer player;
-    public ShapeSlectorGUI(SBPlayer owner, String fuction, int index, int count, boolean update, Particles particle) {
+    public ShapeSelectorGUI(SBPlayer owner, String fuction, int index, int count, boolean update, Particles particle) {
         super(owner);
         this.index = index;
         this.function = fuction;

@@ -1,4 +1,4 @@
-package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator;
+package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.functionCreator.functionTypes;
 
 
 import net.atlas.SkyblockSandbox.gui.PaginatedGUI;
