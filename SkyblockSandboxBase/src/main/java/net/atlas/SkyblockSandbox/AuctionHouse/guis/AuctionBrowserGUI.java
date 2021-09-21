@@ -20,7 +20,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class AuctionBrowserGUI extends PaginatedGUI implements Backable {
-    public static HashMap<UUID, Category> openCategory = new HashMap();
+    public static HashMap<UUID, Category> openCategory = new HashMap<>();
 
     public AuctionBrowserGUI(SBPlayer owner) {
         super(owner);
@@ -33,7 +33,7 @@ public class AuctionBrowserGUI extends PaginatedGUI implements Backable {
 
     public void handleMenu(InventoryClickEvent event) {
         event.setCancelled(true);
-
+        if(event.getClickedInventory().equals(getOwner().getInventory())) return;
         for(Category cat : Category.values()) {
             if (event.getSlot() == cat.index * 9) {
                 openCategory.put(getOwner().getUniqueId(), cat);

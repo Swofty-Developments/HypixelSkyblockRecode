@@ -17,10 +17,7 @@ import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Getter
@@ -61,7 +58,7 @@ public class AuctionItemHandler {
 
         assert s1 != null;
         ItemMeta meta = s1.getItemMeta();
-        List<String> lore = new ArrayList<>(s1.getItemMeta().getLore());
+        List<String> lore = s1.getItemMeta().getLore() != null ? s1.getItemMeta().getLore() : new ArrayList<>();
         lore.add("§8§m---------------");
         lore.add("§7Seller: " + this.getOwner());
         if (this.getBids().isEmpty()) {
@@ -76,7 +73,7 @@ public class AuctionItemHandler {
         lore.add("");
         lore.add("§7Ends in: §e" + time(this.endTime, ZonedDateTime.now(ZoneId.of("-05:00"))));
         lore.add("§eClick to inspect!");
-        meta.setLore(lore);
+        meta.setLore(SUtil.colorize(lore));
         s1.setItemMeta(meta);
         return s1;
     }
@@ -88,7 +85,7 @@ public class AuctionItemHandler {
         assert s1 != null;
 
         ItemMeta meta = s1.getItemMeta();
-        List<String> lore = meta.getLore() != null ? meta.getLore() : new ArrayList<>();
+        List<String> lore = s1.getItemMeta().getLore() != null ? s1.getItemMeta().getLore() : new ArrayList<>();
         lore.add("§8§m---------------");
         lore.add("§7Seller: " + this.getOwner());
         if (this.getBids().isEmpty()) {
@@ -108,17 +105,14 @@ public class AuctionItemHandler {
     }
     
     public void bid(SBPlayer player) {
-        setHighestBidder(player.getUniqueId());
         setCurrentPrice(getCurrentPrice() * 1.15D);
         mongo.setData(getAuctionID(), "currentPrice", getCurrentPrice());
-        mongo.setData(getAuctionID(), "highestBidder", getHighestBidder());
         new AuctionBidHandler(player.getUniqueId(), player.getDisplayName(), ZonedDateTime.now(ZoneId.of("-05:00")), getCurrentPrice()).addBid(auctionID);
         AuctionBidHandler.cacheToMongo(auctionID);
-        if (TimeUnit.MILLISECONDS.toMinutes(ZonedDateTime.now(ZoneId.of("-05:00")).toInstant().toEpochMilli() - endTime.toInstant().toEpochMilli()) <= 2L) {
+        if (endTime.toInstant().toEpochMilli() - TimeUnit.MILLISECONDS.toMinutes(ZonedDateTime.now(ZoneId.of("-05:00")).toInstant().toEpochMilli()) <= 2L) {
             setEndTime(endTime.plusMinutes(2L));
             mongo.setData(getAuctionID(), "endTime", getEndTime().toInstant().toEpochMilli());
         }
-
     }
 
     public static String time(ZonedDateTime endDate, ZonedDateTime startDate) {
@@ -162,13 +156,28 @@ public class AuctionItemHandler {
     public static void mongoToCache() {
         for (Document doc : mongo.getAllDocuments()) {
             UUID id = UUID.fromString(doc.getString("auctionID"));
-            ITEMS.put(id, new AuctionItemHandler(id, UUID.fromString(doc.getString("owner")), doc.getString("item"), ZonedDateTime.ofInstant(Instant.ofEpochMilli(doc.getLong("startTime")), ZoneId.of("-05:00")), ZonedDateTime.ofInstant(Instant.ofEpochMilli(doc.getLong("endTime")), ZoneId.of("-05:00")), doc.getBoolean("hasEnded"), doc.getDouble("startingPrice"), doc.getDouble("currentPrice"), AuctionBidHandler.mongoToCache(id), false, Category.valueOf(doc.getString("category"))));
+            ArrayList<AuctionBidHandler> bids = new ArrayList<>();
+            try {
+                for (Object o : (ArrayList<Object>) mongo.getDoc(id).get("bids")) {
+                    Document doc2 = (Document) o;
+                    doc2.forEach((uuid, nameDoc) -> {
+                        ((Document) nameDoc).forEach((name, timePriceDoc) -> {
+                            ((Document) timePriceDoc).forEach((time, price) -> {
+                                bids.add(new AuctionBidHandler(UUID.fromString(uuid), name, ZonedDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(time)), ZoneId.of("-05:00")), (Double) price));
+                            });
+                        });
+                    });
+                }
+            } catch (Exception ignored) {
+            }
+            AuctionBidHandler.bids.put(id, bids);
+            ITEMS.put(id, new AuctionItemHandler(id, UUID.fromString(doc.getString("owner")), doc.getString("item"), ZonedDateTime.ofInstant(Instant.ofEpochMilli(doc.getLong("startTime")), ZoneId.of("-05:00")), ZonedDateTime.ofInstant(Instant.ofEpochMilli(doc.getLong("endTime")), ZoneId.of("-05:00")), doc.getBoolean("hasEnded"), doc.getDouble("startingPrice"), doc.getDouble("currentPrice"), bids, false, Category.valueOf(doc.getString("category"))));
         }
     }
 
     public enum Category {
         WEAPONS(0, "Weapons", Material.GOLD_SWORD, ChatColor.GOLD, 1, new Material[]{Material.WOOD_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.DIAMOND_SWORD, Material.GOLD_SWORD, Material.BOW}),
-        ARMOR(1, "Armor", Material.DIAMOND_CHESTPLATE, ChatColor.AQUA, 11, new Material[]{Material.IRON_HELMET, Material.IRON_CHESTPLATE, Material.IRON_LEGGINGS, Material.IRON_BOOTS, Material.GOLD_BOOTS, Material.GOLD_CHESTPLATE, Material.GOLD_LEGGINGS, Material.GOLD_HELMET, Material.CHAINMAIL_BOOTS, Material.CHAINMAIL_CHESTPLATE, Material.CHAINMAIL_HELMET, Material.CHAINMAIL_LEGGINGS, Material.DIAMOND_HELMET, Material.DIAMOND_CHESTPLATE, Material.DIAMOND_LEGGINGS, Material.DIAMOND_BOOTS}),
+        ARMOR(1, "Armor", Material.DIAMOND_CHESTPLATE, ChatColor.AQUA, 11, new Material[]{Material.IRON_HELMET, Material.IRON_CHESTPLATE, Material.IRON_LEGGINGS, Material.IRON_BOOTS, Material.GOLD_BOOTS, Material.GOLD_CHESTPLATE, Material.GOLD_LEGGINGS, Material.GOLD_HELMET, Material.CHAINMAIL_BOOTS, Material.CHAINMAIL_CHESTPLATE, Material.CHAINMAIL_HELMET, Material.CHAINMAIL_LEGGINGS, Material.DIAMOND_HELMET, Material.DIAMOND_CHESTPLATE, Material.DIAMOND_LEGGINGS, Material.DIAMOND_BOOTS, Material.LEATHER_BOOTS, Material.LEATHER_CHESTPLATE, Material.LEATHER_HELMET, Material.LEATHER_LEGGINGS}),
         ACCESSORIES(2, "Accessories", Material.SKULL_ITEM, "http://textures.minecraft.net/texture/f36b821c1afdd5a5d14e3b3bd0a32263c8df5df5db6e1e88bf65e97b27a8530", ChatColor.DARK_GREEN, 13, (Material[])null),
         CONSUMABLES(3, "Consumables", Material.APPLE, ChatColor.RED, 14, new Material[]{Material.APPLE, Material.GOLDEN_APPLE, Material.GOLDEN_CARROT, Material.COOKED_BEEF, Material.COOKED_CHICKEN, Material.COOKED_FISH, Material.COOKED_MUTTON, Material.COOKED_RABBIT, Material.POTION, Material.POTATO_ITEM, Material.BAKED_POTATO, Material.POISONOUS_POTATO, Material.RAW_FISH}),
         BLOCKS(4, "Blocks", Material.COBBLESTONE, ChatColor.YELLOW, 12, (Material[])null),

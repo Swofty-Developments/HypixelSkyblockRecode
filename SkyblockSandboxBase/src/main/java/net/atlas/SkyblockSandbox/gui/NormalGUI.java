@@ -86,11 +86,11 @@ public abstract class NormalGUI extends SBGUI {
                             .title(Component.text(getTitle()))
                             .rows(getRows())
                             .create();
+                    setItems();
                     if (this instanceof Backable) {
                         Backable backable = (Backable) this;
                         setItem(backable.backItemSlot(), makeColorfulItem(Material.ARROW, "&aGo Back", 1, 0, "&7To " + backable.backTitle()));
                     }
-                    setItems();
                     if (!setClickActions()) {
                         gui.setDefaultClickAction(this::handleMenu);
                     } else {

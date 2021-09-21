@@ -23,9 +23,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class AuctionCreatorGUI extends NormalGUI implements Backable {
-    public static HashMap<UUID, String> PlayerItems = new HashMap();
-    public static HashMap<UUID, Double> playerPrice = new HashMap();
-    public static HashMap<UUID, Float> playerTime = new HashMap();
+    public static HashMap<UUID, String> PlayerItems = new HashMap<>();
+    public static HashMap<UUID, Double> playerPrice = new HashMap<>();
+    public static HashMap<UUID, Float> playerTime = new HashMap<>();
 
     public AuctionCreatorGUI(SBPlayer owner, boolean bin, double price, float timeInHours) {
         super(owner);
@@ -46,7 +46,7 @@ public class AuctionCreatorGUI extends NormalGUI implements Backable {
                     player.sendMessage("&cThis item must have a Display name or Lore!");
                 } else {
                     PlayerItems.put(this.getOwner().getUniqueId(), BukkitSerilization.itemStackToBase64(event.getCurrentItem()));
-                    player.getInventory().setItem(event.getSlot(), (ItemStack)null);
+                    player.getInventory().setItem(event.getSlot(), null);
                     this.updateItems();
                 }
             }
@@ -54,7 +54,7 @@ public class AuctionCreatorGUI extends NormalGUI implements Backable {
             switch(event.getSlot()) {
                 case 13:
                     if (PlayerItems.containsKey(this.getOwner().getUniqueId())) {
-                        player.getInventory().addItem(new ItemStack[]{BukkitSerilization.itemStackFromBase64((String)PlayerItems.get(player.getUniqueId()))});
+                        player.getInventory().addItem(BukkitSerilization.itemStackFromBase64(PlayerItems.get(player.getUniqueId())));
                         PlayerItems.remove(this.getOwner().getUniqueId());
                         this.updateItems();
                     }
@@ -68,24 +68,26 @@ public class AuctionCreatorGUI extends NormalGUI implements Backable {
                         for(Category cat : Category.values()) {
                             if (cat.getTypes() != null) {
                                 for(Material mat : cat.getTypes()) {
-                                    if (BukkitSerilization.itemStackFromBase64((String)PlayerItems.get(this.getOwner().getUniqueId())).getType().equals(mat)) {
+                                    if (BukkitSerilization.itemStackFromBase64(PlayerItems.get(this.getOwner().getUniqueId())).getType().equals(mat)) {
                                         category = cat;
                                     }
                                 }
                             }
                         }
 
-                        if ((Float)playerTime.get(player.getUniqueId()) < 1.0F) {
-                            AuctionItemHandler.ITEMS.put(auctionID, new AuctionItemHandler(auctionID, getOwner().getUniqueId(), PlayerItems.get(getOwner().getUniqueId()), ZonedDateTime.now(ZoneId.of("-05:00")), ZonedDateTime.now(ZoneId.of("-05:00")).plusMinutes((long)Math.round((Float)playerTime.get(player.getUniqueId()) * 60.0F)), false, playerPrice.get(getOwner().getUniqueId()), playerPrice.get(getOwner().getUniqueId()), new ArrayList<>(), false, category));
+                        if (playerTime.get(player.getUniqueId()) < 1.0F) {
+                            AuctionItemHandler.ITEMS.put(auctionID, new AuctionItemHandler(auctionID, getOwner().getUniqueId(), PlayerItems.get(getOwner().getUniqueId()), ZonedDateTime.now(ZoneId.of("-05:00")), ZonedDateTime.now(ZoneId.of("-05:00")).plusMinutes(Math.round(playerTime.get(player.getUniqueId()) * 60.0F)), false, playerPrice.get(getOwner().getUniqueId()), playerPrice.get(getOwner().getUniqueId()), new ArrayList<>(), false, category));
+                            AuctionBidHandler.bids.put(auctionID, new ArrayList<>());
                         } else {
-                            AuctionItemHandler.ITEMS.put(auctionID, new AuctionItemHandler(auctionID, getOwner().getUniqueId(), PlayerItems.get(getOwner().getUniqueId()), ZonedDateTime.now(ZoneId.of("-05:00")), ZonedDateTime.now(ZoneId.of("-05:00")).plusHours((long)Math.round((Float)playerTime.get(player.getUniqueId()))), false, playerPrice.get(getOwner().getUniqueId()), playerPrice.get(getOwner().getUniqueId()), new ArrayList<>(), false, category));
+                            AuctionItemHandler.ITEMS.put(auctionID, new AuctionItemHandler(auctionID, getOwner().getUniqueId(), PlayerItems.get(getOwner().getUniqueId()), ZonedDateTime.now(ZoneId.of("-05:00")), ZonedDateTime.now(ZoneId.of("-05:00")).plusHours(Math.round(playerTime.get(player.getUniqueId()))), false, playerPrice.get(getOwner().getUniqueId()), playerPrice.get(getOwner().getUniqueId()), new ArrayList<>(), false, category));
+                            AuctionBidHandler.bids.put(auctionID, new ArrayList<>());
                         }
 
                         PlayerItems.remove(player.getUniqueId());
                         (new AuctionHouseGUI(this.getOwner())).open();
                         (new BukkitRunnable() {
                             public void run() {
-                                ((AuctionItemHandler)AuctionItemHandler.ITEMS.get(auctionID)).updateToDB();
+                                AuctionItemHandler.ITEMS.get(auctionID).updateToDB();
                             }
                         }).runTaskLaterAsynchronously(SBX.getInstance(), 10L);
                         System.out.println(AuctionItemHandler.ITEMS.get(auctionID));
@@ -103,7 +105,7 @@ public class AuctionCreatorGUI extends NormalGUI implements Backable {
                             player.sendMessage("§cThat's not a valid number!");
                         }
 
-                    })).withLines(new String[]{"", "^^^^^^^^^^^^^^^", "Auction starting", "bid price"}).open(player.getPlayer());
+                    })).withLines("", "^^^^^^^^^^^^^^^", "Auction starting", "bid price").open(player.getPlayer());
                     break;
                 case 33:
                     (new AuctionDurationGUI(player)).open();
@@ -132,24 +134,24 @@ public class AuctionCreatorGUI extends NormalGUI implements Backable {
                 throw new IllegalArgumentException();
             }
 
-            this.setItem(13, BukkitSerilization.itemStackFromBase64((String)PlayerItems.get(this.getOwner().getUniqueId())));
+            this.setItem(13, BukkitSerilization.itemStackFromBase64(PlayerItems.get(this.getOwner().getUniqueId())));
         } catch (IllegalArgumentException var2) {
-            this.setItem(13, makeColorfulItem(Material.STONE_BUTTON, "&7No item", 1, 0, new String[0]));
+            this.setItem(13, makeColorfulItem(Material.STONE_BUTTON, "&7No item", 1, 0));
         }
 
-        this.setItem(31, makeColorfulItem(Material.POWERED_RAIL, "&fStarting bid &6" + playerPrice.get(this.getOwner().getUniqueId()) + " coins", 1, 0, new String[0]));
+        this.setItem(31, makeColorfulItem(Material.POWERED_RAIL, "&fStarting bid &6" + playerPrice.get(this.getOwner().getUniqueId()) + " coins", 1, 0));
         if (PlayerItems.containsKey(this.getOwner().getUniqueId())) {
             this.setItem(29, makeColorfulItem(Material.STAINED_CLAY, "§aCreate", 1, 5, "§eClick to create auction!"));
         } else {
             this.setItem(29, makeColorfulItem(Material.STAINED_CLAY, "§cCreate", 1, 14, "§cCan't create auction!"));
         }
 
-        if ((Float)playerTime.get(this.getOwner().getUniqueId()) >= 24.0F) {
-            this.setItem(33, makeColorfulItem(Material.WATCH, "&fDuration: &e" + Math.round((Float)playerTime.get(this.getOwner().getUniqueId())) / 24 + " days", 1, 0, new String[0]));
-        } else if ((Float)playerTime.get(this.getOwner().getUniqueId()) >= 1.0F) {
-            this.setItem(33, makeColorfulItem(Material.WATCH, "&fDuration: &e" + Math.round((Float)playerTime.get(this.getOwner().getUniqueId())) + " hours", 1, 0, new String[0]));
+        if (playerTime.get(this.getOwner().getUniqueId()) >= 24.0F) {
+            this.setItem(33, makeColorfulItem(Material.WATCH, "&fDuration: &e" + Math.round(playerTime.get(this.getOwner().getUniqueId())) / 24 + " days", 1, 0));
+        } else if (playerTime.get(this.getOwner().getUniqueId()) >= 1.0F) {
+            this.setItem(33, makeColorfulItem(Material.WATCH, "&fDuration: &e" + Math.round(playerTime.get(this.getOwner().getUniqueId())) + " hours", 1, 0));
         } else {
-            this.setItem(33, makeColorfulItem(Material.WATCH, "&fDuration: &e" + Math.round((Float)playerTime.get(this.getOwner().getUniqueId()) * 60.0F) + " minutes", 1, 0, new String[0]));
+            this.setItem(33, makeColorfulItem(Material.WATCH, "&fDuration: &e" + Math.round(playerTime.get(this.getOwner().getUniqueId()) * 60.0F) + " minutes", 1, 0));
         }
 
     }

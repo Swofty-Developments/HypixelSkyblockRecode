@@ -43,21 +43,4 @@ public class AuctionBidHandler {
         }
         mongo.setData(auctionID, "bids", list);
     }
-    public static ArrayList<AuctionBidHandler> mongoToCache(UUID auctionID) {
-        Document doc = mongo.getDoc(auctionID);
-        ArrayList<AuctionBidHandler> list = new ArrayList<>();
-        if (doc.get("bids") == null) {
-            return list;
-        }
-        ((ArrayList<Document>) doc.get("bids")).forEach(document -> {
-            document.forEach((uuid, nameDoc) -> {
-                ((Document) nameDoc).forEach((name, timepriceDoc) -> {
-                    ((Document) timepriceDoc).forEach((time, price) -> {
-                        list.add(new AuctionBidHandler(UUID.fromString(uuid), name, ZonedDateTime.ofInstant(Instant.ofEpochMilli(Long.getLong(time)), ZoneId.of("-05:00")), (Double) price));
-                    });
-                });
-            });
-        });
-        return list;
-    }
 }

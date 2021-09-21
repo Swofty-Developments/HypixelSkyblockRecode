@@ -128,12 +128,13 @@ public class SBX extends JavaPlugin {
         protocolManager = ProtocolLibrary.getProtocolManager();
         new MongoAH().connect();
         long time = System.currentTimeMillis();
-        Log.info("Starting to cache all ah data....");
+        System.out.println("Starting to cache all ah data....");
         try {
             AuctionItemHandler.mongoToCache();
-            Log.info("Successfully cached all ah data! (" + (System.currentTimeMillis() - time) + " ms)");
+            System.out.println("Successfully cached all ah data! (" + (System.currentTimeMillis() - time) + " ms)");
         } catch (Exception e) {
-            Log.error("Failed to cache all ah data! (" + (System.currentTimeMillis() - time) + " ms)");
+            System.err.println("Failed to cache all ah data! (" + (System.currentTimeMillis() - time) + " ms)");
+            e.printStackTrace();
         }
         mongoStorage.connect();
         mongoIslands.connect();

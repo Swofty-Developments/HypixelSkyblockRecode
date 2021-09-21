@@ -15,7 +15,7 @@ import org.bukkit.Sound;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 public class AuctionDurationGUI extends NormalGUI implements Backable {
-    public static Map<UUID, Integer> Selected = new HashMap();
+    public static Map<UUID, Integer> Selected = new HashMap<>();
     private final double price;
 
     public AuctionDurationGUI(SBPlayer owner) {

@@ -14,6 +14,7 @@ import net.atlas.SkyblockSandbox.economy.CoinEvent;
 import net.atlas.SkyblockSandbox.gui.Backable;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
+import net.atlas.SkyblockSandbox.util.BukkitSerilization;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
@@ -38,10 +39,11 @@ public class AuctionInspectorGUI extends NormalGUI implements Backable {
             });
             if (this.item.getHighestBidder() == null) {
                 this.setAction(31, (e) -> {
-                    if (this.item.highestBidder == null) {
+                    if (this.item.getBids().isEmpty()) {
                         this.item.setHasEnded(true);
                         this.item.updateToDB();
                         AuctionItemHandler.ITEMS.remove(this.item.auctionID);
+                        this.getOwner().getInventory().addItem(BukkitSerilization.itemStackFromBase64(this.item.getItemStack()));
                         this.getOwner().closeInventory();
                     }
 
@@ -92,13 +94,17 @@ public class AuctionInspectorGUI extends NormalGUI implements Backable {
         }
 
         if (this.item.getBids().isEmpty()) {
-            this.setItem(33, makeColorfulItem(Material.MAP, "&fBid History", 1, 0, "&7No bids have been placed on this\n&7item yet.\n\nBe the first to bid on it!"));
+            ItemStack item = makeColorfulItem(Material.MAP, "&fBid History", 1, 0, "&7No bids have been placed on this\n&7item yet.\n\n&7Be the first to bid on it!");
+            ItemMeta meta = item.getItemMeta();
+            meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+            item.setItemMeta(meta);
+            this.setItem(33, item);
         } else {
             DecimalFormat format = new DecimalFormat("#,###");
             ArrayList<String> builder = new ArrayList();
             builder.add("&7Total bids: &a" + this.item.getBids().size() + " bids");
             builder.add("&8-----------------");
-            int last = this.item.getBids().size() - 6 > 0 ? this.item.getBids().size() - 6 : 0;
+            int last = Math.max(this.item.getBids().size() - 6, 0);
 
             for(int i = 0; i < 6; ++i) {
                 if (this.item.getBids().size() - i >= 0) {
@@ -126,7 +132,7 @@ public class AuctionInspectorGUI extends NormalGUI implements Backable {
 
             ItemStack item = makeColorfulItem(Material.MAP, "&fBid History", 1, 0, builder);
             ItemMeta meta = item.getItemMeta();
-            meta.addItemFlags(new ItemFlag[]{ItemFlag.HIDE_POTION_EFFECTS});
+            meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
             item.setItemMeta(meta);
             this.setItem(33, item);
         }
