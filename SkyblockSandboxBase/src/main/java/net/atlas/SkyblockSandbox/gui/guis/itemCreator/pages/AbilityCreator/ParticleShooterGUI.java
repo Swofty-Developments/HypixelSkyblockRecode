@@ -1,6 +1,7 @@
 package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator;
 
 import net.atlas.SkyblockSandbox.SBX;
+import net.atlas.SkyblockSandbox.abilityCreator.AbilityValue;
 import net.atlas.SkyblockSandbox.gui.AnvilGUI;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.item.ability.AbilityData;
@@ -18,31 +19,30 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
+import java.util.function.Function;
+
 public class ParticleShooterGUI extends NormalGUI {
     private final int index;
     private final int count;
-    private final boolean update;
-    private final Particles particle;
-    private final String function;
-    public ParticleShooterGUI(SBPlayer owner, String function, int index, int count, boolean update, Particles particle) {
+    private final AbilityValue.FunctionType function;
+
+    public ParticleShooterGUI(SBPlayer owner, AbilityValue.FunctionType function, int index, int count) {
         super(owner);
         this.index = index;
         this.count = count;
-        this.update = update;
-        this.particle = particle;
         this.function = function;
     }
 
     @Override
     public String getTitle() {
-        return "Item Functions";
+        return "Particle Shooter";
     }
 
     @Override
     public int getRows() {
         return 4;
     }
-    
+
 
     @Override
     public void handleMenu(InventoryClickEvent event) {
@@ -50,11 +50,11 @@ public class ParticleShooterGUI extends NormalGUI {
         event.setCancelled(true);
         switch (event.getSlot()) {
             case 31: {
-                new FunctionsCreatorGUI(getOwner(), index, count, update).open();
+                new FunctionSelectorGUI(getOwner(), index, count).open();
                 break;
             }
             case 14: {
-                if(event.getCurrentItem().equals(FILLER_GLASS)) return;
+                if (event.getCurrentItem().equals(FILLER_GLASS)) return;
 
                 AnvilGUI gui = new AnvilGUI(player.getPlayer(), event1 -> {
                     if (!NumUtils.isInt(event1.getName())) {
@@ -107,7 +107,7 @@ public class ParticleShooterGUI extends NormalGUI {
                 break;
             }
             case 12: {
-                if(event.getCurrentItem().equals(FILLER_GLASS)) return;
+                if (event.getCurrentItem().equals(FILLER_GLASS)) return;
 
                 if (AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.ID)) {
                     if (!AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_TYPE) && !AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_SHAPE) && !AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_SHOOT_RANGE) && !AbilityData.hasFunctionData(player.getItemInHand(), index, count, EnumFunctionsData.PARTICLE_SHOOTING)) {
@@ -127,7 +127,7 @@ public class ParticleShooterGUI extends NormalGUI {
                 break;
             }
             case 4: {
-                if(event.getCurrentItem().equals(FILLER_GLASS)) return;
+                if (event.getCurrentItem().equals(FILLER_GLASS)) return;
 
                 AnvilGUI gui = new AnvilGUI(player.getPlayer(), event12 -> {
                     if (!NumUtils.isFloat(event12.getName())) {
@@ -191,17 +191,17 @@ public class ParticleShooterGUI extends NormalGUI {
         setMenuGlass();
         setItem(31, makeColorfulItem(Material.ARROW, "§aGo Back", 1, 0, "§7To Function editor #" + count));
         setItem(13, makeColorfulItem(Material.IRON_BLOCK, "&aToggle Shooting", 1, 0, "&7Toggle shooting for the\n&bParticle Function&7!\n\n&eLeft-click to enable\n&bRight-click to disable"));
-        if(AbilityData.retrieveFunctionData(EnumFunctionsData.PARTICLE_SHOOTING, getOwner().getItemInHand(), index, count).equals("True")) {
+        if (AbilityData.retrieveFunctionData(EnumFunctionsData.PARTICLE_SHOOTING, getOwner().getItemInHand(), index, count).equals("True")) {
             String enabled = "";
-            if(AbilityData.retrieveFunctionData(EnumFunctionsData.PARTICLE_DAMAGE_ENTITY, getOwner().getItemInHand(), index, count).equals("True")) {
-               enabled = "&aTRUE";
+            if (AbilityData.retrieveFunctionData(EnumFunctionsData.PARTICLE_DAMAGE_ENTITY, getOwner().getItemInHand(), index, count).equals("True")) {
+                enabled = "&aTRUE";
             } else {
                 enabled = "&cFALSE";
             }
             setItem(12, makeColorfulItem(Material.SKULL_ITEM, "&aToggle Entity Damage", 1, 0, "&7Toggle Entity Damage for\n&7the &bParticle Function&7!\n\n&7Enabled: " + enabled + "\n\n&eLeft-click to enable\n&bRight-click to disable"));
             setItem(14, makeColorfulItem(Material.STICK, "&aShooting Range", 1, 0, "&7Set the range of the\n&7the &bParticle Function&7!\n\n&eClick to set!"));
             setItem(4, makeColorfulItem(Material.IRON_AXE, "&aDamage Multiplier", 1, 0, "&7Set the damage multiplier\n&7of the &bParticle\n&bFunction&7!\n&7Default: &a0.3\n\n&eClick to set!"));
-            setItem(5, makeColorfulItem(Material.ENDER_PORTAL_FRAME, "&aToggle Message", 1,0, "&7Toggle Message for\n&7the &bParticle Function&7!\n\n&eLeft-click to enable\n&bRight-click to disable"));
+            setItem(5, makeColorfulItem(Material.ENDER_PORTAL_FRAME, "&aToggle Message", 1, 0, "&7Toggle Message for\n&7the &bParticle Function&7!\n\n&eLeft-click to enable\n&bRight-click to disable"));
         } else {
             setItem(14, FILLER_GLASS);
             setItem(12, FILLER_GLASS);
@@ -215,7 +215,7 @@ public class ParticleShooterGUI extends NormalGUI {
     private void invalidNumberError(AnvilGUI.AnvilClickEvent event, Player player) {
         IChatBaseComponent comp = IChatBaseComponent.ChatSerializer.a("{\"text\":\"§cThat's not a valid number!\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"§fYour input: §e" + event.getName() + "\"}}");
         PacketPlayOutChat c = new PacketPlayOutChat(comp);
-        ((CraftPlayer)player).getHandle().playerConnection.sendPacket(c);
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(c);
 
         player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1f, 0f);
         player.closeInventory();

@@ -1,11 +1,11 @@
 package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator;
 
+import com.google.common.base.Enums;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
-import dev.triumphteam.gui.guis.Gui;
-import dev.triumphteam.gui.guis.PaginatedGui;
 import net.atlas.SkyblockSandbox.SBX;
+import net.atlas.SkyblockSandbox.abilityCreator.AbilityValue;
+import net.atlas.SkyblockSandbox.abilityCreator.FunctionUtil;
 import net.atlas.SkyblockSandbox.gui.AnvilGUI;
-import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.gui.PaginatedGUI;
 import net.atlas.SkyblockSandbox.item.ability.AbilityData;
 import net.atlas.SkyblockSandbox.item.ability.functions.EnumFunctionsData;
@@ -29,16 +29,14 @@ public class SoundChooserGUI extends PaginatedGUI {
     public static Map<UUID, String> search = new HashMap<>();
 
     private final int index2;
-    private final int count;
-    private final boolean update;
+    private final int funcIndex;
     private final Sound sound;
 
-    public SoundChooserGUI(SBPlayer owner, int index, int count, boolean update, Sound sound) {
+    public SoundChooserGUI(SBPlayer owner, int index, int funcIndex) {
         super(owner);
         this.index2 = index;
-        this.count = count;
-        this.update = update;
-        this.sound = sound;
+        this.funcIndex = funcIndex;
+        this.sound = Enums.getIfPresent(org.bukkit.Sound.class, FunctionUtil.getFunctionData(owner.getItemInHand(),index,funcIndex, net.atlas.SkyblockSandbox.abilityCreator.functions.Sound.dataValues.SOUND)).orNull();;
     }
 
     @Override
@@ -116,23 +114,23 @@ public class SoundChooserGUI extends PaginatedGUI {
                     break;
                 } else if (event.getCurrentItem().getItemMeta().getDisplayName().contains("§cBack")) {
                     if (sound == null) {
-                        new FunctionsCreatorGUI(getOwner(), index2, count, update).open();
+                        new FunctionSelectorGUI(getOwner(), index2, funcIndex).open();
                     } else {
-                        new FunctionsEditorGUI(getOwner(), "Sound Function", index2, count, update, sound).open();
+                        new FunctionsEditorGUI(getOwner(), AbilityValue.FunctionType.SOUND, index2, funcIndex).open();
                     }
                 }
                 break;
             }
             default: {
-                if (AbilityData.hasFunctionData(player.getItemInHand(), index2, count, EnumFunctionsData.ID) && !(AbilityData.hasFunctionData(player.getItemInHand(), index2, count, EnumFunctionsData.SOUND_TYPE) || AbilityData.hasFunctionData(player.getItemInHand(), index2, count, EnumFunctionsData.SOUND_DELAY) || AbilityData.hasFunctionData(player.getItemInHand(), index2, count, EnumFunctionsData.SOUND_AMOUNT) || AbilityData.hasFunctionData(player.getItemInHand(), index2, count, EnumFunctionsData.SOUND_VOLUME) || AbilityData.hasFunctionData(player.getItemInHand(), index2, count, EnumFunctionsData.SOUND_PITCH))) {
-                    player.setItemInHand(AbilityData.removeFunction(player.getItemInHand(), index2, count, player));
-                    player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.SOUND_TYPE, count, event.getCurrentItem().getItemMeta().getDisplayName().replace(SUtil.colorize("&a"), "")));
-                    player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.NAME, count, "Sound Function"));
+                if (AbilityData.hasFunctionData(player.getItemInHand(), index2, funcIndex, EnumFunctionsData.ID) && !(AbilityData.hasFunctionData(player.getItemInHand(), index2, funcIndex, EnumFunctionsData.SOUND_TYPE) || AbilityData.hasFunctionData(player.getItemInHand(), index2, funcIndex, EnumFunctionsData.SOUND_DELAY) || AbilityData.hasFunctionData(player.getItemInHand(), index2, funcIndex, EnumFunctionsData.SOUND_AMOUNT) || AbilityData.hasFunctionData(player.getItemInHand(), index2, funcIndex, EnumFunctionsData.SOUND_VOLUME) || AbilityData.hasFunctionData(player.getItemInHand(), index2, funcIndex, EnumFunctionsData.SOUND_PITCH))) {
+                    player.setItemInHand(AbilityData.removeFunction(player.getItemInHand(), index2, funcIndex, player));
+                    player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.SOUND_TYPE, funcIndex, event.getCurrentItem().getItemMeta().getDisplayName().replace(SUtil.colorize("&a"), "")));
+                    player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.NAME, funcIndex, "Sound Function"));
                 } else {
-                    player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.SOUND_TYPE, count, event.getCurrentItem().getItemMeta().getDisplayName().replace(SUtil.colorize("&a"), "")));
-                    player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.NAME, count, "Sound Function"));
+                    player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.SOUND_TYPE, funcIndex, event.getCurrentItem().getItemMeta().getDisplayName().replace(SUtil.colorize("&a"), "")));
+                    player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.NAME, funcIndex, "Sound Function"));
                 }
-                new FunctionsEditorGUI(getOwner(), "Sound Function", index2, count, update, Sound.valueOf(event.getCurrentItem().getItemMeta().getDisplayName().replace(SUtil.colorize("&a"), ""))).open();
+                new FunctionsEditorGUI(getOwner(), AbilityValue.FunctionType.SOUND, index2, funcIndex).open();
                 player.playSound(player.getLocation(), Sound.NOTE_PLING, 1f, 2f);
             }
         }

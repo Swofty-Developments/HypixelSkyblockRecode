@@ -1,6 +1,7 @@
 package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator;
 
 import dev.triumphteam.gui.builder.item.ItemBuilder;
+import net.atlas.SkyblockSandbox.abilityCreator.AbilityValue;
 import net.atlas.SkyblockSandbox.gui.PaginatedGUI;
 import net.atlas.SkyblockSandbox.item.ability.AbilityData;
 import net.atlas.SkyblockSandbox.item.ability.functions.EnumFunctionsData;
@@ -22,14 +23,12 @@ public class ParticleChooserGUI extends PaginatedGUI {
     public static Map<Player, String> search = new HashMap<>();
 
     private final int index2;
-    private final int count;
-    private final boolean update;
+    private final int funcIndex;
 
-    public ParticleChooserGUI(SBPlayer owner, int index, int count, boolean update) {
+    public ParticleChooserGUI(SBPlayer owner, int index, int funcIndex) {
         super(owner);
         this.index2 = index;
-        this.count = count;
-        this.update = update;
+        this.funcIndex = funcIndex;
     }
 
     @Override
@@ -78,29 +77,29 @@ public class ParticleChooserGUI extends PaginatedGUI {
                     }
                     break;
                 } else if (event.getCurrentItem().getItemMeta().getDisplayName().contains("§cBack")) {
-                    new FunctionsCreatorGUI(getOwner(), index2, count, update).open();
+                    new FunctionSelectorGUI(getOwner(), index2, funcIndex).open();
                 } else {
                     player.playSound(player.getLocation(), Sound.NOTE_PLING, 1f, 2f);
                     ItemStack item = event.getCurrentItem();
                     Particles value = AbilityData.ValueFromName(item.getItemMeta().getDisplayName().replace(SUtil.colorize("&7Particle: &a"), ""));
-                    if (!AbilityData.hasFunctionData(player.getItemInHand(), index2, count, EnumFunctionsData.PARTICLE_SHOOTING) && !AbilityData.hasFunctionData(player.getItemInHand(), index2, count, EnumFunctionsData.PARTICLE_TYPE)) {
-                        player.setItemInHand(AbilityData.removeFunction(player.getItemInHand(), index2, count, player));
-                        player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.NAME, count, "Particle Function"));
+                    if (!AbilityData.hasFunctionData(player.getItemInHand(), index2, funcIndex, EnumFunctionsData.PARTICLE_SHOOTING) && !AbilityData.hasFunctionData(player.getItemInHand(), index2, funcIndex, EnumFunctionsData.PARTICLE_TYPE)) {
+                        player.setItemInHand(AbilityData.removeFunction(player.getItemInHand(), index2, funcIndex, player));
+                        player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.NAME, funcIndex, "Particle Function"));
                     }
-                    player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.PARTICLE_TYPE, count, value.name()));
-                    new FunctionsEditorGUI(getOwner(), "Particle Function", index2, count, update, value).open();
+                    player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.PARTICLE_TYPE, funcIndex, value.name()));
+                    new FunctionsEditorGUI(getOwner(), AbilityValue.FunctionType.PARTICLE, index2, funcIndex).open();
                 }
                 break;
             }
             default: {
                 ItemStack item = event.getCurrentItem();
                 Particles value = AbilityData.ValueFromName(item.getItemMeta().getDisplayName().replace(SUtil.colorize("&7Particle: &a"), ""));
-                if (!AbilityData.hasFunctionData(player.getItemInHand(), index2, count, EnumFunctionsData.PARTICLE_SHOOTING) && !AbilityData.hasFunctionData(player.getItemInHand(), index2, count, EnumFunctionsData.PARTICLE_TYPE)) {
-                    player.setItemInHand(AbilityData.removeFunction(player.getItemInHand(), index2, count, player));
-                    player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.NAME, count, "Particle Function"));
+                if (!AbilityData.hasFunctionData(player.getItemInHand(), index2, funcIndex, EnumFunctionsData.PARTICLE_SHOOTING) && !AbilityData.hasFunctionData(player.getItemInHand(), index2, funcIndex, EnumFunctionsData.PARTICLE_TYPE)) {
+                    player.setItemInHand(AbilityData.removeFunction(player.getItemInHand(), index2, funcIndex, player));
+                    player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.NAME, funcIndex, "Particle Function"));
                 }
-                player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.PARTICLE_TYPE, count, value.name()));
-                new FunctionsEditorGUI(getOwner(), "Particle Function", index2, count, update, value).open();
+                player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.PARTICLE_TYPE, funcIndex, value.name()));
+                new FunctionsEditorGUI(getOwner(), AbilityValue.FunctionType.PARTICLE, index2, funcIndex).open();
                 player.playSound(player.getLocation(), Sound.NOTE_PLING, 1f, 2f);
             }
         }

@@ -1,100 +1,88 @@
 package net.atlas.SkyblockSandbox.abilityCreator.functions;
 
-import net.atlas.SkyblockSandbox.abilityCreator.AdvancedFunctions;
-import net.atlas.SkyblockSandbox.item.ability.AbilityData;
+import com.google.common.base.Enums;
+import net.atlas.SkyblockSandbox.SBX;
+import net.atlas.SkyblockSandbox.abilityCreator.Function;
+import net.atlas.SkyblockSandbox.abilityCreator.FunctionUtil;
+import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.SoundChooserGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import org.bukkit.Material;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
+import java.util.List;
 
-public class Sound extends AdvancedFunctions {
-    public Sound(SBPlayer owner) {
-        super(owner);
+import static net.atlas.SkyblockSandbox.util.StackUtils.makeColorfulItem;
+
+public class Sound extends Function {
+    
+    org.bukkit.Sound sound;
+
+    public Sound(SBPlayer player, ItemStack stack, int abilIndex, int functionIndex) {
+        super(player, stack, abilIndex, functionIndex);
+        this.sound = Enums.getIfPresent(org.bukkit.Sound.class, FunctionUtil.getFunctionData(getStack(),getAbilIndex(),getFunctionIndex(),dataValues.SOUND)).orNull();
     }
 
     @Override
-    public void runnable() {
-
-    }
-
-    @Override
-    public ArrayList<ItemStack> itemList() {
-        ArrayList<ItemStack> items = new ArrayList<>();
-        for (Particle.FunctionVariables variables : Particle.FunctionVariables.values()) {
-            if(variables.depend == null) {
-                items.add(createItem(variables.guiName, variables.type, variables.material, variables.min, variables.max, variables.Enum));
-            } else {
-                Object depend = AbilityData.retrieveFunctionData(name() + "_" + variables.depend.guiName, getOwner().getItemInHand(), aindex, findex);
-                if (!depend.equals("")) {
-                    items.add(createItem(variables.guiName, variables.type, variables.material, variables.min, variables.max, variables.Enum));
-                }
+    public void applyFunction() {
+       float volume = Float.parseFloat(FunctionUtil.getFunctionData(getStack(),getAbilIndex(),getFunctionIndex(),dataValues.VOLUME));
+       double pitch = Double.parseDouble(FunctionUtil.getFunctionData(getStack(),getAbilIndex(),getFunctionIndex(),dataValues.PITCH));
+       int delay = Integer.parseInt(FunctionUtil.getFunctionData(getStack(),getAbilIndex(),getFunctionIndex(),dataValues.DELAY));
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                getPlayer().playSound(getPlayer().getLocation(),sound,volume, (float) pitch);
             }
-        }
-        return items;
+        }.runTaskLater(SBX.getInstance(),delay*20L);
     }
 
     @Override
-    public String name() {
-        return "Sound";
+    public List<Class<? extends Function>> conflicts() {
+        return null;
+    }
+
+    public enum dataValues implements Function.dataValues {
+        SOUND(),
+        VOLUME(),
+        PITCH(),
+        DELAY(),
+        AMOUNT();
     }
 
     @Override
-    public String description() {
-        return "&7Plays any sound you choose.";
-    }
-
-    @Override
-    public Material material() {
-        return Material.NOTE_BLOCK;
-    }
-
-    @Override
-    public AdvancedFunctions getGUI() {
-        return this;
-    }
-
-    public enum FunctionVariables{
-        SOUND("Type", Material.NOTE_BLOCK, GUIType.ENUM, org.bukkit.Sound.class, null),
-        VOLUME("Volume", Material.IRON_BLOCK, GUIType.INT, 1, 100, SOUND),
-        PITCH("Pitch", Material.STICK, GUIType.FLOAT, 0.5F, 2.0F, SOUND),
-        DELAY("Delay", Material.WATCH, GUIType.FLOAT, 0, 5.0F, SOUND),
-        AMOUNT("Amount", Material.BOOK_AND_QUILL, GUIType.INT, 1, 30, SOUND);
-
-        public final String guiName;
-        public final GUIType type;
-        public final Material material;
-        public final String min;
-        public final String max;
-        public final Class Enum;
-        public final FunctionVariables depend;
-
-        FunctionVariables(String guiName, Material material,  GUIType type, FunctionVariables depend) {
-            this.guiName = guiName;
-            this.type = type;
-            this.material = material;
-            this.min = null;
-            this.max = null;
-            Enum = null;
-            this.depend = depend;
-        }
-        FunctionVariables(String guiName, Material material, GUIType type, Class Enum, FunctionVariables depend) {
-            this.guiName = guiName;
-            this.type = type;
-            this.material = material;
-            this.min = null;
-            this.max = null;
-            this.Enum = Enum;
-            this.depend = depend;
-        }
-        FunctionVariables(String guiName, Material material,  GUIType type, float min, float max, FunctionVariables depend) {
-            this.guiName = guiName;
-            this.type = type;
-            this.material = material;
-            this.min = String.valueOf(min);
-            this.max = String.valueOf(max);
-            Enum = null;
-            this.depend = depend;
-        }
+    public void getGuiLayout() {
+        setItem(13, makeColorfulItem(Material.NOTE_BLOCK, "&aCurrently edited sound", 1, 0, "&7Currently editing:","&b" + sound.name() + "","","&eLeft-Click to change!","&bRight-Click to play!"));
+        setItem(11, makeColorfulItem(Material.STICK, "&aSet the pitch", 1, 0, "&7Set the pitch of the","&7sound played!","","&7Maximum: &a2.0","&7Minimum: &a0.5","","&eClick to set!"));
+        setItem(12, makeColorfulItem(Material.IRON_BLOCK, "&aSet the volume", 1, 0, "&7Set the volume of the","&7sound played!","","&7Maximum: &a10.0","&7Minimum: &a1.0","","&eClick to set!"));
+        setItem(14, makeColorfulItem(Material.BOOK_AND_QUILL, "&aSet the amount", 1, 0, "&7Set the amount of the","&7sound played!","","&7Maximum: &a30","&7Minimum: &a1","","&eClick to set!"));
+        setItem(15, makeColorfulItem(Material.WATCH, "&aSet the delay", 1, 0, "&7Set the delay of the","&7sound played!","","&7Maximum: &a5.0","&7Minimum: &a0.0","","&eClick to set!"));
+        setAction(13,event -> {
+            if(event.getClick().equals(ClickType.RIGHT)) {
+                float volume = Float.parseFloat(FunctionUtil.getFunctionData(getStack(),getAbilIndex(),getFunctionIndex(),dataValues.VOLUME));
+                double pitch = Double.parseDouble(FunctionUtil.getFunctionData(getStack(),getAbilIndex(),getFunctionIndex(),dataValues.PITCH));
+                int delay = Integer.parseInt(FunctionUtil.getFunctionData(getStack(),getAbilIndex(),getFunctionIndex(),dataValues.DELAY));
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        getPlayer().playSound(getPlayer().getLocation(),sound,volume, (float) pitch);
+                    }
+                }.runTaskLater(SBX.getInstance(),delay*20L);
+            } else {
+                new SoundChooserGUI(getPlayer(),getAbilIndex(),getFunctionIndex());
+            }
+        });
+        setAction(11,event -> {
+            anvilGUI(dataValues.PITCH);
+        });
+        setAction(12,event -> {
+            anvilGUI(dataValues.VOLUME);
+        });
+        setAction(14,event -> {
+            anvilGUI(dataValues.AMOUNT);
+        });
+        setAction(15,event -> {
+            anvilGUI(dataValues.DELAY);
+        });
     }
 }

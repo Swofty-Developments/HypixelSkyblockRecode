@@ -2,6 +2,7 @@ package net.atlas.SkyblockSandbox.listener.sbEvents;
 
 import com.google.common.base.Enums;
 import net.atlas.SkyblockSandbox.SBX;
+import net.atlas.SkyblockSandbox.abilityCreator.AbilityHandler;
 import net.atlas.SkyblockSandbox.gui.guis.backpacks.Backpack;
 import net.atlas.SkyblockSandbox.gui.guis.skyblockmenu.SBMenu;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.SummonListener;
@@ -23,9 +24,10 @@ import org.bukkit.inventory.ItemStack;
 import static net.atlas.SkyblockSandbox.island.islands.end.dragFight.StartFight.spawnLoc;
 
 public class PlayerInteractEvent extends SkyblockListener<org.bukkit.event.player.PlayerInteractEvent> {
+    AbilityHandler handler = new AbilityHandler();
     @EventHandler
     public void callEvent(org.bukkit.event.player.PlayerInteractEvent event) {
-
+        handleAbils(event);
         Player p = event.getPlayer();
         if (p.getItemInHand() != null && p.getItemInHand().hasItemMeta()) {
             if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
@@ -58,6 +60,10 @@ public class PlayerInteractEvent extends SkyblockListener<org.bukkit.event.playe
         if(NBTUtil.getString(e.getItem(),"ID").equals("SKYBLOCK_MENU")) {
             new SBMenu(new SBPlayer(e.getPlayer())).open();
         }
+    }
+
+    void handleAbils(org.bukkit.event.player.PlayerInteractEvent event) {
+        handler.callEvent(event);
     }
 
     void runPetLogic(org.bukkit.event.player.PlayerInteractEvent e) {

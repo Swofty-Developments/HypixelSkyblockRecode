@@ -85,6 +85,6 @@
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.12.3" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.12.3" level="project" />
     <orderEntry type="library" name="Maven: commons-io:commons-io:2.8.0" level="project" />
-    <orderEntry type="library" name="Maven: org.json:json:20201115" level="project" />
+    <orderEntry type="library" name="Maven: org.json:json:20210307" level="project" />
   </component>
 </module>

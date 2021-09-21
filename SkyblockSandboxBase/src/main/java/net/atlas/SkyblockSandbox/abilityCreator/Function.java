@@ -1,10 +1,18 @@
 package net.atlas.SkyblockSandbox.abilityCreator;
 
+import dev.triumphteam.gui.components.GuiAction;
 import lombok.Getter;
+import net.atlas.SkyblockSandbox.gui.AnvilGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
+import org.bukkit.Material;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.function.Consumer;
+
+import static net.atlas.SkyblockSandbox.util.StackUtils.makeColorfulItem;
 
 @Getter
 public abstract class Function {
@@ -13,6 +21,9 @@ public abstract class Function {
     private ItemStack stack;
     private final int abilIndex;
     private final int functionIndex;
+
+    HashMap<Integer, ItemStack> guiItems = new HashMap<>();
+    HashMap<Integer, GuiAction<InventoryClickEvent>> clickActions = new HashMap<>();
 
     public Function(SBPlayer player, ItemStack stack, int abilIndex, int functionIndex) {
         this.player = player;
@@ -26,6 +37,41 @@ public abstract class Function {
     public abstract List<Class<? extends Function>> conflicts();
 
     public interface dataValues {
+    }
+
+    public HashMap<Integer, ItemStack> getGuiItems() {
+        return guiItems;
+    }
+
+    public HashMap<Integer, GuiAction<InventoryClickEvent>> getClickActions() {
+        return clickActions;
+    }
+
+    public enum FunctionValues implements dataValues {
+        SEND_MESSAGE, NAME;
+    }
+
+    public void setAction(int slot, GuiAction<InventoryClickEvent> event) {
+        clickActions.put(slot,event);
+    }
+
+    public void setItem(int slot,ItemStack item) {
+        guiItems.put(slot,item);
+    }
+
+    public abstract void getGuiLayout();
+
+    public AnvilGUI anvilGUI(Enum<? extends dataValues> value) {
+        AnvilGUI gui = new AnvilGUI(player.getPlayer(),event -> {
+           event.setWillClose(true);
+           String output = String.valueOf(event.getName());
+           ItemStack stack = FunctionUtil.setFunctionData(getStack(),getAbilIndex(),getFunctionIndex(),value,output);
+           player.setItemInHand(stack);
+        });
+
+        gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT,makeColorfulItem(Material.PAPER,"&aSet the " + value.name(),1,0,"&aInput: &e^^^^^"));
+        gui.open();
+        return gui;
     }
 
 }

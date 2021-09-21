@@ -6,9 +6,8 @@ import lombok.Setter;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.gui.AnvilGUI;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.FunctionsCreatorGUI;
+import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.FunctionSelectorGUI;
 import net.atlas.SkyblockSandbox.item.ability.AbilityData;
-import net.atlas.SkyblockSandbox.item.ability.functions.EnumFunctionsData;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.NumUtils;
@@ -23,11 +22,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import static net.atlas.SkyblockSandbox.abilityCreator.AdvancedFunctions.GUIType.BOOLEAN;
@@ -95,7 +92,7 @@ public abstract class AdvancedFunctions extends NormalGUI {
         if(event.getCurrentItem().equals(FILLER_GLASS)) return;
         if (event.getCurrentItem().getItemMeta().getDisplayName().equals(colorize("&aBack"))) {
             if(backGUI == null) {
-                new FunctionsCreatorGUI(player, aindex, findex, false).open();
+                new FunctionSelectorGUI(player, aindex, findex).open();
                 return;
             }
             backGUI.update();

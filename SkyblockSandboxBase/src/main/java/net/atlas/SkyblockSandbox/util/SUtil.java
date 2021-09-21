@@ -62,7 +62,10 @@ public class SUtil {
     }
 
     public static String firstLetterUpper(String s) {
-        s = s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
+        if(s.length()>1) {
+            s = s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
+            return s;
+        }
         return s;
     }
 

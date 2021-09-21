@@ -19,7 +19,7 @@ public class FunctionUtil {
 
                 int amt = 0;
                 for(int i=0;i<3;i++) {
-                    if(ability.getCompound("Function_" + i)!=null || !ability.getCompound("Function_" + i).isEmpty()) {
+                    if(!ability.getCompound("Function_" + i).toString().equals("{}")) {
                         amt++;
                     }
                 }
@@ -30,7 +30,7 @@ public class FunctionUtil {
     }
 
     public static ItemStack setFunctionData(ItemStack stack,int index,int functionIndex, Enum<? extends Function.dataValues> value, Object data) {
-        stack = setAbilityString(stack,index,functionIndex, value.name(), String.valueOf(data));
+        stack = setFunctionString(stack,index,functionIndex, value.name(), String.valueOf(data));
         return stack;
     }
 
@@ -38,7 +38,7 @@ public class FunctionUtil {
         return getFunctionString(stack,index,functionIndex, value.name());
     }
 
-    public static ItemStack setAbilityString(ItemStack stack, int index,int functionIndex, String key, String value) {
+    public static ItemStack setFunctionString(ItemStack stack, int index, int functionIndex, String key, String value) {
         if (stack != null) {
             if (stack.hasItemMeta()) {
                 net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);

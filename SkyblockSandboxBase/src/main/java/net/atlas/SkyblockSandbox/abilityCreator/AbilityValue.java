@@ -17,12 +17,13 @@ public enum AbilityValue {
 
     }
 
-    public static enum FunctionType {
+    public enum FunctionType {
         IMPLOSION(Implosion.class),
         TELEPORT(Teleport.class),
         PARTICLE(Particle.class),
         SOUND(Sound.class),
-        PROJECTILE(Implosion.class);
+        PROJECTILE(Implosion.class),
+        HEAD(Implosion.class);
 
         private Class<? extends Function> function;
 
@@ -33,10 +34,12 @@ public enum AbilityValue {
         public Function getFunction(SBPlayer p,ItemStack stack,int abilIndex,int funcIndex) {
             try {
                 Constructor<? extends Function> ctor = function.getDeclaredConstructor(SBPlayer.class, ItemStack.class, int.class, int.class);
-                return ctor.newInstance(p,stack,abilIndex,funcIndex);
+                Function func = ctor.newInstance(p,stack,abilIndex,funcIndex);
+                return func;
             } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException ex) {
                 ex.printStackTrace();
             }
+            return null;
         }
     }
 }
