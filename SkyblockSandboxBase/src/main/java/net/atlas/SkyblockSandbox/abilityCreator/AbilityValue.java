@@ -11,7 +11,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public enum AbilityValue {
-    NAME, CLICK_TYPE, STAT_COST;
+    NAME, CLICK_TYPE, STAT_COST,COOLDOWN,MANA_COST;
 
     AbilityValue() {
 

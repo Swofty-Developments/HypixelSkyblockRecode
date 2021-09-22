@@ -68,7 +68,7 @@ public class FunctionsMainGUI extends NormalGUI {
                     new FunctionsEditorGUI(getOwner(), type,index, finalI).open();
                 }
                 if (event.getClick().equals(ClickType.RIGHT)) {
-                    ItemStack newItem = ItemBuilder.from(AbilityData.removeFunction(player.getItemInHand(), index, finalI, player)).removeNbt("Function_" + finalI).build();
+                    ItemStack newItem = AbilityData.removeFunction(player.getItemInHand(), index, finalI, player);
                     player.setItemInHand(newItem);
                     player.playSound(player.getLocation(), Sound.HORSE_ARMOR, 2, 1);
                     updateItems();
@@ -94,8 +94,8 @@ public class FunctionsMainGUI extends NormalGUI {
             }
 
             for (String value : AbilityData.listFunctionData(player.getItemInHand(), index, i)) {
-                if (!value.equals("id") && !value.equals("name")) {
-                    lore.add("&7" + value.replace("_", " ") + ": &a" + AbilityData.retrieveFunctionData(value, player.getItemInHand(), index, i));
+                if (!value.equals("id") && !value.equalsIgnoreCase("name")) {
+                    lore.add("&7" + value.replace("_", " ") + ": &a" + FunctionUtil.getFunctionString(player.getItemInHand(),index,i,value));
                 }
             }
             lore.add("");

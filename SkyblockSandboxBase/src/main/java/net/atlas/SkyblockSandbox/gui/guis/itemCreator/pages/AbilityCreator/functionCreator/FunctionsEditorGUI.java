@@ -7,6 +7,7 @@ import net.atlas.SkyblockSandbox.abilityCreator.FunctionUtil;
 import net.atlas.SkyblockSandbox.abilityCreator.functions.Particle;
 import net.atlas.SkyblockSandbox.gui.AnvilGUI;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
+import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.AbilityCreatorGUI;
 import net.atlas.SkyblockSandbox.item.ability.AbilityData;
 import net.atlas.SkyblockSandbox.item.ability.functions.EnumFunctionsData;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
@@ -65,6 +66,9 @@ public class FunctionsEditorGUI extends NormalGUI {
         for(int i:function.getClickActions().keySet()) {
             setAction(i,function.getClickActions().get(i));
         }
+        setAction(31,event -> {
+            new AbilityCreatorGUI(getOwner(),index).open();
+        });
         return true;
     }
 
@@ -80,12 +84,10 @@ public class FunctionsEditorGUI extends NormalGUI {
 
         switch (functionType) {
 
-            case PARTICLE: {
-                setItem(13, makeColorfulItem(particle.getB(), "&aCurrently edited particle", 1, 0, "&7Currently editing:\n&b" + particle.name() + "\n\n&eClick to change!"));
-                setItem(12, makeColorfulItem(Material.IRON_BLOCK, "&aParticle shooting", 1, 0, "&7Turn on and off\n&7Shooting, set the\n&7range and set if\n&7it can damage entities\n&7for the &bParticle Function\n\n&eClick to set!"));
-                setItem(14, makeColorfulItem(Material.WATCH, "&aShape of Particle", 1, 0, "&7Set the shape of the particles\n&7played\n&7Includes: Circle, Oval, On Player\n&7and Square\n\n&eClick to set!"));
+            /*case PARTICLE: {
+
                 break;
-            }
+            }*/
 
             case HEAD: {
                 ItemStack playerItem = getOwner().getItemInHand();

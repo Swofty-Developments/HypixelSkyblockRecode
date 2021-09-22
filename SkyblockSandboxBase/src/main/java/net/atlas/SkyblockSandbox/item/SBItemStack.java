@@ -4,14 +4,12 @@ import com.google.common.base.Enums;
 import com.google.common.base.Strings;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import dev.triumphteam.gui.builder.item.ItemBuilder;
+import net.atlas.SkyblockSandbox.abilityCreator.AbilityUtil;
+import net.atlas.SkyblockSandbox.abilityCreator.AbilityValue;
 import net.atlas.SkyblockSandbox.item.ability.Ability;
-import net.atlas.SkyblockSandbox.item.ability.AbilityType;
-import net.atlas.SkyblockSandbox.item.ability.EnumAbilityData;
 import net.atlas.SkyblockSandbox.item.enchant.Enchantment;
 import net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
-import net.atlas.SkyblockSandbox.util.NumUtils;
 import net.atlas.SkyblockSandbox.util.NumberTruncation.NumberSuffix;
 import net.atlas.SkyblockSandbox.util.NumberTruncation.RomanNumber;
 import net.atlas.SkyblockSandbox.util.SUtil;
@@ -27,12 +25,11 @@ import org.bukkit.inventory.meta.SkullMeta;
 import java.lang.reflect.Field;
 import java.text.Collator;
 import java.text.DecimalFormat;
-import java.text.StringCharacterIterator;
 import java.util.*;
 
 import static net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.RaritiesGUI.masterStarKey;
 import static net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.RaritiesGUI.starKey;
-import static net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat.*;
+import static net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat.GEAR_SCORE;
 import static net.atlas.SkyblockSandbox.player.pets.PetBuilder.petXP;
 
 public class SBItemStack extends ItemStack {
@@ -102,6 +99,24 @@ public class SBItemStack extends ItemStack {
     public SBItemStack(String name, Material mat, int amount, byte dmg) {
         stack = new ItemStack(mat, amount, dmg);
         stack = setName(stack, name);
+    }
+
+    public ItemStack setAbility(Ability ability, int index) {
+        stack = setAbilityData(index,AbilityValue.NAME,ability.getAbilityName());
+        stack = setAbilityData(index,AbilityValue.MANA_COST,ability.getManaCost());
+        stack = setAbilityData(index,AbilityValue.CLICK_TYPE,ability.getAbilityType());
+        for(String s:ability.getAbilDescription()) {
+            stack = addAbilityDescriptionLine(stack,s,index);
+        }
+        return stack;
+    }
+
+    public ItemStack setAbilityData(int index,AbilityValue value,Object data) {
+        return AbilityUtil.setAbilityData(stack,index,value,data);
+    }
+
+    public String getAbilityData(int index,AbilityValue value) {
+        return AbilityUtil.getAbilityData(stack,index,value);
     }
 
     public ItemStack refreshName() {
@@ -292,8 +307,8 @@ public class SBItemStack extends ItemStack {
                 if (hasAbility()) {
 
                     for (int b = 1; b < getAbilAmount() + 1; b++) {
-                        abilityNames.put((String) getAbilData(EnumAbilityData.NAME, b), (String) getAbilData(EnumAbilityData.MANA_COST, b));
-                        abilityType.add((String) getAbilData(EnumAbilityData.FUNCTION, b));
+                        abilityNames.put(AbilityUtil.getAbilityData(stack,b, AbilityValue.NAME), AbilityUtil.getAbilityData(stack,b, AbilityValue.MANA_COST));
+                        abilityType.add(AbilityUtil.getAbilityData(stack,b, AbilityValue.CLICK_TYPE));
                     }
                     int j = 1;
                     for (String s : abilityNames.keySet()) {
@@ -584,31 +599,6 @@ public class SBItemStack extends ItemStack {
         return enchants;
     }
 
-    public ItemStack setAbilData(ItemStack stack, EnumAbilityData dataType, Object data, int index) {
-        if (index > 5)
-            throw new NullPointerException("Ability index can't be higher than 5!");
-
-        net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
-        NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
-        NBTTagCompound attributes = (tag.getCompound("ExtraAttributes") != null ? tag.getCompound("ExtraAttributes") : new NBTTagCompound());
-        NBTTagCompound ability = (attributes.getCompound("Abilities") != null ? attributes.getCompound("Abilities") : new NBTTagCompound());
-        NBTTagCompound abilitySlot = (ability.getCompound("Ability_" + index) != null ? ability.getCompound("Ability_" + index) : new NBTTagCompound());
-        abilitySlot.setString(dataType.getA(), data.toString());
-        ability.set("Ability_" + index, abilitySlot);
-        abilitySlot.setString("FunctionCount", "0");
-        abilitySlot.setString("id", UUID.randomUUID().toString());
-
-        attributes.set("Abilities", ability);
-        tag.set("ExtraAttributes", attributes);
-        nmsItem.setTag(tag);
-
-        stack = CraftItemStack.asBukkitCopy(nmsItem);
-        stack = setInteger(stack, 1, "hasAbility");
-        this.stack = stack;
-
-        return stack;
-    }
-
     public ItemStack removeAbil(ItemStack stack, int index) {
         if (index > 5)
             throw new NullPointerException("Ability index can't be higher than 5!");
@@ -629,41 +619,6 @@ public class SBItemStack extends ItemStack {
         this.stack = stack;
 
         return stack;
-    }
-
-    public Object getAbilData(EnumAbilityData dataType, int index) {
-        if (index > 5) {
-            throw new NullPointerException("Ability index can't be higher than 5!");
-        }
-
-        net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(this.stack);
-        NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
-        NBTTagCompound attributes = (tag.getCompound("ExtraAttributes") != null ? tag.getCompound("ExtraAttributes") : new NBTTagCompound());
-        NBTTagCompound ability = (attributes.getCompound("Abilities") != null ? attributes.getCompound("Abilities") : new NBTTagCompound());
-        NBTTagCompound abilitySlot = (ability.getCompound("Ability_" + index) != null ? ability.getCompound("Ability_" + index) : new NBTTagCompound());
-
-        return abilitySlot.getString(dataType.getA());
-    }
-
-    public ItemStack setAbility(ItemStack item, AbilityType type, String name, double manaCost, List<String> description, int index) {
-        item = setAbilData(item, EnumAbilityData.NAME, name, index);
-        item = setAbilData(item, EnumAbilityData.MANA_COST, manaCost, index);
-        item = setAbilData(item, EnumAbilityData.FUNCTION, type.getText(), index);
-        for (String s : description) {
-            item = addAbilityDescriptionLine(item, s, index);
-        }
-        return item;
-    }
-
-    public ItemStack setAbility(ItemStack item, Ability ability, int index) {
-        item = setAbilData(item, EnumAbilityData.NAME, ability.getAbilityName(), index);
-        item = setAbilData(item, EnumAbilityData.MANA_COST, ability.getManaCost(), index);
-        item = setAbilData(item, EnumAbilityData.FUNCTION, ability.getAbilityType().getText(), index);
-        for (String s : ability.getAbilDescription()) {
-            item = addAbilityDescriptionLine(item, s, index);
-        }
-        this.stack = item;
-        return item;
     }
 
     public ItemStack addAbilityDescriptionLine(ItemStack item, String line, int index) {

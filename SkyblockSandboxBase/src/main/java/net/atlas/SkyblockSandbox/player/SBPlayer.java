@@ -1,12 +1,11 @@
 package net.atlas.SkyblockSandbox.player;
 
 import com.google.common.base.Strings;
-import lombok.Setter;
 import com.xxmicloxx.NoteBlockAPI.model.RepeatMode;
 import com.xxmicloxx.NoteBlockAPI.model.Song;
 import com.xxmicloxx.NoteBlockAPI.songplayer.RadioSongPlayer;
 import com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder;
-
+import lombok.Setter;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.database.mongo.MongoAH;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
@@ -19,11 +18,10 @@ import net.atlas.SkyblockSandbox.playerIsland.PlayerIslandHandler;
 import net.atlas.SkyblockSandbox.sound.Jingle;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.SUtil;
-import net.minecraft.server.v1_8_R3.IChatBaseComponent;
-import net.minecraft.server.v1_8_R3.PacketPlayOutTitle;
 import org.bson.Document;
-import org.bukkit.*;
-import org.bukkit.block.SkullOwner;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -33,8 +31,8 @@ import java.io.File;
 import java.util.*;
 
 import static net.atlas.SkyblockSandbox.SBX.*;
-import static net.atlas.SkyblockSandbox.listener.sbEvents.PlayerJoin.maxStats;
 import static net.atlas.SkyblockSandbox.listener.sbEvents.PlayerJoin.bonusStats;
+import static net.atlas.SkyblockSandbox.listener.sbEvents.PlayerJoin.maxStats;
 import static net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat.HEALTH;
 import static net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat.INTELLIGENCE;
 import static net.atlas.SkyblockSandbox.util.StackUtils.makeColorfulItem;

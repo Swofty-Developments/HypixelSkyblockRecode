@@ -1,8 +1,10 @@
 package net.atlas.SkyblockSandbox.item.ability.itemAbilities;
 
 import net.atlas.SkyblockSandbox.SBX;
+import net.atlas.SkyblockSandbox.abilityCreator.AbilityValue;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.item.ability.Ability;
+import net.atlas.SkyblockSandbox.item.ability.AbilityData;
 import net.atlas.SkyblockSandbox.item.ability.AbilityType;
 import net.atlas.SkyblockSandbox.item.ability.EnumAbilityData;
 import net.atlas.SkyblockSandbox.util.SUtil;
@@ -53,7 +55,7 @@ public class ShortBowTerm extends Ability {
         SBItemStack sbitem = new SBItemStack(item);
         for (int j = 1; j < sbitem.getAbilAmount()+1; j++) {
             SBItemStack sbItem = new SBItemStack(item);
-            if (((String)sbItem.getAbilData(EnumAbilityData.NAME, j)).equalsIgnoreCase(getAbilityName())) {
+            if (sbItem.getAbilityData(j, AbilityValue.NAME).equalsIgnoreCase(getAbilityName())) {
 
                 Location loc = player.getLocation();
                 if (!canfire.containsKey(player)) {

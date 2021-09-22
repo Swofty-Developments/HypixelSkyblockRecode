@@ -41,7 +41,7 @@ public class AbilityHandler {
     }
 
     public FunctionType getFunction(SBPlayer p,ItemStack item,int abilIndex,int funcIndex) {
-            String funcType = FunctionUtil.getFunctionString(item,abilIndex,funcIndex,"FUNCTION_TYPE");
+            String funcType = FunctionUtil.getFunctionData(item,abilIndex,funcIndex, Function.FunctionValues.NAME);
             FunctionType type = Enums.getIfPresent(FunctionType.class,funcType).orNull();
             if(type==null) {
                 p.sendMessage(SUtil.colorize("&cSomething went wrong while parsing functions! Please contact an admin if this issue persists."));

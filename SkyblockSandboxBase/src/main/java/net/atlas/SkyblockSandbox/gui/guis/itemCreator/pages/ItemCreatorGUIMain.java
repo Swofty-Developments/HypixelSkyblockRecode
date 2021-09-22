@@ -4,7 +4,7 @@ import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.gui.AnvilGUI;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemTypeGUI;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.AbilityEditorGUI;
+import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.AbilitySelectorGUI;
 import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.petbuilder.PetBuilderGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
@@ -75,7 +75,7 @@ public class ItemCreatorGUIMain extends NormalGUI {
             new ItemLoreGUI(getOwner()).open();
         });
         setAction(15, event -> {
-            new AbilityEditorGUI(getOwner()).open();
+            new AbilitySelectorGUI(getOwner()).open();
         });
         setAction(22, event -> {
             SBPlayer player = new SBPlayer((Player) event.getWhoClicked());

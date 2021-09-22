@@ -24,13 +24,13 @@ public class Implosion extends Function {
     @Override
     public void applyFunction() {
         SBPlayer player = getPlayer();
-        int range = Integer.parseInt(String.valueOf(FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(),dataValues.TELEPORT_RANGE)));
+        int range = Integer.parseInt(String.valueOf(FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(),dataValues.IMPLOSION_RANGE)));
         boolean message = Boolean.parseBoolean(FunctionUtil.getFunctionData(getStack(),getAbilIndex(),getFunctionIndex(), FunctionValues.SEND_MESSAGE));
         double d = 10000 * (1 + (player.getMaxStat(SBPlayer.PlayerStat.INTELLIGENCE) / 100) * 0.3)/*todo + damage*/;
         int i = 0;
         for (Entity e : player.getWorld().getNearbyEntities(player.getLocation(), range, range, range)) {
             if (e instanceof LivingEntity) {
-                if (!(e instanceof Player || e instanceof ArmorStand || e instanceof NPC)) {
+                if (!(e instanceof Player || e instanceof ArmorStand || e instanceof NPC || e.hasMetadata("entity-tag"))) {
                     if (e.isDead()) {
                         ((LivingEntity) e).damage(0);
                     } else {
@@ -47,11 +47,11 @@ public class Implosion extends Function {
                 player.sendMessage("&7Your Implosion Function hit &c" + i + "&7 enemies dealing &c" + format.format(damage) + " damage&7.");
             }
         } else {
-            if (i >= 1) {
+            /*if (i >= 1) {
                 DecimalFormat format = new DecimalFormat("#,###");
                 int damage = (int) (d * i);
                 player.sendMessage("&7Your Implosion Function hit &c" + i + "&7 enemies dealing &c" + format.format(damage) + " damage&7.");
-            }
+            }*/
         }
     }
 

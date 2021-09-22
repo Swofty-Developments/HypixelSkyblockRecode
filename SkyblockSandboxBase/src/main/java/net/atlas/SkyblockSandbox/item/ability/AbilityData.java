@@ -163,7 +163,7 @@ public class AbilityData {
     public static Object retrieveFunctionData(String type, ItemStack item, int index, int count) {
         if(index > 5)
             throw new NullPointerException("Ability index can't be higher than 5!");
-        if(count > 5)
+        if(count > 3)
             throw new NullPointerException("Ability Function can't be more than 3!");
 
         net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
@@ -179,7 +179,7 @@ public class AbilityData {
     public static Set<String> listFunctionData(ItemStack item, int index, int count) {
         if(index > 5)
             throw new NullPointerException("Ability index can't be higher than 5!");
-        if(count > 5)
+        if(count > 3)
             throw new NullPointerException("Ability Function can't be more than 3!");
 
         net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
@@ -187,8 +187,7 @@ public class AbilityData {
         NBTTagCompound attributes = (tag.getCompound("ExtraAttributes") != null ? tag.getCompound("ExtraAttributes") : new NBTTagCompound());
         NBTTagCompound ability = (attributes.getCompound("Abilities") != null ? attributes.getCompound("Abilities") : new NBTTagCompound());
         NBTTagCompound abilitySlot = (ability.getCompound("Ability_" + index) != null ? ability.getCompound("Ability_" + index) : new NBTTagCompound());
-        NBTTagCompound function = (abilitySlot.getCompound("Functions") != null ? abilitySlot.getCompound("Functions") : new NBTTagCompound());
-        NBTTagCompound functionSlot = (function.getCompound("Function_" + count) != null ? function.getCompound("Function_" + count) : new NBTTagCompound());
+        NBTTagCompound functionSlot = (abilitySlot.getCompound("Function_" + count) != null ? abilitySlot.getCompound("Function_" + count) : new NBTTagCompound());
         return functionSlot.c();
     }
 
@@ -239,8 +238,7 @@ public class AbilityData {
         NBTTagCompound attributes = (tag.getCompound("ExtraAttributes") != null ? tag.getCompound("ExtraAttributes") : new NBTTagCompound());
         NBTTagCompound ability = (attributes.getCompound("Abilities") != null ? attributes.getCompound("Abilities") : new NBTTagCompound());
         NBTTagCompound abilitySlot = (ability.getCompound("Ability_" + index) != null ? ability.getCompound("Ability_" + index) : new NBTTagCompound());
-        NBTTagCompound function = (abilitySlot.getCompound("Functions") != null ? abilitySlot.getCompound("Functions") : new NBTTagCompound());
-        function.remove("Function_" + count);
+        abilitySlot.remove("Function_" + count);
 
         attributes.set("Abilities", ability);
         tag.set("ExtraAttributes", attributes);

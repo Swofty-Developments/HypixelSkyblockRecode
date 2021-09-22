@@ -2,6 +2,7 @@ package net.atlas.SkyblockSandbox.item.ability.itemAbilities;
 
 
 import net.atlas.SkyblockSandbox.SBX;
+import net.atlas.SkyblockSandbox.abilityCreator.AbilityValue;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.item.ability.Ability;
 import net.atlas.SkyblockSandbox.item.ability.AbilityType;
@@ -67,7 +68,7 @@ public class SoulCry extends Ability {
         if(item!=null && item.hasItemMeta()) {
             if (sbitem.hasAbility()) {
                 for (int i = 0; i <= sbitem.getAbilAmount(); i++) {
-                    if (((String) sbitem.getAbilData(EnumAbilityData.NAME, i)).equalsIgnoreCase(getAbilityName())) {
+                    if (sbitem.getAbilityData(i, AbilityValue.NAME).equalsIgnoreCase(getAbilityName())) {
                         if (isSoulCryActive.containsKey(pl.getUniqueId())) {
                             if (!isSoulCryActive.get(pl.getUniqueId())) {
                                 double oldfero = pl.getMaxStat(SBPlayer.PlayerStat.FEROCITY);

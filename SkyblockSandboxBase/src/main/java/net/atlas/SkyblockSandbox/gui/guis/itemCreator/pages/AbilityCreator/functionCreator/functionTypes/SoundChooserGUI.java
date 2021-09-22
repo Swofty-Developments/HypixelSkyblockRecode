@@ -38,7 +38,8 @@ public class SoundChooserGUI extends PaginatedGUI {
         super(owner);
         this.index2 = index;
         this.funcIndex = funcIndex;
-        this.sound = Enums.getIfPresent(org.bukkit.Sound.class, FunctionUtil.getFunctionData(owner.getItemInHand(),index,funcIndex, net.atlas.SkyblockSandbox.abilityCreator.functions.Sound.dataValues.SOUND)).orNull();;
+        this.sound = Enums.getIfPresent(org.bukkit.Sound.class, FunctionUtil.getFunctionData(owner.getItemInHand(), index, funcIndex, net.atlas.SkyblockSandbox.abilityCreator.functions.Sound.dataValues.SOUND)).orNull();
+        ;
     }
 
     @Override
@@ -124,14 +125,7 @@ public class SoundChooserGUI extends PaginatedGUI {
                 break;
             }
             default: {
-                if (AbilityData.hasFunctionData(player.getItemInHand(), index2, funcIndex, EnumFunctionsData.ID) && !(AbilityData.hasFunctionData(player.getItemInHand(), index2, funcIndex, EnumFunctionsData.SOUND_TYPE) || AbilityData.hasFunctionData(player.getItemInHand(), index2, funcIndex, EnumFunctionsData.SOUND_DELAY) || AbilityData.hasFunctionData(player.getItemInHand(), index2, funcIndex, EnumFunctionsData.SOUND_AMOUNT) || AbilityData.hasFunctionData(player.getItemInHand(), index2, funcIndex, EnumFunctionsData.SOUND_VOLUME) || AbilityData.hasFunctionData(player.getItemInHand(), index2, funcIndex, EnumFunctionsData.SOUND_PITCH))) {
-                    player.setItemInHand(AbilityData.removeFunction(player.getItemInHand(), index2, funcIndex, player));
-                    player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.SOUND_TYPE, funcIndex, event.getCurrentItem().getItemMeta().getDisplayName().replace(SUtil.colorize("&a"), "")));
-                    player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.NAME, funcIndex, "Sound Function"));
-                } else {
-                    player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.SOUND_TYPE, funcIndex, event.getCurrentItem().getItemMeta().getDisplayName().replace(SUtil.colorize("&a"), "")));
-                    player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.NAME, funcIndex, "Sound Function"));
-                }
+                player.setItemInHand(FunctionUtil.setFunctionData(player.getItemInHand(),index2,funcIndex, net.atlas.SkyblockSandbox.abilityCreator.functions.Sound.dataValues.SOUND,event.getCurrentItem().getItemMeta().getDisplayName().replace(SUtil.colorize("&a"), "").toUpperCase()));
                 new FunctionsEditorGUI(getOwner(), AbilityValue.FunctionType.SOUND, index2, funcIndex).open();
                 player.playSound(player.getLocation(), Sound.NOTE_PLING, 1f, 2f);
             }

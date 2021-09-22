@@ -13,6 +13,7 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.*;
@@ -36,40 +37,42 @@ public class Particle extends Function {
     public void applyFunction() {
         SBPlayer player = getPlayer();
         ParticleShape shape = Enums.getIfPresent(ParticleShape.class, FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.PARTICLE_SHAPE)).orNull();
-        int range = Integer.parseInt(FunctionUtil.getFunctionData(getStack(),getAbilIndex(),getFunctionIndex(),dataValues.PARTICLE_RANGE));
-        Particles particles = Enums.getIfPresent(Particles.class,FunctionUtil.getFunctionData(getStack(),getAbilIndex(),getFunctionIndex(),dataValues.PARTICLE_TYPE)).orNull();
-        if(shape==null) {
+        int range = Integer.parseInt(FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.PARTICLE_RANGE));
+        Particles particles = Enums.getIfPresent(Particles.class, FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.PARTICLE_TYPE)).orNull();
+        if (shape == null) {
             getPlayer().sendMessage(SUtil.colorize("&cYou don't have a shape set!"));
             return;
         }
-        if(particles==null) {
+        if (particles == null) {
             getPlayer().sendMessage(SUtil.colorize("&cYou don't have a particle type set!"));
             return;
         }
-        List<Location> shapeList = shape.getShape(player,range);
+        List<Location> shapeList = shape.getShape(player, range);
         boolean message = Boolean.parseBoolean(FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), FunctionValues.SEND_MESSAGE));
         double d = 10000 * (1 + (player.getMaxStat(SBPlayer.PlayerStat.INTELLIGENCE) / 100) * 0.3)/*todo + damage*/;
         int i = 0;
-        for(Location loc:shapeList) {
-            PacketPlayOutWorldParticles particlePacket = new PacketPlayOutWorldParticles(particles.getA(),true,(float) loc.getX(),(float) loc.getY(),(float) loc.getZ(),0,0,0,0,1);
-            for(Entity en:loc.getWorld().getNearbyEntities(loc,30,30,30)) {
-                if(en instanceof Player) {
+        for (Location loc : shapeList) {
+            PacketPlayOutWorldParticles particlePacket = new PacketPlayOutWorldParticles(particles.getA(), true, (float) loc.getX(), (float) loc.getY(), (float) loc.getZ(), 0, 0, 0, 0, 1);
+            for (Entity en : loc.getWorld().getNearbyEntities(loc, 30, 30, 30)) {
+                if (en instanceof Player) {
                     ((CraftPlayer) en).getHandle().playerConnection.sendPacket(particlePacket);
                 }
             }
-            for (Entity e : player.getWorld().getNearbyEntities(loc, 0.1, 0.1, 0.1)) {
-                if (e instanceof LivingEntity) {
-                    if (!(e instanceof Player || e instanceof ArmorStand || e instanceof NPC)) {
-                        if (e.isDead()) {
-                            ((LivingEntity) e).damage(0);
-                        } else {
-                            ++i;
-                            if(((LivingEntity) e).getHealth()<=d) {
-                                EntityDamageByEntityEvent event = new EntityDamageByEntityEvent(getPlayer(),e, EntityDamageEvent.DamageCause.MAGIC,d);
-                                SkillEXPGainEvent skillEvent = new SkillEXPGainEvent(getPlayer(), SkillType.COMBAT,1000,event);
-                                Bukkit.getPluginManager().callEvent(skillEvent);
+            if(FunctionUtil.getFunctionData(getStack(),getAbilIndex(),getFunctionIndex(),dataValues.PARTICLE_DAMAGE).equals("true")) {
+                for (Entity e : player.getWorld().getNearbyEntities(loc, 0.1, 0.1, 0.1)) {
+                    if (e instanceof LivingEntity) {
+                        if (!(e instanceof Player || e instanceof ArmorStand || e instanceof NPC)) {
+                            if (e.isDead()) {
+                                ((LivingEntity) e).damage(0);
+                            } else {
+                                ++i;
+                                if (((LivingEntity) e).getHealth() <= d) {
+                                    EntityDamageByEntityEvent event = new EntityDamageByEntityEvent(getPlayer(), e, EntityDamageEvent.DamageCause.MAGIC, d);
+                                    SkillEXPGainEvent skillEvent = new SkillEXPGainEvent(getPlayer(), SkillType.COMBAT, 1000, event);
+                                    Bukkit.getPluginManager().callEvent(skillEvent);
+                                }
+                                ((LivingEntity) e).damage(d);
                             }
-                            ((LivingEntity) e).damage(d);
                         }
                     }
                 }
@@ -98,32 +101,35 @@ public class Particle extends Function {
     public enum ParticleShape {
         CIRCLE() {
             public List<Location> getShape(SBPlayer p, int rad) {
-                return getCircle(p.getLocation(),rad, 40);
+                return getCircle(p.getLocation(), rad, 40);
             }
         },
         CONE() {
             public List<Location> getShape(SBPlayer p, int rad) {
-                return getCircle(p.getLocation(),rad, 40);
+                return getCircle(p.getLocation(), rad, 40);
             }
         },
         SQUARE() {
             public List<Location> getShape(SBPlayer p, int rad) {
-                return getSquare(p.getLocation(),rad, 40);
+                return getSquare(p.getLocation(), rad, 40);
             }
         },
         LINE() {
             public List<Location> getShape(SBPlayer p, int rad) {
-                return getCircle(p.getLocation(),rad, 40);
+                return getCircle(p.getLocation(), rad, 40);
             }
         };
 
-        public abstract List<Location> getShape(SBPlayer p,int rad);
+        public abstract List<Location> getShape(SBPlayer p, int rad);
 
-        ParticleShape() {};
+        ParticleShape() {
+        }
+
+        ;
     }
 
     public enum dataValues implements Function.dataValues {
-        PARTICLE_TYPE, PARTICLE_RANGE, PARTICLE_SHAPE
+        PARTICLE_TYPE, PARTICLE_RANGE, PARTICLE_SHAPE,PARTICLE_DAMAGE
     }
 
     public enum Particles {
@@ -198,13 +204,13 @@ public class Particle extends Function {
         return locations;
     }
 
-    public static List<Location> getSquare(Location center, double radius,int amount) {
+    public static List<Location> getSquare(Location center, double radius, int amount) {
         List<Location> locations = new ArrayList<>();
         World world = center.getWorld();
-        double startX = center.clone().subtract(radius,0,0).getX();
-        double startZ = center.clone().subtract(0,0,radius).getZ();
-        double endX = center.clone().add(radius,0,0).getX();
-        double endZ = center.clone().add(0,0,radius).getZ();
+        double startX = center.clone().subtract(radius, 0, 0).getX();
+        double startZ = center.clone().subtract(0, 0, radius).getZ();
+        double endX = center.clone().add(radius, 0, 0).getX();
+        double endZ = center.clone().add(0, 0, radius).getZ();
         for (double x = startX; x < endX; x++) {
             for (double z = startZ; z < endZ; z++) {
                 if (x != startX || z != startZ) {
@@ -217,23 +223,49 @@ public class Particle extends Function {
 
     @Override
     public void getGuiLayout() {
-        setItem(13, makeColorfulItem(Material.BOOK_AND_QUILL, "&aImplosion Range", 1, 0, "&7Edit the range of the","&bImplosion Function&7!","","&eClick to set!"));
-        setItem(14, makeColorfulItem(Material.FEATHER, "&aToggle message", 1, 0, "&7Turn on and off the","&bImplosion Function &7message!","","&bRight-click to disable!","&eLeft-click to enable!"));
-        setAction(13,event -> {
-            new ParticleChooserGUI(getPlayer(),getAbilIndex(),getFunctionIndex());
+        Particles particle = Enums.getIfPresent(Particles.class, FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.PARTICLE_TYPE)).orNull();
+        if (particle == null) {
+            setItem(13, makeColorfulItem(Material.NOTE_BLOCK, "&aCurrently edited particle", 1, 0, "&7Currently editing:","&cNOT SET" + "","","&eClick to set!"));
+        } else {
+            setItem(13, makeColorfulItem(particle.getB(), "&aCurrently edited particle", 1, 0, "&7Currently editing:","&b" + particle.name() + "","","&eClick to change!"));
+        }
+        setItem(12, makeColorfulItem(Material.IRON_BLOCK, "&aParticle damage", 1, 0, "&7Turn on and off","&7Particle damage","&7for the &bParticle Function","","&eClick to set!"));
+        setItem(14, makeColorfulItem(Material.WATCH, "&aShape of Particle", 1, 0, "&7Set the shape of the particles","&7played","&7Includes: Circle, Square, and Cone (AOTD/Ice Spray)","","&eLeft click to enable!","&bRight-click to disable"));
+        setAction(13, event -> {
+            new ParticleChooserGUI(getPlayer(), getAbilIndex(), getFunctionIndex()).open();
         });
-        setAction(14,event -> {
+        if(FunctionUtil.getFunctionData(getStack(),getAbilIndex(),getFunctionIndex(),dataValues.PARTICLE_DAMAGE).equals("true")) {
+            setItem(11, makeColorfulItem(Material.FEATHER, "&aParticle damage message", 1, 0, "&7Turn on and off","&7The Particle damage message","&7for the &bParticle Function","","&eLeft click to enable!","&bRight-click to disable"));
+            setAction(11,event -> {
+                ItemStack stack = getStack();
+                switch (event.getClick()) {
+                    case LEFT:
+                        stack = FunctionUtil.setFunctionData(stack, getAbilIndex(), getFunctionIndex(), FunctionValues.SEND_MESSAGE, "true");
+                        break;
+                    case RIGHT:
+                        stack = FunctionUtil.setFunctionData(stack, getAbilIndex(), getFunctionIndex(), FunctionValues.SEND_MESSAGE, "false");
+                        break;
+                }
+                if (getStack() != stack) {
+                    getPlayer().setItemInHand(stack);
+                    getPlayer().playSound(getPlayer().getLocation(), Sound.ITEM_PICKUP,1,1);
+                }
+            });
+        }
+
+        setAction(12, event -> {
             ItemStack stack = getStack();
             switch (event.getClick()) {
                 case LEFT:
-                    stack = FunctionUtil.setFunctionData(stack,getAbilIndex(),getFunctionIndex(),FunctionValues.SEND_MESSAGE,"true");
+                    stack = FunctionUtil.setFunctionData(stack, getAbilIndex(), getFunctionIndex(), dataValues.PARTICLE_DAMAGE, "true");
                     break;
                 case RIGHT:
-                    stack = FunctionUtil.setFunctionData(stack,getAbilIndex(),getFunctionIndex(),FunctionValues.SEND_MESSAGE,"false");
+                    stack = FunctionUtil.setFunctionData(stack, getAbilIndex(), getFunctionIndex(), dataValues.PARTICLE_DAMAGE, "false");
                     break;
             }
-            if(getStack()!=stack) {
+            if (getStack() != stack) {
                 getPlayer().setItemInHand(stack);
+                getPlayer().playSound(getPlayer().getLocation(), Sound.ITEM_PICKUP,1,1);
             }
         });
     }

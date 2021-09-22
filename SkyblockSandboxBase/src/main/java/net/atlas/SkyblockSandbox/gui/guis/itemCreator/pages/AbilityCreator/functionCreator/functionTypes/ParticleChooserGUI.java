@@ -2,6 +2,8 @@ package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.func
 
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import net.atlas.SkyblockSandbox.abilityCreator.AbilityValue;
+import net.atlas.SkyblockSandbox.abilityCreator.FunctionUtil;
+import net.atlas.SkyblockSandbox.abilityCreator.functions.Particle;
 import net.atlas.SkyblockSandbox.gui.PaginatedGUI;
 import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.functionCreator.FunctionSelectorGUI;
 import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.functionCreator.FunctionsEditorGUI;
@@ -96,11 +98,7 @@ public class ParticleChooserGUI extends PaginatedGUI {
             default: {
                 ItemStack item = event.getCurrentItem();
                 Particles value = AbilityData.ValueFromName(item.getItemMeta().getDisplayName().replace(SUtil.colorize("&7Particle: &a"), ""));
-                if (!AbilityData.hasFunctionData(player.getItemInHand(), index2, funcIndex, EnumFunctionsData.PARTICLE_SHOOTING) && !AbilityData.hasFunctionData(player.getItemInHand(), index2, funcIndex, EnumFunctionsData.PARTICLE_TYPE)) {
-                    player.setItemInHand(AbilityData.removeFunction(player.getItemInHand(), index2, funcIndex, player));
-                    player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.NAME, funcIndex, "Particle Function"));
-                }
-                player.setItemInHand(AbilityData.setFunctionData(player.getItemInHand(), index2, EnumFunctionsData.PARTICLE_TYPE, funcIndex, value.name()));
+                player.setItemInHand(FunctionUtil.setFunctionData(player.getItemInHand(),index2,funcIndex, Particle.dataValues.PARTICLE_TYPE,value));
                 new FunctionsEditorGUI(getOwner(), AbilityValue.FunctionType.PARTICLE, index2, funcIndex).open();
                 player.playSound(player.getLocation(), Sound.NOTE_PLING, 1f, 2f);
             }

@@ -1,5 +1,6 @@
 package net.atlas.SkyblockSandbox.item.ability;
 
+import net.atlas.SkyblockSandbox.abilityCreator.AbilityValue;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,7 +26,7 @@ public class AbiltyListener implements Listener {
         if (item != null && item.hasItemMeta()) {
             if (sbitem.hasAbility()) {
                 for (int i = 0; i <= sbitem.getAbilAmount(); i++) {
-                    if (((String) sbitem.getAbilData(EnumAbilityData.NAME, i)).equalsIgnoreCase(ability.getAbilityName())) {
+                    if (sbitem.getAbilityData(i, AbilityValue.NAME).equalsIgnoreCase(ability.getAbilityName())) {
                         switch (e.getAction()) {
                             case RIGHT_CLICK_BLOCK:
                                 if (p.isSneaking()) {

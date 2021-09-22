@@ -83,7 +83,7 @@ public class SBItemBuilder {
         if(!abilities.isEmpty()) {
             SBItemStack item = new SBItemStack(name,id,mat,rarity,type,0,stackable,true,stats);
             for(int i:abilities.keySet()) {
-                item.setAbility(item.asBukkitItem(),abilities.get(i),i);
+                item.setAbility(abilities.get(i),i);
             }
             return item;
         }
