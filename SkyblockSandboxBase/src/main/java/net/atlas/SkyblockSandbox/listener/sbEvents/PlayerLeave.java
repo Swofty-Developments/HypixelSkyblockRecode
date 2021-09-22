@@ -5,6 +5,7 @@ import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.database.mongo.MongoCoins;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
+import org.bson.Document;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -19,14 +20,19 @@ public class PlayerLeave extends SkyblockListener<PlayerQuitEvent> {
         if (AuctionCreatorGUI.PlayerItems.containsKey(event.getPlayer().getUniqueId())) {
             playerData.setData(event.getPlayer().getUniqueId(), "AuctionItem", AuctionCreatorGUI.PlayerItems.get(event.getPlayer().getUniqueId()));
         }
+        Document doc = new Document();
+
         for(SkillType type:cachedSkills.get(event.getPlayer().getUniqueId()).keySet()) {
             double amt = cachedSkills.get(event.getPlayer().getUniqueId()).get(type);
-            playerData.setData(event.getPlayer().getUniqueId(),type.getName() + "_xp",amt);
+            //playerData.setData(event.getPlayer().getUniqueId(),type.getName() + "_xp",amt);
+            doc.put(type.getName() + "_xp",amt);
         }
         for(SkillType type:cachedSkillLvls.get(event.getPlayer().getUniqueId()).keySet()) {
             int amt = cachedSkillLvls.get(event.getPlayer().getUniqueId()).get(type);
-            playerData.setData(event.getPlayer().getUniqueId(), type.getName() + "_lvl",amt);
+            //playerData.setData(event.getPlayer().getUniqueId(), type.getName() + "_lvl",amt);
+            doc.put(type.getName() + "_lvl",amt);
         }
+        playerData.setData(event.getPlayer().getUniqueId(),"Skills",doc);
         cachedSkillLvls.remove(event.getPlayer().getUniqueId());
         cachedSkills.remove(event.getPlayer().getUniqueId());
     }
