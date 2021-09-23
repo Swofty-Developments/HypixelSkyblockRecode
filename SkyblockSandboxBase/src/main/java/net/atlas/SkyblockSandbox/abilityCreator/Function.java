@@ -2,11 +2,16 @@ package net.atlas.SkyblockSandbox.abilityCreator;
 
 import dev.triumphteam.gui.components.GuiAction;
 import lombok.Getter;
+import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.gui.AnvilGUI;
+import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.AbilityCreatorGUI;
+import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.functionCreator.FunctionsEditorGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +38,8 @@ public abstract class Function {
     }
 
     public abstract void applyFunction();
+
+    public abstract AbilityValue.FunctionType getFunctionType();
 
     public abstract List<Class<? extends Function>> conflicts();
 
@@ -67,6 +74,12 @@ public abstract class Function {
            String output = String.valueOf(event.getName());
            ItemStack stack = FunctionUtil.setFunctionData(getStack(),getAbilIndex(),getFunctionIndex(),value,output);
            player.setItemInHand(stack);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    new FunctionsEditorGUI(player,getFunctionType(),abilIndex,functionIndex).open();
+                }
+            }.runTaskLater(SBX.getInstance(), 2);
         });
 
         gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT,makeColorfulItem(Material.PAPER,"&aSet the " + value.name(),1,0,"&aInput: &e^^^^^"));

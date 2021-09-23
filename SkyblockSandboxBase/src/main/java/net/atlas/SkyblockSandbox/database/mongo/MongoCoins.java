@@ -94,6 +94,38 @@ public class MongoCoins implements MongoDB {
         return null;
     }
 
+    public Document getDocument(UUID uuid, String key) {
+
+        Document query = new Document("uuid", uuid.toString());
+        if (query.isEmpty()) {
+            setData(uuid, key, 0D);
+        } else {
+            if (col.find(query).first() != null) {
+                Document found = col.find(query).first();
+                if (found != null) {
+                    if (found.get(key) != null) {
+                        return (Document) found.get(key);
+                    } else {
+                        setData(uuid, key, new Document());
+                        Document found2 = col.find(query).first();
+                        if (found2 != null)
+                            return (Document) found2.get(key);
+                    }
+                }
+            } else {
+                setData(uuid, key, new Document());
+                if (col.find(query).first() != null) {
+                    Document found2 = col.find(query).first();
+                    if(found2!=null) {
+                        return (Document) found2.get(key);
+                    }
+                }
+            }
+
+        }
+        return null;
+    }
+
     public void removeData(UUID uuid, String key) {
 
         Document query = new Document("uuid", uuid.toString());
@@ -103,7 +135,7 @@ public class MongoCoins implements MongoDB {
         if (found == null) return;
 
         update.remove("pet_" + key);
-        col.updateOne(Filters.eq("pet_" + key,key),Updates.unset("pet_" + key));
+        col.updateOne(Filters.eq("pet_" + key, key), Updates.unset("pet_" + key));
 
 
     }

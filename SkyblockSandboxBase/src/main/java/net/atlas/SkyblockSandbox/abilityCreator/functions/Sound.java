@@ -2,10 +2,12 @@ package net.atlas.SkyblockSandbox.abilityCreator.functions;
 
 import com.google.common.base.Enums;
 import net.atlas.SkyblockSandbox.SBX;
+import net.atlas.SkyblockSandbox.abilityCreator.AbilityValue;
 import net.atlas.SkyblockSandbox.abilityCreator.Function;
 import net.atlas.SkyblockSandbox.abilityCreator.FunctionUtil;
 import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.functionCreator.functionTypes.SoundChooserGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
+import net.atlas.SkyblockSandbox.util.SUtil;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
@@ -38,6 +40,11 @@ public class Sound extends Function {
     }
 
     @Override
+    public AbilityValue.FunctionType getFunctionType() {
+        return AbilityValue.FunctionType.SOUND;
+    }
+
+    @Override
     public List<Class<? extends Function>> conflicts() {
         return null;
     }
@@ -63,9 +70,23 @@ public class Sound extends Function {
             setItem(13, makeColorfulItem(Material.NOTE_BLOCK, "&aCurrently edited sound", 1, 0, "&7Currently editing:", "&b" + sound.name() + "", "", "&eLeft-Click to change!", "&bRight-Click to play!"));
             setAction(13, event -> {
                 if (event.getClick().equals(ClickType.RIGHT)) {
-                    float volume = Float.parseFloat(FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.VOLUME));
-                    double pitch = Double.parseDouble(FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.PITCH));
-                    int delay = Integer.parseInt(FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.DELAY));
+                    String vol = FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.VOLUME);
+                    if(vol.isEmpty()) {
+                        vol = "1";
+                    }
+                    float volume = Float.parseFloat(vol);
+
+                    String pitc = FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.PITCH);
+                    if(pitc.isEmpty()) {
+                        pitc = "1";
+                    }
+                    double pitch = Double.parseDouble(pitc);
+
+                    String del = FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.DELAY);
+                    if(del.isEmpty()) {
+                        del = "0";
+                    }
+                    int delay = Integer.parseInt(del);
                     new BukkitRunnable() {
                         @Override
                         public void run() {

@@ -83,12 +83,6 @@ public class FunctionsEditorGUI extends NormalGUI {
         }
 
         switch (functionType) {
-
-            /*case PARTICLE: {
-
-                break;
-            }*/
-
             case HEAD: {
                 ItemStack playerItem = getOwner().getItemInHand();
                 if (AbilityData.stringFromFunction(playerItem, EnumFunctionsData.HEAD_SHOOTER_TYPE, index, funcIndex, null) == null) {

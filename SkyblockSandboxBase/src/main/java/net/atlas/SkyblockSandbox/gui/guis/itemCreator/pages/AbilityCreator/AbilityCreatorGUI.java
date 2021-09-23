@@ -46,9 +46,10 @@ public class AbilityCreatorGUI extends NormalGUI {
                 }
                 if (event12.getSlot().equals(AnvilGUI.AnvilSlot.OUTPUT)) {
                     SBItemStack i = new SBItemStack(player.getItemInHand());
-                    player.setItemInHand(i.setAbilityData(index, AbilityValue.NAME, event12.getName()));
                     if (i.getAbilityData(index, AbilityValue.MANA_COST).isEmpty()) {
                         player.setItemInHand(i.setAbilityData(index, AbilityValue.MANA_COST, 0));
+                        i = new SBItemStack(player.getItemInHand());
+                        player.setItemInHand(i.setAbilityData(index, AbilityValue.NAME, event12.getName()));
                     }
 
                     new BukkitRunnable() {

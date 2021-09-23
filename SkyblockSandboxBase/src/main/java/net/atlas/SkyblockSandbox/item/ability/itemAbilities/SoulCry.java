@@ -65,58 +65,56 @@ public class SoulCry extends Ability {
     public void rightClickAirAction(Player p, PlayerInteractEvent event, ItemStack item) {
         SBPlayer pl = new SBPlayer(p);
         SBItemStack sbitem = new SBItemStack(item);
-        if(item!=null && item.hasItemMeta()) {
+        if (item != null && item.hasItemMeta()) {
             if (sbitem.hasAbility()) {
-                for (int i = 0; i <= sbitem.getAbilAmount(); i++) {
-                    if (sbitem.getAbilityData(i, AbilityValue.NAME).equalsIgnoreCase(getAbilityName())) {
-                        if (isSoulCryActive.containsKey(pl.getUniqueId())) {
-                            if (!isSoulCryActive.get(pl.getUniqueId())) {
-                                double oldfero = pl.getMaxStat(SBPlayer.PlayerStat.FEROCITY);
-                                pl.playJingle(Jingle.SOULCRY,false);
-                                pl.setMaxStat(SBPlayer.PlayerStat.FEROCITY, pl.getMaxStat(SBPlayer.PlayerStat.FEROCITY) + 400);
-                                isSoulCryActive.put(pl.getUniqueId(), true);
-                                if (sbitem.getString(item, "UUID").equals("")) {
-                                    item = sbitem.setString(item, UUID.randomUUID().toString(), "UUID");
-                                }
-                                String uuid = sbitem.getString(item, "UUID");
-                                storedItem.put(uuid, item);
-                                item.setType(Material.GOLD_SWORD);
-                                p.getItemInHand().setType(Material.GOLD_SWORD);
-                                new BukkitRunnable() {
-                                    @Override
-                                    public void run() {
-                                        pl.playJingle(Jingle.SOULCRY,false);
-                                        pl.setMaxStat(SBPlayer.PlayerStat.FEROCITY, oldfero);
-                                        isSoulCryActive.put(pl.getUniqueId(), false);
-                                        for (int c = 0; c < p.getInventory().getContents().length; c++) {
-                                            ItemStack i = p.getInventory().getItem(c);
-                                            if (i != null) {
-                                                SBItemStack it = new SBItemStack(i);
-                                                if (it.getString(i, "UUID").equals(uuid)) {
-                                                    p.getInventory().getItem(c).setType(Material.DIAMOND_SWORD);
-                                                    System.out.println(c);
-                                                    return;
-                                                }
-                                            }
+                if (isSoulCryActive.containsKey(pl.getUniqueId())) {
+                    if (!isSoulCryActive.get(pl.getUniqueId())) {
+                        double oldfero = pl.getMaxStat(SBPlayer.PlayerStat.FEROCITY);
+                        pl.playJingle(Jingle.SOULCRY, false);
+                        pl.setMaxStat(SBPlayer.PlayerStat.FEROCITY, pl.getMaxStat(SBPlayer.PlayerStat.FEROCITY) + 400);
+                        isSoulCryActive.put(pl.getUniqueId(), true);
+                        if (sbitem.getString(item, "UUID").equals("")) {
+                            item = sbitem.setString(item, UUID.randomUUID().toString(), "UUID");
+                        }
+                        String uuid = sbitem.getString(item, "UUID");
+                        storedItem.put(uuid, item);
+                        item.setType(Material.GOLD_SWORD);
+                        p.getItemInHand().setType(Material.GOLD_SWORD);
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                pl.playJingle(Jingle.SOULCRY, false);
+                                pl.setMaxStat(SBPlayer.PlayerStat.FEROCITY, oldfero);
+                                isSoulCryActive.put(pl.getUniqueId(), false);
+                                for (int c = 0; c < p.getInventory().getContents().length; c++) {
+                                    ItemStack i = p.getInventory().getItem(c);
+                                    if (i != null) {
+                                        SBItemStack it = new SBItemStack(i);
+                                        if (it.getString(i, "UUID").equals(uuid)) {
+                                            p.getInventory().getItem(c).setType(Material.DIAMOND_SWORD);
+                                            System.out.println(c);
+                                            return;
                                         }
                                     }
-                                }.runTaskLater(SBX.getInstance(), 20 * 4);
-                            }
-                        } else {
-                            isSoulCryActive.put(pl.getUniqueId(), false);
-                            ItemStack finalItem = item;
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
-                                    rightClickAirAction(p, event, finalItem);
                                 }
-                            }.runTaskLater(SBX.getInstance(), 1L);
-
-                        }
+                            }
+                        }.runTaskLater(SBX.getInstance(), 20 * 4);
                     }
+                } else {
+                    isSoulCryActive.put(pl.getUniqueId(), false);
+                    ItemStack finalItem = item;
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            rightClickAirAction(p, event, finalItem);
+                        }
+                    }.runTaskLater(SBX.getInstance(), 1L);
+
                 }
+
             }
         }
+
     }
 
 

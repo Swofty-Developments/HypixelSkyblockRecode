@@ -332,12 +332,9 @@ public class SBPlayer extends PluginPlayer {
         HashMap<SkillType, Double> map;
         if (cachedSkills.containsKey(sbPlayer.getUniqueId())) {
             map = new HashMap<>(cachedSkills.get(sbPlayer.getUniqueId()));
-        } else {
-            map = new HashMap<>();
-        }
-        if (map.containsKey(type)) {
             map.put(type, map.get(type) + amt);
         } else {
+            map = new HashMap<>();
             map.put(type, amt);
         }
 

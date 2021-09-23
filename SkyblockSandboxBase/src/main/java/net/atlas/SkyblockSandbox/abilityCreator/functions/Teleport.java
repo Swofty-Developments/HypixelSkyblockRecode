@@ -1,5 +1,6 @@
 package net.atlas.SkyblockSandbox.abilityCreator.functions;
 
+import net.atlas.SkyblockSandbox.abilityCreator.AbilityValue;
 import net.atlas.SkyblockSandbox.abilityCreator.AdvancedFunctions;
 import net.atlas.SkyblockSandbox.abilityCreator.Function;
 import net.atlas.SkyblockSandbox.abilityCreator.FunctionUtil;
@@ -52,6 +53,11 @@ public class Teleport extends Function {
         Location loc = new Location(b.getWorld(), b.getX() + 0.5, b.getY(), b.getZ() + 0.5, getPlayer().getLocation().getYaw(),
                 getPlayer().getLocation().getPitch());
         getPlayer().teleport(loc);
+    }
+
+    @Override
+    public AbilityValue.FunctionType getFunctionType() {
+        return AbilityValue.FunctionType.TELEPORT;
     }
 
     @Override

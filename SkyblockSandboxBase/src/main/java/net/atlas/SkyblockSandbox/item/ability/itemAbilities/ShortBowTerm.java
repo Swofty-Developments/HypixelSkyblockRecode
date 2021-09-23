@@ -47,63 +47,60 @@ public class ShortBowTerm extends Ability {
 
     @Override
     public List<String> getAbilDescription() {
-        return SUtil.colorize("&7Shoot &b3 &7arrows at once.","&7Can damage Enderman."," ","&cDivides your &9Crit Chance &cby 4!");
+        return SUtil.colorize("&7Shoot &b3 &7arrows at once.", "&7Can damage Enderman.", " ", "&cDivides your &9Crit Chance &cby 4!");
     }
 
     @Override
     public void leftClickAirAction(Player player, ItemStack item) {
         SBItemStack sbitem = new SBItemStack(item);
-        for (int j = 1; j < sbitem.getAbilAmount()+1; j++) {
-            SBItemStack sbItem = new SBItemStack(item);
-            if (sbItem.getAbilityData(j, AbilityValue.NAME).equalsIgnoreCase(getAbilityName())) {
 
-                Location loc = player.getLocation();
-                if (!canfire.containsKey(player)) {
+
+        Location loc = player.getLocation();
+        if (!canfire.containsKey(player)) {
+            canfire.put(player, true);
+        }
+        Arrow a1;
+        Arrow a2;
+        Arrow a3;
+        if (canfire.get(player)) {
+            canfire.put(player, false);
+            a1 = player.launchProjectile(Arrow.class);
+            a1.setVelocity(a1.getVelocity().multiply(2.5));
+
+            a2 = player.launchProjectile(Arrow.class);
+
+            a2.setCustomName("terminator");
+            a2.setVelocity(rotateVector(a1.getVelocity(), 50.38));
+
+            a3 = player.launchProjectile(Arrow.class);
+
+            a3.setCustomName("terminator");
+            player.playSound(player.getLocation(), Sound.SHOOT_ARROW, 1, 1);
+            a3.setVelocity(rotateVector(a1.getVelocity(), -50.38));
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (a1.isValid()) {
+                        a1.remove();
+                    }
+                    if (a2.isValid()) {
+                        a2.remove();
+                    }
+                    if (a3.isValid()) {
+                        a3.remove();
+                    }
+                }
+            }.runTaskLater(SBX.getInstance(), 300);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
                     canfire.put(player, true);
                 }
-                Arrow a1;
-                Arrow a2;
-                Arrow a3;
-                if (canfire.get(player)) {
-                    canfire.put(player, false);
-                    a1 = player.launchProjectile(Arrow.class);
-                    a1.setVelocity(a1.getVelocity().multiply(2.5));
+            }.runTaskLater(SBX.getInstance(), 87 / 13);
 
-                    a2 = player.launchProjectile(Arrow.class);
-
-                    a2.setCustomName("terminator");
-                    a2.setVelocity(rotateVector(a1.getVelocity(), 50.38));
-
-                    a3 = player.launchProjectile(Arrow.class);
-
-                    a3.setCustomName("terminator");
-                    player.playSound(player.getLocation(), Sound.SHOOT_ARROW,1,1);
-                    a3.setVelocity(rotateVector(a1.getVelocity(), -50.38));
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            if (a1.isValid()) {
-                                a1.remove();
-                            }
-                            if (a2.isValid()) {
-                                a2.remove();
-                            }
-                            if (a3.isValid()) {
-                                a3.remove();
-                            }
-                        }
-                    }.runTaskLater(SBX.getInstance(), 300);
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            canfire.put(player, true);
-                        }
-                    }.runTaskLater(SBX.getInstance(), 87 / 13);
-
-                }
-            }
         }
     }
+
 
     public Vector rotateVector(Vector vector, double whatAngle) {
         double cos = Math.cos(whatAngle);

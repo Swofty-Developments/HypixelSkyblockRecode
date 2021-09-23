@@ -1,5 +1,6 @@
 package net.atlas.SkyblockSandbox.abilityCreator.functions;
 
+import net.atlas.SkyblockSandbox.abilityCreator.AbilityValue;
 import net.atlas.SkyblockSandbox.abilityCreator.Function;
 import net.atlas.SkyblockSandbox.abilityCreator.FunctionUtil;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
@@ -17,15 +18,15 @@ import java.util.function.Consumer;
 import static net.atlas.SkyblockSandbox.util.StackUtils.makeColorfulItem;
 
 public class Implosion extends Function {
-    public Implosion(SBPlayer player,ItemStack stack, int abilIndex, int functionIndex) {
-        super(player,stack, abilIndex, functionIndex);
+    public Implosion(SBPlayer player, ItemStack stack, int abilIndex, int functionIndex) {
+        super(player, stack, abilIndex, functionIndex);
     }
 
     @Override
     public void applyFunction() {
         SBPlayer player = getPlayer();
-        int range = Integer.parseInt(String.valueOf(FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(),dataValues.IMPLOSION_RANGE)));
-        boolean message = Boolean.parseBoolean(FunctionUtil.getFunctionData(getStack(),getAbilIndex(),getFunctionIndex(), FunctionValues.SEND_MESSAGE));
+        int range = Integer.parseInt(String.valueOf(FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.IMPLOSION_RANGE)));
+        boolean message = Boolean.parseBoolean(FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), FunctionValues.SEND_MESSAGE));
         double d = 10000 * (1 + (player.getMaxStat(SBPlayer.PlayerStat.INTELLIGENCE) / 100) * 0.3)/*todo + damage*/;
         int i = 0;
         for (Entity e : player.getWorld().getNearbyEntities(player.getLocation(), range, range, range)) {
@@ -46,13 +47,12 @@ public class Implosion extends Function {
                 int damage = (int) (d * i);
                 player.sendMessage("&7Your Implosion Function hit &c" + i + "&7 enemies dealing &c" + format.format(damage) + " damage&7.");
             }
-        } else {
-            /*if (i >= 1) {
-                DecimalFormat format = new DecimalFormat("#,###");
-                int damage = (int) (d * i);
-                player.sendMessage("&7Your Implosion Function hit &c" + i + "&7 enemies dealing &c" + format.format(damage) + " damage&7.");
-            }*/
         }
+    }
+
+    @Override
+    public AbilityValue.FunctionType getFunctionType() {
+        return AbilityValue.FunctionType.IMPLOSION;
     }
 
     public enum dataValues implements Function.dataValues {
@@ -66,22 +66,22 @@ public class Implosion extends Function {
 
     @Override
     public void getGuiLayout() {
-        setItem(13, makeColorfulItem(Material.BOOK_AND_QUILL, "&aImplosion Range", 1, 0, "&7Edit the range of the","&bImplosion Function&7!","","&eClick to set!"));
-        setItem(14, makeColorfulItem(Material.FEATHER, "&aToggle message", 1, 0, "&7Turn on and off the","&bImplosion Function &7message!","","&bRight-click to disable!","&eLeft-click to enable!"));
-        setAction(13,event -> {
+        setItem(13, makeColorfulItem(Material.BOOK_AND_QUILL, "&aImplosion Range", 1, 0, "&7Edit the range of the", "&bImplosion Function&7!", "", "&eClick to set!"));
+        setItem(14, makeColorfulItem(Material.FEATHER, "&aToggle message", 1, 0, "&7Turn on and off the", "&bImplosion Function &7message!", "", "&bRight-click to disable!", "&eLeft-click to enable!"));
+        setAction(13, event -> {
             anvilGUI(dataValues.IMPLOSION_RANGE);
         });
-        setAction(14,event -> {
+        setAction(14, event -> {
             ItemStack stack = getStack();
             switch (event.getClick()) {
                 case LEFT:
-                    stack = FunctionUtil.setFunctionData(stack,getAbilIndex(),getFunctionIndex(),FunctionValues.SEND_MESSAGE,"true");
+                    stack = FunctionUtil.setFunctionData(stack, getAbilIndex(), getFunctionIndex(), FunctionValues.SEND_MESSAGE, "true");
                     break;
                 case RIGHT:
-                    stack = FunctionUtil.setFunctionData(stack,getAbilIndex(),getFunctionIndex(),FunctionValues.SEND_MESSAGE,"false");
+                    stack = FunctionUtil.setFunctionData(stack, getAbilIndex(), getFunctionIndex(), FunctionValues.SEND_MESSAGE, "false");
                     break;
             }
-            if(getStack()!=stack) {
+            if (getStack() != stack) {
                 getPlayer().setItemInHand(stack);
             }
         });

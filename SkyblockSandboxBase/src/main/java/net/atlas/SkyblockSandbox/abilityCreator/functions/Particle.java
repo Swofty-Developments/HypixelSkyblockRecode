@@ -1,10 +1,12 @@
 package net.atlas.SkyblockSandbox.abilityCreator.functions;
 
 import com.google.common.base.Enums;
+import net.atlas.SkyblockSandbox.abilityCreator.AbilityValue;
 import net.atlas.SkyblockSandbox.abilityCreator.Function;
 import net.atlas.SkyblockSandbox.abilityCreator.FunctionUtil;
 import net.atlas.SkyblockSandbox.event.customEvents.SkillEXPGainEvent;
 import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.functionCreator.functionTypes.ParticleChooserGUI;
+import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.functionCreator.functionTypes.ParticleShapeGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
 import net.atlas.SkyblockSandbox.util.SUtil;
@@ -84,13 +86,12 @@ public class Particle extends Function {
                 int damage = (int) (d * i);
                 player.sendMessage("&7Your Particle Function hit &c" + i + "&7 enemies dealing &c" + format.format(damage) + " damage&7.");
             }
-        } else {
-            /*if (i >= 1) {
-                DecimalFormat format = new DecimalFormat("#,###");
-                int damage = (int) (d * i);
-                player.sendMessage("&7Your Particle Function hit &c" + i + "&7 enemies dealing &c" + format.format(damage) + " damage&7.");
-            }*/
         }
+    }
+
+    @Override
+    public AbilityValue.FunctionType getFunctionType() {
+        return AbilityValue.FunctionType.PARTICLE;
     }
 
     @Override
@@ -99,33 +100,37 @@ public class Particle extends Function {
     }
 
     public enum ParticleShape {
-        CIRCLE() {
+        CIRCLE(Material.SNOW_BALL) {
             public List<Location> getShape(SBPlayer p, int rad) {
                 return getCircle(p.getLocation(), rad, 40);
             }
         },
-        CONE() {
+        CONE(Material.STRING) {
             public List<Location> getShape(SBPlayer p, int rad) {
                 return getCircle(p.getLocation(), rad, 40);
             }
         },
-        SQUARE() {
+        SQUARE(Material.PAINTING) {
             public List<Location> getShape(SBPlayer p, int rad) {
                 return getSquare(p.getLocation(), rad, 40);
             }
         },
-        LINE() {
+        LINE(Material.STICK) {
             public List<Location> getShape(SBPlayer p, int rad) {
                 return getCircle(p.getLocation(), rad, 40);
             }
         };
 
         public abstract List<Location> getShape(SBPlayer p, int rad);
+        private Material mat;
 
-        ParticleShape() {
+        ParticleShape(Material mat) {
+            this.mat = mat;
         }
 
-        ;
+        public Material getMat() {
+            return mat;
+        }
     }
 
     public enum dataValues implements Function.dataValues {
@@ -231,6 +236,7 @@ public class Particle extends Function {
         }
         setItem(12, makeColorfulItem(Material.IRON_BLOCK, "&aParticle damage", 1, 0, "&7Turn on and off","&7Particle damage","&7for the &bParticle Function","","&eClick to set!"));
         setItem(14, makeColorfulItem(Material.WATCH, "&aShape of Particle", 1, 0, "&7Set the shape of the particles","&7played","&7Includes: Circle, Square, and Cone (AOTD/Ice Spray)","","&eLeft click to enable!","&bRight-click to disable"));
+        setItem(15,makeColorfulItem(Material.SNOW_BALL,"&aParticle Range",1,0,"&7Set the particle function range!","","&eClick to edit!"));
         setAction(13, event -> {
             new ParticleChooserGUI(getPlayer(), getAbilIndex(), getFunctionIndex()).open();
         });
@@ -267,6 +273,12 @@ public class Particle extends Function {
                 getPlayer().setItemInHand(stack);
                 getPlayer().playSound(getPlayer().getLocation(), Sound.ITEM_PICKUP,1,1);
             }
+        });
+        setAction(14,event -> {
+            new ParticleShapeGUI(getPlayer(),getAbilIndex(),getFunctionIndex()).open();
+        });
+        setAction(15,event -> {
+            anvilGUI(dataValues.PARTICLE_RANGE);
         });
     }
 }
