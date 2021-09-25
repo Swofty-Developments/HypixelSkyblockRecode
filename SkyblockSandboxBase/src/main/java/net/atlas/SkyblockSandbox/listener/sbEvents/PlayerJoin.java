@@ -116,6 +116,7 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
 
         //loading skill cache
         Document doc = SBX.getMongoStats().getDocument(p.getUniqueId(), "Skills");
+        Document doc2 = new Document(doc);
         for (SkillType t : SkillType.values()) {
             p.addSkillXP(t, 0);
             p.setSkillLvl(t, 0);
@@ -130,6 +131,9 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
             doc.putIfAbsent(t.getName() + "_xp",0D);
             temp.put(t, (Double) doc.get(t.getName()));
             cachedSkills.put(p.getUniqueId(), temp);
+            if(doc2==doc) {
+                SBX.getMongoStats().setData(p.getUniqueId(), "Skills", doc);
+            }
         }
 
     }
