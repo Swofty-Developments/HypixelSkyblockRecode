@@ -332,7 +332,12 @@ public class SBPlayer extends PluginPlayer {
         HashMap<SkillType, Double> map;
         if (cachedSkills.containsKey(sbPlayer.getUniqueId())) {
             map = new HashMap<>(cachedSkills.get(sbPlayer.getUniqueId()));
-            map.put(type, map.get(type) + amt);
+            //idfk what this is; Intellij thingy:
+            //what it does:
+            //if(map.get(type)==null) {
+            //   map.put(type,amt);
+            // }
+            map.merge(type, amt, Double::sum);
         } else {
             map = new HashMap<>();
             map.put(type, amt);

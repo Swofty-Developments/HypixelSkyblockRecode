@@ -123,7 +123,11 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
             if (lvl instanceof Double) {
                 p.setSkillLvl(t, ((Double) lvl).intValue());
             } else {
-                p.setSkillLvl(t, (Integer) lvl);
+                if(lvl instanceof Integer) {
+                    p.setSkillLvl(t, (Integer) lvl);
+                } else {
+                    p.setSkillLvl(t,0);
+                }
             }
 
             HashMap<SkillType, Double> temp = new HashMap<>(cachedSkills.get(p.getUniqueId()));

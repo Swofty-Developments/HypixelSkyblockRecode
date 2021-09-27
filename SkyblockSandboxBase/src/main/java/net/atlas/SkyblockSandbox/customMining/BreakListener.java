@@ -87,7 +87,7 @@ public class BreakListener implements Listener {
                 miningTime = 1;
             }
             this.breakTime = miningTime;
-            player.sendMessage(String.valueOf(breakTime));
+            //player.sendMessage(String.valueOf(breakTime));
         }
 
         public void setTaskID(int taskID)
@@ -150,7 +150,6 @@ public class BreakListener implements Listener {
         MineTask prev = isClicking.get(p.getUniqueId());
         if(prev!=null) {
             prev.cancel();
-            p.sendMessage(ChatColor.RED + "Canceled");
         }
     }
 }
