@@ -109,8 +109,8 @@ public interface SkyblockItem {
 
     enum Sword implements SkyblockItem {
         ASPECT_OF_DRAGONS(SBItemBuilder.init().name("Aspect of the Dragons").id("ASPECT_OF_DRAGONS").mat(Material.DIAMOND_SWORD).rarity(Rarity.LEGENDARY).type(type()).build()),
-        ATOMSPLIT_KATANA(SBItemBuilder.init().name("Atomsplit Katana").id("ATOMSPLIT_KATANA").mat(Material.DIAMOND_SWORD).ability(new SoulCry(),1).rarity(Rarity.LEGENDARY).type(type()).stat(PlayerStat.DAMAGE,5000D).build()),
-        HELLS_COMPLEMENT(SBItemBuilder.init().name("Hell's Complement").id("HELLS_COMPLEMENT").mat(Material.BLAZE_ROD).ability(new HellShatter(),1).rarity(Rarity.MYTHIC).type(type()).stat(PlayerStat.DAMAGE,666D).stat(PlayerStat.STRENGTH,666D).build(),false);
+        ATOMSPLIT_KATANA(SBItemBuilder.init().name("Atomsplit Katana").id("ATOMSPLIT_KATANA").mat(Material.DIAMOND_SWORD).ability(new SoulCry(),0).rarity(Rarity.LEGENDARY).type(type()).stat(PlayerStat.DAMAGE,5000D).build()),
+        HELLS_COMPLEMENT(SBItemBuilder.init().name("Hell's Complement").id("HELLS_COMPLEMENT").mat(Material.BLAZE_ROD).ability(new HellShatter(),0).rarity(Rarity.MYTHIC).type(type()).stat(PlayerStat.DAMAGE,666D).stat(PlayerStat.STRENGTH,666D).build(),false);
 
         private final SBItemStack item;
         private boolean ispublic = true;

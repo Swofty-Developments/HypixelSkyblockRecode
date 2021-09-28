@@ -31,7 +31,8 @@ public class AbilityHandler {
                 ClickType type = Enums.getIfPresent(ClickType.class,clickTypeString).orNull();
                 if(type!=null) {
                     if(event.getAction().name().contains(type.name())) {
-                        for(int ii=0;ii<FunctionUtil.getFunctionAmount(craftItem,i);i++) {
+                        //todo only running 1 function
+                        for(int ii=0;ii<=FunctionUtil.getFunctionAmount(craftItem,i);i++) {
                             getFunction(p, craftItem, i, ii).getFunction(p,craftItem,i,ii).applyFunction();
                         }
                     }

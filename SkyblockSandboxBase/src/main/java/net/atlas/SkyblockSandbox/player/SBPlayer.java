@@ -22,7 +22,6 @@ import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.block.SkullOwner;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -357,15 +356,6 @@ public class SBPlayer extends PluginPlayer {
         return false;
     }
 
-    @Override
-    public SkullOwner.Texture getTexture() {
-        return sbPlayer.getTexture();
-    }
-
-    @Override
-    public Map<String, Object> getData() {
-        return null;
-    }
 
     public enum PlayerStat {
         HEALTH("&a", "health", 100, true, makeColorfulItem(Material.GOLDEN_APPLE, "&cHealth", 1, 0, "")),

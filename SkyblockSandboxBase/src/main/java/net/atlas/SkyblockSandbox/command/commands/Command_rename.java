@@ -30,7 +30,7 @@ public class Command_rename extends SkyblockCommandFramework {
             if(args.length>=1) {
                 StringBuilder s = new StringBuilder();
                 for(String ss:args) {
-                    s.append(SUtil.colorize(ss));
+                    s.append(" ").append(SUtil.colorize(ss));
                 }
                 SBPlayer p = new SBPlayer((Player) cmd.getSender());
                 ItemStack item = p.getItemInHand();
