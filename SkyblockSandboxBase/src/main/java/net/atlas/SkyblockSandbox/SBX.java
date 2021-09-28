@@ -194,7 +194,7 @@ public class SBX extends JavaPlugin {
     }
 
     void registerCommands() {
-        framework.registerCommands(new Command_spawnmob(this));
+        /*framework.registerCommands(new Command_spawnmob(this));
         framework.registerCommands(new Command_giveItem(this));
         framework.registerCommands(new Command_createitem(this));
         framework.registerCommands(new Command_island(this));
@@ -212,7 +212,9 @@ public class SBX extends JavaPlugin {
         framework.registerCommands(new Command_trade(this));
         framework.registerCommands(new Command_dupe(this));
         framework.registerCommands(new Command_rename(this));
-        framework.registerCommands(new Command_coins(this));
+        framework.registerCommands(new Command_coins(this));*/
+
+        framework.registerAllCommands();
         framework.registerHelp();
     }
 

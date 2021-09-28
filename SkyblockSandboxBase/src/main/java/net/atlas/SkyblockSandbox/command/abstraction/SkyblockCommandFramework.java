@@ -1,5 +1,7 @@
 package net.atlas.SkyblockSandbox.command.abstraction;
 
+import net.atlas.SkyblockSandbox.SBX;
+import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
@@ -9,7 +11,9 @@ import org.bukkit.help.HelpTopicComparator;
 import org.bukkit.help.IndexHelpTopic;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.SimplePluginManager;
+import org.reflections.Reflections;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -47,10 +51,10 @@ public class SkyblockCommandFramework implements CommandExecutor {
      * Handles commands. Used in the onCommand method in your JavaPlugin class
      *
      * @param sender The {@link org.bukkit.command.CommandSender} parsed from
-     *            onCommand
-     * @param cmd The {@link org.bukkit.command.Command} parsed from onCommand
-     * @param label The label parsed from onCommand
-     * @param args The arguments parsed from onCommand
+     *               onCommand
+     * @param cmd    The {@link org.bukkit.command.Command} parsed from onCommand
+     * @param label  The label parsed from onCommand
+     * @param args   The arguments parsed from onCommand
      * @return Always returns true for simplicity's sake in onCommand
      */
     public boolean handleCommand(CommandSender sender, org.bukkit.command.Command cmd, String label, String[] args) {
@@ -122,6 +126,48 @@ public class SkyblockCommandFramework implements CommandExecutor {
                 }
             }
         }
+
+    }
+
+    public void registerAllCommands() {
+        Reflections reflection = new Reflections("net.atlas.SkyblockSandbox.command.commands");
+        for (Class<? extends SkyblockCommandFramework> clazz : reflection.getSubTypesOf(SkyblockCommandFramework.class)) {
+            try {
+                Constructor<? extends SkyblockCommandFramework> ctor = clazz.getDeclaredConstructor(SBX.class);
+                SkyblockCommandFramework cmd = ctor.newInstance(SBX.getInstance());
+                for (Method m : clazz.getMethods()) {
+                    if (m.getAnnotation(SBCommand.class) != null) {
+                        SBCommand command = m.getAnnotation(SBCommand.class);
+                        if (m.getParameterTypes().length > 1 || m.getParameterTypes()[0] != SBCommandArgs.class) {
+                            System.out.println("Unable to register command " + m.getName() + ". Unexpected method arguments");
+                            continue;
+                        }
+                        registerCommand(command, command.name(), m, cmd);
+                        for (String alias : command.aliases()) {
+                            registerCommand(command, alias, m, cmd);
+                        }
+                    } else if (m.getAnnotation(SBCompleter.class) != null) {
+                        SBCompleter comp = m.getAnnotation(SBCompleter.class);
+                        if (m.getParameterTypes().length != 1
+                                || m.getParameterTypes()[0] != SBCommandArgs.class) {
+                            System.out.println("Unable to register tab completer " + m.getName()
+                                    + ". Unexpected method arguments");
+                            continue;
+                        }
+                        if (m.getReturnType() != List.class) {
+                            System.out.println("Unable to register tab completer " + m.getName() + ". Unexpected return type");
+                            continue;
+                        }
+                        registerCompleter(comp.name(), m, cmd);
+                        for (String alias : comp.aliases()) {
+                            registerCompleter(alias, m, cmd);
+                        }
+                    }
+                }
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -142,7 +188,7 @@ public class SkyblockCommandFramework implements CommandExecutor {
     }
 
     public void registerCommand(SBCommand command, String label, Method m, Object obj) {
-        commandMap.put(label.toLowerCase(), new AbstractMap.SimpleEntry<Method, Object>(m, obj));
+        commandMap.put(label.toLowerCase(), new AbstractMap.SimpleEntry<>(m, obj));
         commandMap.put(this.plugin.getName() + ':' + label.toLowerCase(), new AbstractMap.SimpleEntry<Method, Object>(m, obj));
         String cmdLabel = label.split("\\.")[0].toLowerCase();
         if (map.getCommand(cmdLabel) == null) {
@@ -156,6 +202,7 @@ public class SkyblockCommandFramework implements CommandExecutor {
             map.getCommand(cmdLabel).setUsage(command.usage());
         }
     }
+
 
     public void registerCompleter(String label, Method m, Object obj) {
         String cmdLabel = label.split("\\.")[0].toLowerCase();
