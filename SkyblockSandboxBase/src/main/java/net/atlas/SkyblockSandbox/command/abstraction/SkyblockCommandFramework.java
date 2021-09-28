@@ -133,37 +133,10 @@ public class SkyblockCommandFramework implements CommandExecutor {
         Reflections reflection = new Reflections("net.atlas.SkyblockSandbox.command.commands");
         for (Class<? extends SkyblockCommandFramework> clazz : reflection.getSubTypesOf(SkyblockCommandFramework.class)) {
             try {
-                Constructor<? extends SkyblockCommandFramework> ctor = clazz.getDeclaredConstructor(SBX.class);
+                Constructor<? extends SkyblockCommandFramework> ctor = clazz.getDeclaredConstructor(Plugin.class);
                 SkyblockCommandFramework cmd = ctor.newInstance(SBX.getInstance());
-                for (Method m : clazz.getMethods()) {
-                    if (m.getAnnotation(SBCommand.class) != null) {
-                        SBCommand command = m.getAnnotation(SBCommand.class);
-                        if (m.getParameterTypes().length > 1 || m.getParameterTypes()[0] != SBCommandArgs.class) {
-                            System.out.println("Unable to register command " + m.getName() + ". Unexpected method arguments");
-                            continue;
-                        }
-                        registerCommand(command, command.name(), m, cmd);
-                        for (String alias : command.aliases()) {
-                            registerCommand(command, alias, m, cmd);
-                        }
-                    } else if (m.getAnnotation(SBCompleter.class) != null) {
-                        SBCompleter comp = m.getAnnotation(SBCompleter.class);
-                        if (m.getParameterTypes().length != 1
-                                || m.getParameterTypes()[0] != SBCommandArgs.class) {
-                            System.out.println("Unable to register tab completer " + m.getName()
-                                    + ". Unexpected method arguments");
-                            continue;
-                        }
-                        if (m.getReturnType() != List.class) {
-                            System.out.println("Unable to register tab completer " + m.getName() + ". Unexpected return type");
-                            continue;
-                        }
-                        registerCompleter(comp.name(), m, cmd);
-                        for (String alias : comp.aliases()) {
-                            registerCompleter(alias, m, cmd);
-                        }
-                    }
-                }
+                registerCommands(cmd);
+                System.out.println(clazz.getName() + " successfully registered.");
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException ex) {
                 ex.printStackTrace();
             }

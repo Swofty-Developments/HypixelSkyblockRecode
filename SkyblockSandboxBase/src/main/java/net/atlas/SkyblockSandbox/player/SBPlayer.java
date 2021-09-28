@@ -22,6 +22,7 @@ import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.SkullOwner;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -354,6 +355,16 @@ public class SBPlayer extends PluginPlayer {
         }
 
         return false;
+    }
+
+    @Override
+    public SkullOwner.Texture getTexture() {
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> getData() {
+        return null;
     }
 
 

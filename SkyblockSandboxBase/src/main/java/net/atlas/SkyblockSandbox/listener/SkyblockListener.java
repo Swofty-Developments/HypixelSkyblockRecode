@@ -53,8 +53,6 @@ public abstract class SkyblockListener<E extends Event> implements Listener {
                                     }.runTaskLater(SBX.getInstance(),1L);
                                 }
                             }
-                            //event.setCancelled(true);
-                            //System.out.println(event.getPacket());
                         }
                     }
                 });
