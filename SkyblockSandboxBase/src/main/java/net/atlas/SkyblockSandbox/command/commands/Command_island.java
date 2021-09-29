@@ -9,6 +9,7 @@ import net.atlas.SkyblockSandbox.command.abstraction.SBCommand;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCommandArgs;
 import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
 import net.atlas.SkyblockSandbox.files.CfgFile;
+import net.atlas.SkyblockSandbox.listener.sbEvents.MessageListener;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.playerIsland.Data;
 import net.atlas.SkyblockSandbox.playerIsland.IslandId;
@@ -32,6 +33,9 @@ import java.util.Map;
 import java.util.UUID;
 
 public class Command_island extends SkyblockCommandFramework {
+
+    private final static Map<String, String> playerToken = new HashMap<>();
+    public static final Map<String, String> visits = new HashMap<>();
 
     /**
      * Initializes the command framework and sets up the command maps
@@ -57,6 +61,8 @@ public class Command_island extends SkyblockCommandFramework {
             } else {
                 if (new CfgFile().getConfiguration().getBoolean("island-server")) {
                     player.sendMessage("▼7Teleporting Home...");
+
+                    visits.remove(player.getName());
 
                     Location teleLoc = player.getPlayerIsland().getCenter();
                     while (teleLoc.getBlock().getType()!= Material.AIR) {
@@ -141,9 +147,44 @@ public class Command_island extends SkyblockCommandFramework {
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                                 "forwardcmdtobungeecord " + player.getName() + " joinplayerisland " + player.getName() + " " + target.getName());
 
+                        playerToken.put(target.getName(), UUID.randomUUID().toString());
+
+                        new Thread(() -> {
+                           try {
+                               Thread.sleep(30000);
+                           } catch (Exception ignored) {}
+
+                           playerToken.remove(target.getName());
+                        }).start();
+
                         player.sendMessage("§7Waiting for owner confirmation...");
                         break;
                     }
+                    break;
+                }
+                case "visit": {
+                    player.sendMessage("§7Processing request...");
+
+                    String target = args[1];
+
+                    ByteArrayDataOutput dataOutput = ByteStreams.newDataOutput();
+                    dataOutput.writeUTF("doesIslandExist:" + target);
+
+                    player.sendPluginMessage(SBX.getInstance(), Command_forward.VISIT_MESSAGE_CHANNEL, dataOutput.toByteArray());
+
+                    if (!MessageListener.exists.containsKey(target)) {
+                        player.sendMessage("§cProcess failed: ER-32 §7(ISLAND_NOT_FOUND)");
+
+                        return;
+                    }
+
+                    ByteArrayDataOutput output = ByteStreams.newDataOutput();
+                    output.writeUTF("visitRequest:" + player.getName() + ":" + target);
+
+                    player.sendPluginMessage(SBX.getInstance(), Command_forward.VISIT_MESSAGE_CHANNEL, output.toByteArray());
+
+                    player.sendMessage("§aRequested processed! Sending you to the island...");
+                    BungeeUtil.sendPlayer(player, new CfgFile().getConfiguration().getString("island-server-name"));
                 }
             }
         }
@@ -167,6 +208,12 @@ public class Command_island extends SkyblockCommandFramework {
     public void addMemberCmd(SBCommandArgs arguments) {
         SBPlayer player = new SBPlayer(arguments.getPlayer());
         String[] args = arguments.getArgs();
+
+        if (!playerToken.containsKey(player.getName())) {
+            player.sendMessage("§eInvalid destination error: Your timer has expired!");
+
+            return;
+        }
 
         if (arguments.getArgs().length == 1) {
             if (new CfgFile().getConfiguration().getBoolean("island-server")) {
@@ -198,5 +245,9 @@ public class Command_island extends SkyblockCommandFramework {
         } else {
             BungeeUtil.sendPlayer(player, "islands");
         }
+    }
+
+    public static String getVisiting(Player who) {
+        return visits.get(who.getName());
     }
 }
