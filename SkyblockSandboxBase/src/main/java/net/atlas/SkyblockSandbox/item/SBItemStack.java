@@ -14,9 +14,11 @@ import net.atlas.SkyblockSandbox.util.NumberTruncation.NumberSuffix;
 import net.atlas.SkyblockSandbox.util.NumberTruncation.RomanNumber;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -400,6 +402,15 @@ public class SBItemStack extends ItemStack {
                     }
                 }
 
+                for(String ss:NBTUtil.getAllSignatures(stack)) {
+                    String pString = NBTUtil.getSignature(stack,ss);
+                    if(Bukkit.getPlayer(pString)!=null) {
+                        if(Integer.parseInt(ss)>newLore.size()) {
+                            ss = String.valueOf(newLore.size());
+                        }
+                        newLore.add(Integer.parseInt(ss),SUtil.colorize("&8Signed by: &e" + pString + " &a✔"));
+                    }
+                }
 
                 meta.setLore(newLore);
                 stack.setItemMeta(meta);
@@ -838,8 +849,9 @@ public class SBItemStack extends ItemStack {
         net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(this.stack);
         NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
         NBTTagCompound attributes = (tag.getCompound("ExtraAttributes") != null ? tag.getCompound("ExtraAttributes") : new NBTTagCompound());
+        NBTTagCompound abilities = (attributes.getCompound("Abilities") != null ? tag.getCompound("Abilities") : new NBTTagCompound());
 
-        return attributes.hasKey("hasAbility");
+        return abilities.hasKey("has-ability");
     }
 
     public boolean hasAbility(int index) {

@@ -101,7 +101,7 @@ public class SoundChooserGUI extends PaginatedGUI {
             case ARROW: {
                 if (event.getCurrentItem().getItemMeta().getDisplayName().contains("§aNext")) {
                     if (getGui().next()) {
-                        getGui().updateTitle("Select a Sound (Page" + getGui().getCurrentPageNum() + ")");
+                        getGui().updateTitle("Select a Sound (Page " + getGui().getCurrentPageNum() + ")");
                     } else {
                         player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1f, 0f);
                         player.sendMessage(ChatColor.RED + "You are on the last page.");
@@ -112,7 +112,7 @@ public class SoundChooserGUI extends PaginatedGUI {
                         player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1f, 0f);
                         player.sendMessage(ChatColor.RED + "You are already on the first page.");
                     } else {
-                        getGui().updateTitle("Select a Sound (Page" + getGui().getCurrentPageNum() + ")");
+                        getGui().updateTitle("Select a Sound (Page " + getGui().getCurrentPageNum() + ")");
                     }
                     break;
                 } else if (event.getCurrentItem().getItemMeta().getDisplayName().contains("§cBack")) {
@@ -157,6 +157,9 @@ public class SoundChooserGUI extends PaginatedGUI {
 
     @Override
     public void setItems() {
+        for(int i = 0;i<getGui().getInventory().getSize();i++) {
+            getGui().removeItem(i);
+        }
         getGui().getFiller().fillBorder(ItemBuilder.from(super.FILLER_GLASS).name(Component.text(SUtil.colorize("&7 "))).asGuiItem());
         List<ItemStack> items = new ArrayList<>();
         for (Sound value : Sound.values()) {

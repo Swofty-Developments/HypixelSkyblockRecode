@@ -8,6 +8,7 @@ import com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder;
 import lombok.Setter;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.database.mongo.MongoAH;
+import net.atlas.SkyblockSandbox.island.islands.FairySouls;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.item.SkyblockItem;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
@@ -22,7 +23,6 @@ import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.block.SkullOwner;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -138,6 +138,10 @@ public class SBPlayer extends PluginPlayer {
 
             for (PlayerStat s : PlayerStat.values()) {
                 double stat = map.get(s);
+                HashMap<PlayerStat,Double> fairyMap = FairySouls.getPlayerRewards(pl);
+                if(fairyMap.containsKey(s)) {
+                    stat+=fairyMap.get(s);
+                }
                 if (pl.getStat(s) < pl.getMaxStat(s) && !s.isRegen()) {
                     pl.setStat(s, pl.getMaxStat(s));
                 }
@@ -356,17 +360,6 @@ public class SBPlayer extends PluginPlayer {
 
         return false;
     }
-
-    @Override
-    public SkullOwner.Texture getTexture() {
-        return null;
-    }
-
-    @Override
-    public Map<String, Object> getData() {
-        return null;
-    }
-
 
     public enum PlayerStat {
         HEALTH("&a", "health", 100, true, makeColorfulItem(Material.GOLDEN_APPLE, "&cHealth", 1, 0, "")),

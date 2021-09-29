@@ -2,6 +2,7 @@ package net.atlas.SkyblockSandbox.listener.sbEvents;
 
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.files.CfgFile;
+import net.atlas.SkyblockSandbox.island.islands.FairySouls;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.StartFight;
 import net.atlas.SkyblockSandbox.item.Rarity;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
@@ -31,6 +32,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import static net.atlas.SkyblockSandbox.SBX.cachedSkills;
+import static net.atlas.SkyblockSandbox.island.islands.FairySouls.cachedFairySouls;
 import static net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat.*;
 
 public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
@@ -43,6 +45,8 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
     public void callEvent(PlayerJoinEvent event) {
 
         SBPlayer p = new SBPlayer(event.getPlayer());
+        Document playerDoc = SBX.getMongoStats().getPlayerDocument(p.getUniqueId());
+
         p.getInventory().setItem(8, SBItemBuilder.init().name("&aSkyblock Menu &7(Right Click)").mat(Material.NETHER_STAR).id("SKYBLOCK_MENU").stackable(false).rarity(Rarity.SKYBLOCK_MENU).build().asBukkitItem());
         if (StartFight.fightActive) {
             StartFight.playerDMG.put(p.getPlayer(), 0D);
@@ -115,7 +119,7 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
         ((CraftPlayer) p.getPlayer()).getHandle().playerConnection.sendPacket(entityEffect);
 
         //loading skill cache
-        Document doc = SBX.getMongoStats().getDocument(p.getUniqueId(), "Skills");
+        Document doc = (Document) playerDoc.get("Skills");
         Document doc2 = new Document(doc);
         HashMap<SkillType, Double> temp = new HashMap<>();
         for (SkillType t : SkillType.values()) {
@@ -140,5 +144,12 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
             }
         }
         cachedSkills.put(p.getUniqueId(), temp);
+
+        //caching fairy souls
+        if(playerDoc.getInteger("fairy-souls")==null) {
+            cachedFairySouls.put(p.getUniqueId(), 0);
+        } else {
+            cachedFairySouls.put(p.getUniqueId(), playerDoc.getInteger("fairy-souls"));
+        }
     }
 }

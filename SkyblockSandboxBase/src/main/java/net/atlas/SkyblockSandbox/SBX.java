@@ -4,12 +4,10 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.google.common.base.Enums;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.sk89q.worldedit.internal.expression.runtime.Break;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCommandArgs;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCompleter;
 import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
-import net.atlas.SkyblockSandbox.command.commands.*;
 import net.atlas.SkyblockSandbox.customMining.BreakListener;
 import net.atlas.SkyblockSandbox.customMining.MineUtil;
 import net.atlas.SkyblockSandbox.database.mongo.MongoAH;
@@ -32,7 +30,6 @@ import net.atlas.SkyblockSandbox.item.ability.itemAbilities.ShortBowTerm;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.SoulCry;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.WitherImpact;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
-import net.atlas.SkyblockSandbox.listener.sbEvents.abilities.AbilityHandler;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
 import net.atlas.SkyblockSandbox.playerIsland.Data;
@@ -189,7 +186,6 @@ public class SBX extends JavaPlugin {
         pm.registerEvents(new AbiltyListener(new WitherImpact()), this);
         pm.registerEvents(new AbiltyListener(new ShortBowTerm()), this);
         pm.registerEvents(new LootListener(), this);
-        pm.registerEvents(new AbilityHandler(), this);
         pm.registerEvents(new BreakListener(),this);
     }
 
@@ -215,7 +211,7 @@ public class SBX extends JavaPlugin {
         framework.registerCommands(new Command_coins(this));*/
 
         framework.registerAllCommands();
-        framework.registerHelp();
+        //framework.registerHelp();
     }
 
     void createIslandWorld() {

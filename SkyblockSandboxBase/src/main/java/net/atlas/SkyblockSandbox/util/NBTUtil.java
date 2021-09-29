@@ -188,6 +188,62 @@ public class NBTUtil {
         return stack;
     }
 
+    public static ItemStack setSignature(ItemStack stack, String msg, String key) {
+        if (stack != null) {
+            if (stack.hasItemMeta()) {
+                net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
+                NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+                NBTTagCompound data = tag.getCompound("ExtraAttributes");
+                NBTTagCompound signatures = data.getCompound("Signatures");
+                if (signatures == null) {
+                    signatures = new NBTTagCompound();
+                }
+
+                signatures.setString(key, msg);
+                data.set("Signatures",signatures);
+                tag.set("ExtraAttributes", data);
+                nmsItem.setTag(tag);
+                return CraftItemStack.asBukkitCopy(nmsItem);
+            }
+        }
+        return stack;
+    }
+
+    public static String getSignature(ItemStack stack,String key) {
+        if (stack != null) {
+            if (stack.hasItemMeta()) {
+                net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
+                NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+                NBTTagCompound data = tag.getCompound("ExtraAttributes");
+                NBTTagCompound signatures = data.getCompound("Signatures");
+                if (signatures == null) {
+                    signatures = new NBTTagCompound();
+                }
+
+                return signatures.getString(key);
+            }
+        }
+        return "";
+    }
+    public static List<String> getAllSignatures(ItemStack stack) {
+        List<String> signaturesList = new ArrayList<>();
+        if (stack != null) {
+            if (stack.hasItemMeta()) {
+                net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
+                NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+                NBTTagCompound data = tag.getCompound("ExtraAttributes");
+                NBTTagCompound signatures = data.getCompound("Signatures");
+                if (signatures == null) {
+                    signatures = new NBTTagCompound();
+                }
+                signaturesList = new ArrayList<>(signatures.c());
+
+            }
+        }
+        return signaturesList;
+    }
+
+
     public static ItemStack setBytes(ItemStack stack, byte[] bytes, String key) {
         if (stack != null) {
             if (stack.hasItemMeta()) {

@@ -28,6 +28,8 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.UUID;
 
+import static net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat.*;
+
 public class DamageUtil {
     public static final String damageColorSequence = "ffe6cc";
     static HashMap<LivingEntity, Integer> entityPhase = new HashMap<>();
@@ -119,15 +121,15 @@ public class DamageUtil {
     public static double calculateSingleHit(Entity en, SBPlayer p) {
         boolean isCrit = false;
         HashMap<SBPlayer.PlayerStat, Double> playerStats = NBTUtil.getAllStats(p);
-        double cc = playerStats.get(SBPlayer.PlayerStat.CRIT_CHANCE);
+        double cc = p.getMaxStat(CRIT_CHANCE);
         Random random = new Random();
         double crit = random.nextDouble();
         if (cc / 100 >= crit) {
             isCrit = true;
         }
-        double wpDmg = playerStats.get(SBPlayer.PlayerStat.DAMAGE);
-        double str = playerStats.get(SBPlayer.PlayerStat.STRENGTH);
-        double cd = playerStats.get(SBPlayer.PlayerStat.CRIT_DAMAGE);
+        double wpDmg = p.getMaxStat(DAMAGE);
+        double str = p.getMaxStat(STRENGTH);
+        double cd = p.getMaxStat(CRIT_DAMAGE);
         double init = (wpDmg + 5D) * (1D + (str / 100D));
         double mult = 1 + (/*combat lvl*/0 * 0.04);
         double dmg = 0;
@@ -162,7 +164,7 @@ public class DamageUtil {
         for (SBPlayer.PlayerStat stat : SBPlayer.PlayerStat.values()) {
             playerStats.put(stat, stat.getBase());
         }
-        double cc = playerStats.get(SBPlayer.PlayerStat.CRIT_CHANCE);
+        double cc = playerStats.get(CRIT_CHANCE);
         Random random = new Random();
         double crit = random.nextDouble();
         if (cc / 100 >= crit) {

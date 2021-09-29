@@ -116,7 +116,7 @@ public class MongoCoins implements MongoDB {
                 setData(uuid, key, new Document());
                 if (col.find(query).first() != null) {
                     Document found2 = col.find(query).first();
-                    if(found2!=null) {
+                    if (found2 != null) {
                         return (Document) found2.get(key);
                     }
                 }
@@ -124,6 +124,18 @@ public class MongoCoins implements MongoDB {
 
         }
         return null;
+    }
+
+    public Document getPlayerDocument(UUID uuid) {
+
+        Document query = new Document("uuid", uuid.toString());
+        if (col.find(query).first() != null) {
+            Document found = col.find(query).first();
+            if (found != null) {
+                return found;
+            }
+        }
+        return query;
     }
 
     public void removeData(UUID uuid, String key) {
