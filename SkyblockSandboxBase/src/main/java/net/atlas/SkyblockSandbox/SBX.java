@@ -98,6 +98,7 @@ public class SBX extends JavaPlugin {
     public static HashMap<Player, Boolean> canfire = new HashMap<>();
     public static HashMap<Player, List<EntityArmorStand>> thrownAxes = new HashMap<>();
     public static final TreeMap<String, ItemStack> hypixelItemMap = new TreeMap<>();
+    public static boolean pvpEnabled;
     public MySQL sql;
     public SignManager signManager;
 
