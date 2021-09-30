@@ -5,6 +5,7 @@ import com.comphenix.protocol.ProtocolManager;
 import com.google.common.base.Enums;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
+import net.atlas.SkyblockSandbox.AuctionHouse.AuctionItemHandler;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCommandArgs;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCompleter;
 import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
@@ -51,6 +52,7 @@ import org.bukkit.*;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.craftbukkit.libs.jline.internal.Log;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.*;
@@ -123,6 +125,15 @@ public class SBX extends JavaPlugin {
         mongoStats.connect();
         protocolManager = ProtocolLibrary.getProtocolManager();
         new MongoAH().connect();
+        long time = System.currentTimeMillis();
+        System.out.println("Starting to cache all ah data....");
+        try {
+            AuctionItemHandler.mongoToCache();
+            System.out.println("Successfully cached all ah data! (" + (System.currentTimeMillis() - time) + " ms)");
+        } catch (Exception e) {
+            System.err.println("Failed to cache all ah data! (" + (System.currentTimeMillis() - time) + " ms)");
+            e.printStackTrace();
+        }
         mongoStorage.connect();
         mongoIslands.connect();
         coins = new Coins();
@@ -166,15 +177,6 @@ public class SBX extends JavaPlugin {
             }
             mongoStats.setData(uid,"Skills",doc);
         }
-    }
-
-    @SBCompleter(name = "spawnmob", aliases = {"spawncustommob"})
-    public List<String> spawnMobComplete(SBCommandArgs args) {
-        List<String> list = new ArrayList<String>();
-        for (EntityType e : EntityType.values()) {
-            list.add(e.name());
-        }
-        return list;
     }
 
     void registerListeners() {

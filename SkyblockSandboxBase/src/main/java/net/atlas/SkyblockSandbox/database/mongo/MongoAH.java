@@ -123,6 +123,12 @@ public class MongoAH implements MongoDB {
 
         return found;
     }
+    public Document getDoc(UUID uuid) {
+        Document query = new Document("auctionID", uuid.toString());
+
+        return col.find(query).first();
+    }
+
     public void setData(AuctionItemHandler item) {
         UUID id = item.getAuctionID();
         Document query = new Document("auctionID", item.getAuctionID());
@@ -139,9 +145,10 @@ public class MongoAH implements MongoDB {
             setData(id, "hasEnded", item.isHasEnded());
             setData(id, "startingPrice", item.getStartingPrice());
             setData(id, "currentPrice", item.getCurrentPrice());
-            setData(id, "highestBidder", item.getHighestBidder());
+            setData(id, "highestBidder", item.getHighestBidder() != null ? item.getHighestBidder().toString() : "null");
             setData(id, "isBin", item.isBin());
-            setData(id, "owner", item.getOwner());
+            setData(id, "category", item.getCategory().name());
+            setData(id, "owner", item.getOwner().toString());
 
             Log.info("Created data for \"" + id + "\" in " + (System.currentTimeMillis() - cms) + "ms!");
         } else {
@@ -154,9 +161,10 @@ public class MongoAH implements MongoDB {
             setData(id, "hasEnded", item.isHasEnded());
             setData(id, "startingPrice", item.getStartingPrice());
             setData(id, "currentPrice", item.getCurrentPrice());
-            setData(id, "highestBidder", item.getHighestBidder());
+            setData(id, "highestBidder", item.getHighestBidder() != null ? item.getHighestBidder().toString() : "null");
             setData(id, "isBin", item.isBin());
-            setData(id, "owner", item.getOwner());
+            setData(id, "category", item.getCategory().name());
+            setData(id, "owner", item.getOwner().toString());
 
             Log.info("Updated data for \"" + id + "\" in " + (System.currentTimeMillis() - cms) + "ms!");
         }

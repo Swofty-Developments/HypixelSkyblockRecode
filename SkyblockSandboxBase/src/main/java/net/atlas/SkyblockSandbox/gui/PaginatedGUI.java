@@ -10,6 +10,7 @@ import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.Logger;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -68,11 +69,21 @@ public abstract class PaginatedGUI extends SBGUI{
                             .create();
                     gui.updateTitle(getTitle());
                     setItems();
+                    if (this instanceof Backable) {
+                        Backable backable = (Backable) this;
+                        setItem(backable.backItemSlot(), makeColorfulItem(Material.ARROW, "&aGo Back", 1, 0, "&7To " + backable.backTitle()));
+                    }
                     if (!setClickActions()) {
                         gui.setDefaultClickAction(this::handleMenu);
                     } else {
                         gui.setDefaultClickAction(event -> {
                             event.setCancelled(true);
+                        });
+                    }
+                    if (this instanceof Backable) {
+                        Backable backable = (Backable) this;
+                        gui.addSlotAction(backable.backItemSlot(), e -> {
+                            backable.openBack();
                         });
                     }
                     gui.open(owner);

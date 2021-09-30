@@ -197,4 +197,24 @@ public abstract class SBGUI {
         item.setItemMeta(itemMeta);
         return item;
     }
+    public static ItemStack makeColorfulCustomSkullItem(String url, String displayname, int amount) {
+        ItemStack item = new ItemStack(Material.SKULL_ITEM, amount, (short) 3);
+        if (url.isEmpty()) return item;
+
+        SkullMeta itemMeta = (SkullMeta) item.getItemMeta();
+        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
+        byte[] encodedData = Base64.getEncoder().encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", url).getBytes());
+        profile.getProperties().put("textures", new Property("textures", new String(encodedData)));
+        Field profileField = null;
+        try {
+            profileField = itemMeta.getClass().getDeclaredField("profile");
+            profileField.setAccessible(true);
+            profileField.set(itemMeta, profile);
+        } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        itemMeta.setDisplayName(colorize(displayname));
+        item.setItemMeta(itemMeta);
+        return item;
+    }
 }
