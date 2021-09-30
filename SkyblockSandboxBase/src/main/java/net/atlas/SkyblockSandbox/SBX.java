@@ -4,11 +4,8 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.google.common.base.Enums;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.sk89q.worldedit.internal.expression.runtime.Break;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import net.atlas.SkyblockSandbox.AuctionHouse.AuctionItemHandler;
-import net.atlas.SkyblockSandbox.command.abstraction.SBCommandArgs;
-import net.atlas.SkyblockSandbox.command.abstraction.SBCompleter;
 import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
 import net.atlas.SkyblockSandbox.command.commands.*;
 import net.atlas.SkyblockSandbox.customMining.BreakListener;
@@ -33,7 +30,6 @@ import net.atlas.SkyblockSandbox.item.ability.itemAbilities.ShortBowTerm;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.SoulCry;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.WitherImpact;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
-import net.atlas.SkyblockSandbox.listener.sbEvents.abilities.AbilityHandler;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
 import net.atlas.SkyblockSandbox.playerIsland.Data;
@@ -54,10 +50,11 @@ import org.bukkit.*;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.craftbukkit.libs.jline.internal.Log;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.*;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -80,9 +77,9 @@ import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.util.*;
 
+import static net.atlas.SkyblockSandbox.command.commands.Command_forward.MESSAGE_CHANNEL;
 import static net.atlas.SkyblockSandbox.listener.sbEvents.entityEvents.EntitySpawnEvent.holoMap;
 import static net.atlas.SkyblockSandbox.listener.sbEvents.entityEvents.EntitySpawnEvent.holoMap2;
-import static net.atlas.SkyblockSandbox.command.commands.Command_forward.MESSAGE_CHANNEL;
 
 public class SBX extends JavaPlugin {
     public static HashMap<UUID, Boolean> isSoulCryActive = new HashMap<>();
@@ -188,26 +185,11 @@ public class SBX extends JavaPlugin {
         pm.registerEvents(new AbiltyListener(new WitherImpact()), this);
         pm.registerEvents(new AbiltyListener(new ShortBowTerm()), this);
         pm.registerEvents(new LootListener(), this);
-        pm.registerEvents(new AbilityHandler(), this);
         pm.registerEvents(new BreakListener(),this);
     }
 
     void registerCommands() {
-        framework.registerCommands(new Command_spawnmob(this));
-        framework.registerCommands(new Command_giveItem(this));
-        framework.registerCommands(new Command_createitem(this));
-        framework.registerCommands(new Command_island(this));
-        framework.registerCommands(new Command_jingle(this));
-        framework.registerCommands(new Command_warp(this));
-        framework.registerCommands(new Command_importhead(this));
-        framework.registerCommands(new Command_sbmenu(this));
-        framework.registerCommands(new Command_storage(this));
-        framework.registerCommands(new Command_dev(this));
-        framework.registerCommands(new Command_items(this));
-        framework.registerCommands(new Command_storage(this));
-        framework.registerCommands(new Command_debugtest(this));
-        framework.registerCommands(new Command_forward(this));
-        framework.registerCommands(new Command_enchant(this));
+        framework.registerAllCommands();
         framework.registerHelp();
     }
 
