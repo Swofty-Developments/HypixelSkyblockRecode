@@ -18,6 +18,7 @@ import java.util.Optional;
 
 public class Command_forward extends SkyblockCommandFramework {
     public final static String MESSAGE_CHANNEL = "commandforward:cmd";
+    public final static String VISIT_MESSAGE_CHANNEL = "visiting:player";
 
     /**
      * Initializes the command framework and sets up the command maps
@@ -32,6 +33,12 @@ public class Command_forward extends SkyblockCommandFramework {
     public void forwardCmd(SBCommandArgs arguments) {
         String[] args = arguments.getArgs();
         CommandSender sender = arguments.getSender();
+
+        if (sender instanceof Player) {
+            sender.sendMessage("§cProcess failed. Please try again later.");
+
+            return;
+        }
 
         if (args.length <= 1) {
             sendErrorMessage(sender, "Wrong command, Missing arguments");

@@ -4,11 +4,13 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.google.common.base.Enums;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.internal.expression.runtime.Break;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import net.atlas.SkyblockSandbox.AuctionHouse.AuctionItemHandler;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCommandArgs;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCompleter;
 import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
+import net.atlas.SkyblockSandbox.command.commands.*;
 import net.atlas.SkyblockSandbox.customMining.BreakListener;
 import net.atlas.SkyblockSandbox.customMining.MineUtil;
 import net.atlas.SkyblockSandbox.database.mongo.MongoAH;
@@ -31,6 +33,7 @@ import net.atlas.SkyblockSandbox.item.ability.itemAbilities.ShortBowTerm;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.SoulCry;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.WitherImpact;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
+import net.atlas.SkyblockSandbox.listener.sbEvents.abilities.AbilityHandler;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
 import net.atlas.SkyblockSandbox.playerIsland.Data;
@@ -45,7 +48,6 @@ import net.atlas.SkyblockSandbox.util.StackUtils;
 import net.atlas.SkyblockSandbox.util.signGUI.SignManager;
 import net.minecraft.server.v1_8_R3.*;
 import org.apache.commons.io.FileUtils;
-import org.bson.Document;
 import org.bukkit.Material;
 import org.bukkit.WorldType;
 import org.bukkit.*;
@@ -166,16 +168,14 @@ public class SBX extends JavaPlugin {
 
     public static void cacheSkills() {
         for (UUID uid : cachedSkills.keySet()) {
-            Document doc = new Document();
             for (SkillType type : cachedSkills.get(uid).keySet()) {
                 double amt = cachedSkills.get(uid).get(type);
-                doc.put(type.getName() + "_xp",amt);
+                mongoStats.setData(uid, type.getName() + "_xp", amt);
             }
             for (SkillType type : cachedSkillLvls.get(uid).keySet()) {
                 int amt = cachedSkillLvls.get(uid).get(type);
-                doc.put(type.getName() + "_lvl",amt);
+                mongoStats.setData(uid, type.getName() + "_lvl", amt);
             }
-            mongoStats.setData(uid,"Skills",doc);
         }
     }
 
@@ -188,11 +188,12 @@ public class SBX extends JavaPlugin {
         pm.registerEvents(new AbiltyListener(new WitherImpact()), this);
         pm.registerEvents(new AbiltyListener(new ShortBowTerm()), this);
         pm.registerEvents(new LootListener(), this);
+        pm.registerEvents(new AbilityHandler(), this);
         pm.registerEvents(new BreakListener(),this);
     }
 
     void registerCommands() {
-        /*framework.registerCommands(new Command_spawnmob(this));
+        framework.registerCommands(new Command_spawnmob(this));
         framework.registerCommands(new Command_giveItem(this));
         framework.registerCommands(new Command_createitem(this));
         framework.registerCommands(new Command_island(this));
@@ -207,13 +208,7 @@ public class SBX extends JavaPlugin {
         framework.registerCommands(new Command_debugtest(this));
         framework.registerCommands(new Command_forward(this));
         framework.registerCommands(new Command_enchant(this));
-        framework.registerCommands(new Command_trade(this));
-        framework.registerCommands(new Command_dupe(this));
-        framework.registerCommands(new Command_rename(this));
-        framework.registerCommands(new Command_coins(this));*/
-
-        framework.registerAllCommands();
-        //framework.registerHelp();
+        framework.registerHelp();
     }
 
     void createIslandWorld() {
@@ -478,12 +473,7 @@ public class SBX extends JavaPlugin {
                                                     if (split1.contains("?")) {
                                                         split1 = split1.replace("?", "");
                                                     }
-                                                    if (split1.contains("HEALTH") || split1.contains("PERSECOND") || split1.contains("SPEED") || split1.contains("INTELLIGENCE") || split1.contains("DAMAGE") || split1.contains("STRENGTH") || split1.contains(SUtil.colorize("& "))) {
-                                                        split1 = "0";
-                                                    }
-                                                    try {
-                                                        int amt = Integer.parseInt(split1);
-                                                    } catch (NumberFormatException ignored) {
+                                                    if (split1.contains("HEALTH") || split1.contains("PERSECOND") || split1.contains("SPEED") || split1.contains("INTELLIGENCE") || split1.contains("DAMAGE") || split1.contains("STRENGTH")) {
                                                         split1 = "0";
                                                     }
                                                     int amt = Integer.parseInt(split1);

@@ -1,5 +1,6 @@
 package net.atlas.SkyblockSandbox.listener.sbEvents;
 
+import net.atlas.SkyblockSandbox.command.commands.Command_island;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.SUtil;
@@ -14,6 +15,13 @@ public class BlockPlace extends SkyblockListener<BlockPlaceEvent> {
     @EventHandler
     public void callEvent(BlockPlaceEvent event) {
         SBPlayer pl = new SBPlayer(event.getPlayer());
+
+        if (Command_island.getVisiting(pl) != null) {
+            event.setCancelled(true);
+
+            return;
+        }
+
         if(pl.hasIsland()) {
             if (pl.getWorld() == pl.getPlayerIsland().getCenter().getWorld()) {
                 if(pl.getLocation().distance(pl.getPlayerIsland().getCenter()) > dist()) {
