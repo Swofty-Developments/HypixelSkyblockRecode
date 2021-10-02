@@ -7,10 +7,14 @@ import net.atlas.SkyblockSandbox.abilityCreator.functions.Particle;
 import net.atlas.SkyblockSandbox.abilityCreator.functions.Sound;
 import net.atlas.SkyblockSandbox.abilityCreator.functions.Teleport;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
+import net.atlas.SkyblockSandbox.item.ability.AbilityData;
+import net.atlas.SkyblockSandbox.item.ability.EnumAbilityData;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.SUtil;
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -22,17 +26,26 @@ public class AbilityHandler {
         SBPlayer p = new SBPlayer(event.getPlayer());
         ItemStack craftItem = event.getItem();
         SBItemStack sbItem = new SBItemStack(craftItem);
-        if(getGenericAbilityString(craftItem,"has-ability").equalsIgnoreCase("true")) {
+        if (getGenericAbilityString(craftItem, "has-ability").equalsIgnoreCase("true")) {
             for (int i = 0; i < getAbilityAmount(craftItem); i++) {
-                String abilName = getAbilityString(craftItem,i,AbilityValue.NAME.name());
+                String abilName = getAbilityString(craftItem, i, AbilityValue.NAME.name());
 
-                String clickTypeString = getAbilityData(craftItem,i,AbilityValue.CLICK_TYPE);
+                String clickTypeString = getAbilityData(craftItem, i, AbilityValue.CLICK_TYPE);
                 clickTypeString = clickTypeString.split("_")[0];
-                ClickType type = Enums.getIfPresent(ClickType.class,clickTypeString).orNull();
-                if(type!=null) {
-                    if(event.getAction().name().contains(type.name())) {
-                        for(int ii=0;ii<FunctionUtil.getFunctionAmount(craftItem,i);i++) {
-                            getFunction(p, craftItem, i, ii).getFunction(p,craftItem,i,ii).applyFunction();
+                ClickType type = Enums.getIfPresent(ClickType.class, clickTypeString).orNull();
+                if (type != null) {
+                    if (event.getAction().name().contains(type.name())) {
+                        //todo only running 1 function
+                        if (FunctionUtil.getFunctionAmount(craftItem, i) != 0) {
+                            for (int ii = 0; ii <= FunctionUtil.getFunctionAmount(craftItem, i); ii++) {
+                                FunctionType funcType = getFunction(p, craftItem, i, ii);
+                                if(funcType!=null) {
+                                    Function func = funcType.getFunction(p, craftItem, i, ii);
+                                    if (func != null) {
+                                        func.applyFunction();
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -40,13 +53,13 @@ public class AbilityHandler {
         }
     }
 
-    public FunctionType getFunction(SBPlayer p,ItemStack item,int abilIndex,int funcIndex) {
-            String funcType = FunctionUtil.getFunctionData(item,abilIndex,funcIndex, Function.FunctionValues.NAME);
-            FunctionType type = Enums.getIfPresent(FunctionType.class,funcType).orNull();
-            if(type==null) {
-                p.sendMessage(SUtil.colorize("&cSomething went wrong while parsing functions! Please contact an admin if this issue persists."));
-                return null;
-            }
-            return type;
+    public FunctionType getFunction(SBPlayer p, ItemStack item, int abilIndex, int funcIndex) {
+        String funcType = FunctionUtil.getFunctionData(item, abilIndex, funcIndex, Function.FunctionValues.NAME);
+        FunctionType type = Enums.getIfPresent(FunctionType.class, funcType).orNull();
+        if (type == null) {
+            //p.sendMessage(SUtil.colorize("&cSomething went wrong while parsing functions! Please contact an admin if this issue persists."));
+            return null;
+        }
+        return type;
     }
 }

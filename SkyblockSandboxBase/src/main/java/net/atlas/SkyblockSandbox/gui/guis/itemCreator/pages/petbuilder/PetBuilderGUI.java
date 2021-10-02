@@ -8,6 +8,7 @@ import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.player.pets.Pet;
 import net.atlas.SkyblockSandbox.player.pets.PetBuilder;
+import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.NumUtils;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
@@ -127,8 +128,34 @@ public class PetBuilderGUI extends NormalGUI {
             getOwner().getInventory().addItem(stack);
 
         });
+        setAction(23,event -> {
+            petTypeGui(getOwner());
+        });
         return true;
     }
+
+    private void setPetType(String s,ItemStack i,Player player) {
+        ItemStack i1 = NBTUtil.setString(i, SUtil.colorize(s), "pet-type");
+        SBItemStack it = new SBItemStack(i1);
+        player.setItemInHand(it.refreshLore());
+    }
+
+    public AnvilGUI petTypeGui(SBPlayer player) {
+        AnvilGUI gui = new AnvilGUI(player.getPlayer(), event1 -> {
+            setPetType(event1.getName(),player.getItemInHand(),player);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    updateItems();
+                }
+            }.runTaskLater(SBX.getInstance(), 1);
+        });
+
+        gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, makeColorfulItem(Material.PAPER, "Set Pet Type", 1, 0));
+        gui.open();
+        return gui;
+    }
+
 
     private void invalidNumberError(AnvilGUI.AnvilClickEvent event, Player player) {
         IChatBaseComponent comp = IChatBaseComponent.ChatSerializer.a("{\"text\":\"§cThat's not a valid number!\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"§fYour input: §e" + event.getName() + "\"}}");

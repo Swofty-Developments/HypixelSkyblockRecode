@@ -1,6 +1,7 @@
 package net.atlas.SkyblockSandbox.listener.sbEvents;
 
 import net.atlas.SkyblockSandbox.SBX;
+import net.atlas.SkyblockSandbox.command.commands.Command_island;
 import net.atlas.SkyblockSandbox.customMining.MiningBlock;
 import net.atlas.SkyblockSandbox.customMining.MiningBlocks;
 import net.atlas.SkyblockSandbox.event.customEvents.SkillEXPGainEvent;
@@ -9,6 +10,7 @@ import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -25,6 +27,14 @@ public class BlockBreak extends SkyblockListener<BlockBreakEvent> {
 
     @EventHandler
     public void callEvent(BlockBreakEvent event) {
+        Player p = event.getPlayer();
+
+        if (Command_island.getVisiting(p) != null) {
+            event.setCancelled(true);
+
+            return;
+        }
+
         if(event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
             if (event.getPlayer().getItemInHand().getType().name().contains("SWORD")) {
                 event.setCancelled(true);

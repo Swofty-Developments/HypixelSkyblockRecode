@@ -1,5 +1,7 @@
 package net.atlas.SkyblockSandbox.command.abstraction;
 
+import net.atlas.SkyblockSandbox.SBX;
+import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
@@ -9,7 +11,9 @@ import org.bukkit.help.HelpTopicComparator;
 import org.bukkit.help.IndexHelpTopic;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.SimplePluginManager;
+import org.reflections.Reflections;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -47,10 +51,10 @@ public class SkyblockCommandFramework implements CommandExecutor {
      * Handles commands. Used in the onCommand method in your JavaPlugin class
      *
      * @param sender The {@link org.bukkit.command.CommandSender} parsed from
-     *            onCommand
-     * @param cmd The {@link org.bukkit.command.Command} parsed from onCommand
-     * @param label The label parsed from onCommand
-     * @param args The arguments parsed from onCommand
+     *               onCommand
+     * @param cmd    The {@link org.bukkit.command.Command} parsed from onCommand
+     * @param label  The label parsed from onCommand
+     * @param args   The arguments parsed from onCommand
      * @return Always returns true for simplicity's sake in onCommand
      */
     public boolean handleCommand(CommandSender sender, org.bukkit.command.Command cmd, String label, String[] args) {
@@ -122,6 +126,21 @@ public class SkyblockCommandFramework implements CommandExecutor {
                 }
             }
         }
+
+    }
+
+    public void registerAllCommands() {
+        Reflections reflection = new Reflections("net.atlas.SkyblockSandbox.command.commands");
+        for (Class<? extends SkyblockCommandFramework> clazz : reflection.getSubTypesOf(SkyblockCommandFramework.class)) {
+            try {
+                Constructor<? extends SkyblockCommandFramework> ctor = clazz.getDeclaredConstructor(Plugin.class);
+                SkyblockCommandFramework cmd = ctor.newInstance(SBX.getInstance());
+                registerCommands(cmd);
+                System.out.println(clazz.getName() + " successfully registered.");
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -132,8 +151,10 @@ public class SkyblockCommandFramework implements CommandExecutor {
         for (String s : commandMap.keySet()) {
             if (!s.contains(".")) {
                 org.bukkit.command.Command cmd = map.getCommand(s);
-                HelpTopic topic = new GenericCommandHelpTopic(cmd);
-                help.add(topic);
+                if(cmd!=null) {
+                    HelpTopic topic = new GenericCommandHelpTopic(cmd);
+                    help.add(topic);
+                }
             }
         }
         IndexHelpTopic topic = new IndexHelpTopic(plugin.getName(), "All commands for " + plugin.getName(), null, help,
@@ -142,7 +163,7 @@ public class SkyblockCommandFramework implements CommandExecutor {
     }
 
     public void registerCommand(SBCommand command, String label, Method m, Object obj) {
-        commandMap.put(label.toLowerCase(), new AbstractMap.SimpleEntry<Method, Object>(m, obj));
+        commandMap.put(label.toLowerCase(), new AbstractMap.SimpleEntry<>(m, obj));
         commandMap.put(this.plugin.getName() + ':' + label.toLowerCase(), new AbstractMap.SimpleEntry<Method, Object>(m, obj));
         String cmdLabel = label.split("\\.")[0].toLowerCase();
         if (map.getCommand(cmdLabel) == null) {
@@ -156,6 +177,7 @@ public class SkyblockCommandFramework implements CommandExecutor {
             map.getCommand(cmdLabel).setUsage(command.usage());
         }
     }
+
 
     public void registerCompleter(String label, Method m, Object obj) {
         String cmdLabel = label.split("\\.")[0].toLowerCase();

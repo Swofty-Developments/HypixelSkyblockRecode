@@ -28,9 +28,23 @@ public class Sound extends Function {
 
     @Override
     public void applyFunction() {
-        float volume = Float.parseFloat(FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.VOLUME));
-        double pitch = Double.parseDouble(FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.PITCH));
-        int delay = Integer.parseInt(FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.DELAY));
+        String vol = FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.VOLUME);
+        if (vol.isEmpty()) {
+            vol = "1";
+        }
+        float volume = Float.parseFloat(vol);
+
+        String pitc = FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.PITCH);
+        if (pitc.isEmpty()) {
+            pitc = "1";
+        }
+        double pitch = Double.parseDouble(pitc);
+
+        String del = FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.DELAY);
+        if (del.isEmpty()) {
+            del = "0";
+        }
+        int delay = Integer.parseInt(del);
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -71,19 +85,19 @@ public class Sound extends Function {
             setAction(13, event -> {
                 if (event.getClick().equals(ClickType.RIGHT)) {
                     String vol = FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.VOLUME);
-                    if(vol.isEmpty()) {
+                    if (vol.isEmpty()) {
                         vol = "1";
                     }
                     float volume = Float.parseFloat(vol);
 
                     String pitc = FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.PITCH);
-                    if(pitc.isEmpty()) {
+                    if (pitc.isEmpty()) {
                         pitc = "1";
                     }
                     double pitch = Double.parseDouble(pitc);
 
                     String del = FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.DELAY);
-                    if(del.isEmpty()) {
+                    if (del.isEmpty()) {
                         del = "0";
                     }
                     int delay = Integer.parseInt(del);

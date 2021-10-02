@@ -100,4 +100,25 @@ public class AbilityUtil {
         return "";
     }
 
+    public static ItemStack removeAbility(ItemStack stack,int index) {
+        if (stack != null) {
+            if (stack.hasItemMeta()) {
+                net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
+                NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+                NBTTagCompound data = tag.getCompound("ExtraAttributes");
+                NBTTagCompound abils = data.getCompound("Abilities");
+                NBTTagCompound ability = abils.getCompound("Ability_" + index);
+
+                abils.remove("Ability_" + index);
+                data.set("Abilities", abils);
+                tag.set("ExtraAttributes", data);
+
+                nmsItem.setTag(tag);
+
+                return CraftItemStack.asBukkitCopy(nmsItem);
+            }
+        }
+        return stack;
+    }
+
 }

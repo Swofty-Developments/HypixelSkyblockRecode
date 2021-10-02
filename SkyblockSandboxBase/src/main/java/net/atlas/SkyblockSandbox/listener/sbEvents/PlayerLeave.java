@@ -3,6 +3,7 @@ package net.atlas.SkyblockSandbox.listener.sbEvents;
 import net.atlas.SkyblockSandbox.AuctionHouse.guis.AuctionCreatorGUI;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.database.mongo.MongoCoins;
+import net.atlas.SkyblockSandbox.island.islands.FairySouls;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
 import org.bson.Document;
@@ -33,6 +34,7 @@ public class PlayerLeave extends SkyblockListener<PlayerQuitEvent> {
             doc.put(type.getName() + "_lvl",amt);
         }
         playerData.setData(event.getPlayer().getUniqueId(),"Skills",doc);
+        playerData.setData(event.getPlayer().getUniqueId(),"fairy-souls", FairySouls.cachedFairySouls.get(event.getPlayer().getUniqueId()));
         cachedSkillLvls.remove(event.getPlayer().getUniqueId());
         cachedSkills.remove(event.getPlayer().getUniqueId());
     }

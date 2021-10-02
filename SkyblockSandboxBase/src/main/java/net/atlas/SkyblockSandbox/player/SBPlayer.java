@@ -8,6 +8,7 @@ import com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder;
 import lombok.Setter;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.database.mongo.MongoAH;
+import net.atlas.SkyblockSandbox.island.islands.FairySouls;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.item.SkyblockItem;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
@@ -137,6 +138,10 @@ public class SBPlayer extends PluginPlayer {
 
             for (PlayerStat s : PlayerStat.values()) {
                 double stat = map.get(s);
+                HashMap<PlayerStat,Double> fairyMap = FairySouls.getPlayerRewards(pl);
+                if(fairyMap.containsKey(s)) {
+                    stat+=fairyMap.get(s);
+                }
                 if (pl.getStat(s) < pl.getMaxStat(s) && !s.isRegen()) {
                     pl.setStat(s, pl.getMaxStat(s));
                 }
@@ -332,7 +337,12 @@ public class SBPlayer extends PluginPlayer {
         HashMap<SkillType, Double> map;
         if (cachedSkills.containsKey(sbPlayer.getUniqueId())) {
             map = new HashMap<>(cachedSkills.get(sbPlayer.getUniqueId()));
-            map.put(type, map.get(type) + amt);
+            //idfk what this is; Intellij thingy:
+            //what it does:
+            //if(map.get(type)==null) {
+            //   map.put(type,amt);
+            // }
+            map.merge(type, amt, Double::sum);
         } else {
             map = new HashMap<>();
             map.put(type, amt);
