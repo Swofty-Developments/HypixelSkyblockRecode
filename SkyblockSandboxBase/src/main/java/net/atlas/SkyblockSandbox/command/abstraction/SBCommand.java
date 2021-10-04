@@ -1,5 +1,7 @@
 package net.atlas.SkyblockSandbox.command.abstraction;
 
+import net.atlas.SkyblockSandbox.util.SUtil;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -31,7 +33,7 @@ public @interface SBCommand {
      *
      * @return
      */
-    public String noPerm() default "You do not have permission to perform that action";
+    public String noPerm() default "§cYou must be admin or higher to use that command!";
 
     /**
      * A list of alternate names that the command is executed under. See

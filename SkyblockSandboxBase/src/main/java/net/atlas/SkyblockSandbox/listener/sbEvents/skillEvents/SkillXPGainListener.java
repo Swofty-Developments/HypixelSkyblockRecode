@@ -30,9 +30,9 @@ public class SkillXPGainListener extends SkyblockListener<SkillEXPGainEvent> {
 
         p.addSkillXP(event.getSkill(), event.getExpAmt());
 
-        if(p.getCurrentSkillExp(event.getSkill())>=SkillType.getLvlXP(p.getSkillLvl(event.getSkill()))) {
+        /*if(p.getCurrentSkillExp(event.getSkill())>=SkillType.getLvlXP(p.getSkillLvl(event.getSkill()))) {
             p.levelSkill(event.getSkill());
-        }
+        }*/
 
         if (event.getSkill().equals(SkillType.COMBAT)) {
             if (activeSlayers.containsKey(p.getUniqueId())) {

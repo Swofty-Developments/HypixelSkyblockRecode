@@ -47,6 +47,7 @@ public class EntitySpawnEvent extends SkyblockListener<org.bukkit.event.entity.E
                         empty.setCustomName(SUtil.colorize("&70"));
                         empty.setSize(1);
                         empty.setMaxHealth(Integer.MAX_VALUE);
+
                         setAI(empty, false);
                         empty.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, -10, false, false));
                         empty.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 10, false, false));

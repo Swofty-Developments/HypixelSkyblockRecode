@@ -30,7 +30,7 @@ public class Command_spawnmob extends SkyblockCommandFramework {
         super(plugin);
     }
 
-    @SBCommand(name = "spawnmob", aliases = { "spawncustommob" }, description = "Spawns a mob with flags", usage = "/spawnmob <Type> <Health> --noai --noteleport")
+    @SBCommand(name = "spawnmob", aliases = { "spawncustommob" }, description = "Spawns a mob with flags", usage = "/spawnmob <Type> <Health> --noai --noteleport",permission = "sbx.admin.spawnmob")
     public void spawnMobCmd(SBCommandArgs cmd) {
         if (cmd.getSender() instanceof Player) {
             SBPlayer p = new SBPlayer((Player) cmd.getSender());

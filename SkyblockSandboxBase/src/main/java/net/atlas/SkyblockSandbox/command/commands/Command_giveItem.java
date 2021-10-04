@@ -22,7 +22,7 @@ public class Command_giveItem extends SkyblockCommandFramework {
         super(plugin);
     }
 
-    @SBCommand(name = "giveItem", aliases = { "getItem","getCustomItem","getCustom" }, description = "Gives you any custom item.", usage = "/getItem <Item ID>")
+    @SBCommand(name = "giveItem", aliases = { "getItem","getCustomItem","getCustom" }, description = "Gives you any custom item.", usage = "/getItem <Item ID>",permission = "sbx.admin.item")
     public void giveItemCmd(SBCommandArgs cmd) {
         if (cmd.getSender() instanceof Player) {
             SBPlayer p = new SBPlayer((Player) cmd.getSender());

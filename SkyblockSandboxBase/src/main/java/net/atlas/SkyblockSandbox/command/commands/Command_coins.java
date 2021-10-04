@@ -27,7 +27,7 @@ public class Command_coins extends SkyblockCommandFramework {
         super(plugin);
     }
 
-    @SBCommand(name = "coins", aliases = {"skyblockcoins"}, description = "Gives/Takes coins", usage = "/coins <add/take> <Player> <Amount>")
+    @SBCommand(name = "coins", aliases = {"skyblockcoins"}, description = "Gives/Takes coins", usage = "/coins <add/take> <Player> <Amount>",permission = "sbx.admin.economy")
     public void coinsCommand(SBCommandArgs cmd) {
         if (cmd.getSender() instanceof Player) {
             SBPlayer p = new SBPlayer((Player) cmd.getSender());

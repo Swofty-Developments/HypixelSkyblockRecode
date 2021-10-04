@@ -65,6 +65,9 @@ public class EntityDeathEvent extends SkyblockListener<org.bukkit.event.entity.E
             }
             dragonDownMessage(StartFight.activeDrag, event.getEntity().getKiller(), event.getEntity().getLocation());
         }
+        if(event.getEntity().hasMetadata("entity-tag")) {
+            event.getDrops().clear();
+        }
     }
 }
 

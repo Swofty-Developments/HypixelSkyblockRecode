@@ -30,7 +30,7 @@ public class Command_jingle extends SkyblockCommandFramework {
         super(plugin);
     }
 
-    @SBCommand(name = "playJingle", aliases = { "jingle" }, description = "Allows you to play jingles", usage = "/playJingle <Jingle ID> <Player> <Loop>")
+    @SBCommand(name = "playJingle", aliases = { "jingle" }, description = "Allows you to play jingles", usage = "/playJingle <Jingle ID> <Player> <Loop>",permission = "sbx.admin.sound")
     public void jingleCommand(SBCommandArgs cmd) {
         if (cmd.getSender() instanceof Player) {
             SBPlayer sender = new SBPlayer((Player) cmd.getSender());
