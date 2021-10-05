@@ -36,6 +36,23 @@ public class BreakListener implements Listener {
     public void blockBreak(BlockDamageEvent e) {
         //e.setCancelled(true);
         Player p = e.getPlayer();
+        if(e.getBlock().getType().name().contains("LOG")) {
+            Block b = e.getBlock();
+            MineTask previous = isClicking.get(p.getUniqueId());
+            if(previous==null || !previous.getBlock().getLocation().equals(b.getLocation())) {
+                if(previous !=null) {
+                    previous.cancel();
+                }
+
+                SBPlayer pl = new SBPlayer(p);
+                MiningBlock mb = MiningBlocks.toMiningBlock(b);
+
+                MineTask task = new MineTask(pl,b,mb);
+                int taskID = scheduler.scheduleSyncRepeatingTask(SBX.getInstance(),task,0L,0L);
+                task.setTaskID(taskID);
+                isClicking.put(p.getUniqueId(),task);
+            }
+        }
         if (p.getItemInHand() != null && !p.getItemInHand().getType().equals(Material.AIR)) {
             String ID = NBTUtil.getString(p.getItemInHand(),"item-type");
             if(ID!=null) {

@@ -16,6 +16,7 @@ public class ChatEvent extends SkyblockListener<AsyncPlayerChatEvent> {
         if(isTyping.containsKey(event.getPlayer().getUniqueId())) {
             if(isTyping.get(event.getPlayer().getUniqueId())) {
                 event.setCancelled(true);
+
                 storedPets.get(event.getPlayer().getUniqueId()).texture("http://textures.minecraft.net/texture/" + event.getMessage());
                 new PetBuilderGUI(new SBPlayer(event.getPlayer())).open();
                 isTyping.put(event.getPlayer().getUniqueId(),false);

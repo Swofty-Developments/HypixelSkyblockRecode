@@ -45,6 +45,12 @@ public class Shortbow extends Function {
                 arrowAmt = 5;
             }
             double angle = (100.76 / (arrowAmt - 1));
+            if(arrowAmt<=2) {
+                angle = 100.76/2;
+            }
+            if(arrowAmt==4) {
+                angle = 100.76/2;
+            }
             Arrow a1 = null;
             for (int i = 0; i < arrowAmt; i++) {
                 Arrow arrow = player.launchProjectile(Arrow.class);
@@ -62,10 +68,10 @@ public class Shortbow extends Function {
                             arrow.setVelocity(rotateVector(a1.getVelocity(), angle));
                             break;
                         case 3:
-                            arrow.setVelocity(rotateVector(a1.getVelocity(), -angle * (arrowAmt - 1) / 2));
+                            arrow.setVelocity(rotateVector(a1.getVelocity(), -angle * 2));
                             break;
                         case 4:
-                            arrow.setVelocity(rotateVector(a1.getVelocity(), angle * (arrowAmt - 1) / 2));
+                            arrow.setVelocity(rotateVector(a1.getVelocity(), angle * 2));
                             break;
                     }
 
@@ -77,7 +83,7 @@ public class Shortbow extends Function {
                 public void run() {
                     canfire.put(player.getPlayer(), true);
                 }
-            }.runTaskLater(SBX.getInstance(), 87 / 13);
+            }.runTaskLater(SBX.getInstance(), (long) 6.4);
 
         }
     }
@@ -113,7 +119,7 @@ public class Shortbow extends Function {
         }
         setItem(13, makeColorfulItem(Material.ARROW, "&aSet arrow amount!", 1, 0, "&7Current arrow amount: &a" + arrows, "", "&eClick to set!", "&cMAX 5 ARROWS!"));
         setAction(13, event -> {
-            anvilGUI(dataValues.ARROW_AMOUNT);
+            anvilGUI(dataValues.ARROW_AMOUNT,1,5);
         });
     }
 }

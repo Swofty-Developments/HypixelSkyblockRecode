@@ -24,7 +24,10 @@ public enum MiningBlocks {
     RUBY_GEMSTONE("Ruby Gemstone",Material.STAINED_GLASS,80,2500,(byte) 14),
     TOPAZ_GEMSTONE("Topaz Gemstone",Material.STAINED_GLASS,80,4000,(byte) 4),
     JASPER_GEMSTONE("Jasper Gemstone",Material.STAINED_GLASS,80,5000,(byte) 2),
-    OAK_LOG("Oak Log",Material.LOG,8,SkillType.FORAGING,80,(byte) 1);
+    OAK_LOG_1("Oak Log 1",Material.LOG,8,SkillType.FORAGING,80,(byte) 0),
+    OAK_LOG_2("Oak Log 2",Material.LOG,8,SkillType.FORAGING,80,(byte) 4),
+    OAK_LOG_3("Oak Log 3",Material.LOG,8,SkillType.FORAGING,80,(byte) 8),
+    OAK_LOG_4("Oak Log 4",Material.LOG,8,SkillType.FORAGING,80,(byte) 12);
 
 
 

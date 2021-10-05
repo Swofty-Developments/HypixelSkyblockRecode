@@ -69,7 +69,7 @@ public class Implosion extends Function {
         setItem(13, makeColorfulItem(Material.BOOK_AND_QUILL, "&aImplosion Range", 1, 0, "&7Edit the range of the", "&bImplosion Function&7!", "", "&eClick to set!"));
         setItem(14, makeColorfulItem(Material.FEATHER, "&aToggle message", 1, 0, "&7Turn on and off the", "&bImplosion Function &7message!", "", "&bRight-click to disable!", "&eLeft-click to enable!"));
         setAction(13, event -> {
-            anvilGUI(dataValues.IMPLOSION_RANGE);
+            anvilGUI(dataValues.IMPLOSION_RANGE,1,15);
         });
         setAction(14, event -> {
             ItemStack stack = getStack();

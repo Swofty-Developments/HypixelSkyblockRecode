@@ -118,16 +118,16 @@ public class Sound extends Function {
         setItem(15, makeColorfulItem(Material.WATCH, "&aSet the delay", 1, 0, "&7Set the delay of the", "&7sound played!", "", "&7Maximum: &a5.0", "&7Minimum: &a0.0", "", "&eClick to set!"));
 
         setAction(11, event -> {
-            anvilGUI(dataValues.PITCH);
+            anvilGUI(dataValues.PITCH,0,2);
         });
         setAction(12, event -> {
-            anvilGUI(dataValues.VOLUME);
+            anvilGUI(dataValues.VOLUME,0,10);
         });
         setAction(14, event -> {
-            anvilGUI(dataValues.AMOUNT);
+            anvilGUI(dataValues.AMOUNT,1,30);
         });
         setAction(15, event -> {
-            anvilGUI(dataValues.DELAY);
+            anvilGUI(dataValues.DELAY,0,5);
         });
     }
 }
