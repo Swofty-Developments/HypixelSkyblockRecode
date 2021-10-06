@@ -127,6 +127,41 @@ public class StorageCache
 		CACHED_PLAYERS.add(player.getUniqueId());
 	}
 
+	public void toMongoFromCache(int page) {
+		MongoDB mongoDB = SBX.getInstance().mongoStorage;
+
+		switch (page) {
+			case 1:
+				mongoDB.setData(player.getUniqueId(), "enderchest_page_1", ENDER_CHEST_PAGE_1.get(player.getUniqueId()));
+				break;
+			case 2:
+				mongoDB.setData(player.getUniqueId(), "enderchest_page_2", ENDER_CHEST_PAGE_2.get(player.getUniqueId()));
+				break;
+			case 3:
+				mongoDB.setData(player.getUniqueId(), "enderchest_page_3", ENDER_CHEST_PAGE_3.get(player.getUniqueId()));
+				break;
+			case 4:
+				mongoDB.setData(player.getUniqueId(), "enderchest_page_4", ENDER_CHEST_PAGE_4.get(player.getUniqueId()));
+				break;
+			case 5:
+				mongoDB.setData(player.getUniqueId(), "enderchest_page_5", ENDER_CHEST_PAGE_5.get(player.getUniqueId()));
+				break;
+			case 6:
+				mongoDB.setData(player.getUniqueId(), "enderchest_page_6", ENDER_CHEST_PAGE_6.get(player.getUniqueId()));
+				break;
+			case 7:
+				mongoDB.setData(player.getUniqueId(), "enderchest_page_7", ENDER_CHEST_PAGE_7.get(player.getUniqueId()));
+				break;
+			case 8:
+				mongoDB.setData(player.getUniqueId(), "enderchest_page_8", ENDER_CHEST_PAGE_8.get(player.getUniqueId()));
+				break;
+			case 9:
+				mongoDB.setData(player.getUniqueId(), "enderchest_page_9", ENDER_CHEST_PAGE_9.get(player.getUniqueId()));
+				break;
+		}
+	}
+
+
 	public boolean isCached() {
 		return CACHED_PLAYERS.contains(player.getUniqueId());
 	}

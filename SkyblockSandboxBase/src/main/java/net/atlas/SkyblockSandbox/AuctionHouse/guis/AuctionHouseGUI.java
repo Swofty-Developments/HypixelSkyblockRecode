@@ -37,7 +37,9 @@ public class AuctionHouseGUI extends NormalGUI {
             new AuctionBrowserGUI(getOwner()).open();
         });
         setAction(13, event -> {
-            new AuctionYourBidsGUI(getOwner()).open();
+            if(!getOwner().getItemsBided().isEmpty()) {
+                new AuctionYourBidsGUI(getOwner()).open();
+            }
         });
         return true;
     }
@@ -61,7 +63,9 @@ public class AuctionHouseGUI extends NormalGUI {
         } else {
             setItem(15, makeColorfulItem(Material.GOLD_BARDING, "&6Make auction", 1,0));
         }
-        setItem(13, makeColorfulItem(Material.GOLDEN_CARROT, "&6Your bids", 1, 0));
+        if (!getOwner().getItemsBided().isEmpty()) {
+            setItem(13, makeColorfulItem(Material.GOLDEN_CARROT, "&6Your bids", 1, 0));
+        }
         setItem(11, makeColorfulItem(Material.GOLD_BLOCK, "&aBrowse AH", 1, 0));
 
     }

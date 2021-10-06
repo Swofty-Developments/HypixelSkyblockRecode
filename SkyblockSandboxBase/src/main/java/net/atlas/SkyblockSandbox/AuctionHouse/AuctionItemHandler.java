@@ -38,6 +38,7 @@ public class AuctionItemHandler {
     public final boolean isBin;
     public final UUID owner;
     public final Category category;
+    public boolean claimed = false;
     public AuctionItemHandler(UUID auctionID, UUID owner, String itemStack, ZonedDateTime startTime, ZonedDateTime endTime, boolean hasEnded, double startingPrice, double currentPrice, ArrayList<AuctionBidHandler> bids, boolean isBin, Category category) {
         this.auctionID = auctionID;
         this.owner = owner;
@@ -52,7 +53,7 @@ public class AuctionItemHandler {
         this.category = category;
     }
 
-    public ItemStack createItem() {
+    public ItemStack createItem(SBPlayer player) {
         ItemStack s = BukkitSerilization.itemStackFromBase64(itemStack);
         ItemStack s1 = NBTUtil.setString(s, auctionID.toString(), "Auction-id");
 
@@ -69,16 +70,29 @@ public class AuctionItemHandler {
             lore.add("&7Top bid: &6" + (new DecimalFormat("#,###")).format((this.getBids().get(this.getBids().size() - 1)).getPrice()) + " coins");
             lore.add("&7Bidder: " + (this.getBids().get(this.getBids().size() - 1)).getName());
         }
+        if(this.getOwner() == player.getUniqueId()) {
+            lore.add("");
+            lore.add("&aThis is your own auction!");
+        }
 
         lore.add("");
-        lore.add("§7Ends in: §e" + time(this.endTime, ZonedDateTime.now(ZoneId.of("-05:00"))));
+        if (isHasEnded()) {
+            if (getBids().isEmpty()) {
+                lore.add("&7Status: &cExpired!");
+            } else {
+                lore.add("&7Status: &aEnded!");
+            }
+        } else {
+            lore.add("§7Ends in: §e" + time(this.endTime, ZonedDateTime.now(ZoneId.of("-05:00"))));
+        }
+        lore.add("");
         lore.add("§eClick to inspect!");
         meta.setLore(SUtil.colorize(lore));
         s1.setItemMeta(meta);
         return s1;
     }
 
-    public ItemStack createInspectorItem() {
+    public ItemStack createInspectorItem(SBPlayer player) {
         ItemStack s = BukkitSerilization.itemStackFromBase64(this.itemStack);
         ItemStack s1 = NBTUtil.setString(s, this.auctionID.toString(), "Auction-id");
 
@@ -97,8 +111,21 @@ public class AuctionItemHandler {
             lore.add("&7Bidder: " + (this.getBids().get(this.getBids().size() - 1)).getName());
         }
 
+        if(this.getOwner() == player.getUniqueId()) {
+            lore.add("");
+            lore.add("&aThis is your own auction!");
+        }
+
         lore.add("");
-        lore.add("§7Ends in: §e" + time(this.endTime, ZonedDateTime.now(ZoneId.of("-05:00"))));
+        if (isHasEnded()) {
+            if (getBids().isEmpty()) {
+                lore.add("&7Status: &cExpired!");
+            } else {
+                lore.add("&7Status: &aEnded!");
+            }
+        } else {
+            lore.add("§7Ends in: §e" + time(this.endTime, ZonedDateTime.now(ZoneId.of("-05:00"))));
+        }
         meta.setLore(SUtil.colorize(lore));
         s1.setItemMeta(meta);
         return s1;
@@ -171,8 +198,41 @@ public class AuctionItemHandler {
             } catch (Exception ignored) {
             }
             AuctionBidHandler.bids.put(id, bids);
-            ITEMS.put(id, new AuctionItemHandler(id, UUID.fromString(doc.getString("owner")), doc.getString("item"), ZonedDateTime.ofInstant(Instant.ofEpochMilli(doc.getLong("startTime")), ZoneId.of("-05:00")), ZonedDateTime.ofInstant(Instant.ofEpochMilli(doc.getLong("endTime")), ZoneId.of("-05:00")), doc.getBoolean("hasEnded"), doc.getDouble("startingPrice"), doc.getDouble("currentPrice"), bids, false, Category.valueOf(doc.getString("category"))));
+            AuctionItemHandler item = new AuctionItemHandler(id, UUID.fromString(doc.getString("owner")), doc.getString("item"), ZonedDateTime.ofInstant(Instant.ofEpochMilli(doc.getLong("startTime")), ZoneId.of("-05:00")), ZonedDateTime.ofInstant(Instant.ofEpochMilli(doc.getLong("endTime")), ZoneId.of("-05:00")), doc.getBoolean("hasEnded"), doc.getDouble("startingPrice"), doc.getDouble("currentPrice"), bids, false, Category.valueOf(doc.getString("category")));
+            if(doc.get("isClaimed") == null) {
+                item.setClaimed(false);
+            } else {
+                item.setClaimed(doc.getBoolean("isClaimed"));
+            }
+            AuctionItemHandler.ITEMS.put(id, item);
         }
+    }
+    public AuctionBidHandler getLastBid() {
+        return getBids().get(getBids().size()-1);
+    }
+    public static AuctionItemHandler mongoToCache(UUID id) {
+        Document doc = mongo.getDoc(id);
+        ArrayList<AuctionBidHandler> bids = new ArrayList<>();
+        try {
+            for (Object o : (ArrayList<Object>) mongo.getDoc(id).get("bids")) {
+                Document doc2 = (Document) o;
+                doc2.forEach((uuid, nameDoc) -> {
+                    ((Document) nameDoc).forEach((name, timePriceDoc) -> {
+                        ((Document) timePriceDoc).forEach((time, price) -> {
+                            bids.add(new AuctionBidHandler(UUID.fromString(uuid), name, ZonedDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(time)), ZoneId.of("-05:00")), (Double) price));
+                        });
+                    });
+                });
+            }
+        } catch (Exception ignored) {
+        }
+        AuctionItemHandler item = new AuctionItemHandler(id, UUID.fromString(doc.getString("owner")), doc.getString("item"), ZonedDateTime.ofInstant(Instant.ofEpochMilli(doc.getLong("startTime")), ZoneId.of("-05:00")), ZonedDateTime.ofInstant(Instant.ofEpochMilli(doc.getLong("endTime")), ZoneId.of("-05:00")), doc.getBoolean("hasEnded"), doc.getDouble("startingPrice"), doc.getDouble("currentPrice"), bids, false, Category.valueOf(doc.getString("category")));
+        if(doc.get("isClaimed") == null) {
+            item.setClaimed(false);
+        } else {
+            item.setClaimed(doc.getBoolean("isClaimed"));
+        }
+        return item;
     }
 
     public enum Category {

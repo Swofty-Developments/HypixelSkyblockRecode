@@ -18,19 +18,7 @@ public class AuctionYourBidsGUI extends NormalGUI implements Backable {
     public static HashMap<UUID, ArrayList<AuctionItemHandler>> items = new HashMap<>();
     public AuctionYourBidsGUI(SBPlayer owner) {
         super(owner);
-        ArrayList<AuctionItemHandler> list =  new ArrayList<>();
-        for (AuctionItemHandler item : AuctionItemHandler.ITEMS.values()) {
-            AtomicBoolean con = new AtomicBoolean(true);
-
-            for (AuctionBidHandler bid : AuctionBidHandler.bids.get(item.getAuctionID())) {
-                if (bid.getUuid().toString().equals(owner.getUniqueId().toString()) && con.get()) {
-                    list.add(item);
-                    con.set(false);
-                }
-            }
-        }
-
-        items.put(owner.getUniqueId(), list);
+        items.put(owner.getUniqueId(), owner.getItemsBided());
     }
 
     @Override
@@ -61,7 +49,7 @@ public class AuctionYourBidsGUI extends NormalGUI implements Backable {
     public void setItems() {
         getGui().getFiller().fillBorder(ItemBuilder.from(FILLER_GLASS).asGuiItem());
         items.get(getOwner().getUniqueId()).forEach(item -> {
-            getGui().addItem(ItemBuilder.from(item.createInspectorItem()).asGuiItem());
+            getGui().addItem(ItemBuilder.from(item.createInspectorItem(getOwner())).asGuiItem());
         });
     }
 

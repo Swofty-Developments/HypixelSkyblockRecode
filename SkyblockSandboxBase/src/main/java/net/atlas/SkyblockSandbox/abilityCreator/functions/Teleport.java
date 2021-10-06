@@ -1,7 +1,6 @@
 package net.atlas.SkyblockSandbox.abilityCreator.functions;
 
 import net.atlas.SkyblockSandbox.abilityCreator.AbilityValue;
-import net.atlas.SkyblockSandbox.abilityCreator.AdvancedFunctions;
 import net.atlas.SkyblockSandbox.abilityCreator.Function;
 import net.atlas.SkyblockSandbox.abilityCreator.FunctionUtil;
 import net.atlas.SkyblockSandbox.item.ability.AbilityData;

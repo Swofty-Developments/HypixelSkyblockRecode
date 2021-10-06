@@ -105,7 +105,7 @@ public class CreativeItemPage extends PaginatedGUI {
                 }
                 break;
             default:
-                if(event.getCurrentItem().hasItemMeta()) return;
+                if(event.getCurrentItem().getItemMeta().getDisplayName().equals(SUtil.colorize("&7 "))) return;
                 if (p.hasSpace()) {
                     p.getInventory().addItem(event.getCurrentItem());
                     p.playSound(p.getLocation(), Sound.NOTE_PLING, 1f, 2f);

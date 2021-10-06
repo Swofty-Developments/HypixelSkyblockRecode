@@ -77,28 +77,22 @@ public class AuctionBrowserGUI extends PaginatedGUI implements Backable {
     }
 
     public void setItems() {
-        getGui().getFiller().fillBorder(((ItemBuilder)ItemBuilder.from(new ItemStack(Material.STAINED_GLASS_PANE, 1, (short)((byte)((Category)openCategory.get(getOwner().getUniqueId())).glassColor))).name(Component.text(SUtil.colorize("&7 ")))).asGuiItem());
+        getGui().getFiller().fillBorder((ItemBuilder.from(new ItemStack(Material.STAINED_GLASS_PANE, 1, ((byte)(openCategory.get(getOwner().getUniqueId())).glassColor))).name(Component.text(SUtil.colorize("&7 ")))).asGuiItem());
         ItemStack next = makeColorfulItem(Material.ARROW, ChatColor.GREEN + "Next Page", 1, 0, "§7Go to the next page.");
         ItemStack prev = makeColorfulItem(Material.ARROW, ChatColor.GREEN + "Previous Page", 1, 0, "§7Go to the previous page.");
-        Iterator var3 = getItems().iterator();
 
-        while(var3.hasNext()) {
-            ItemStack item = (ItemStack)var3.next();
+        for (ItemStack item : getItems()) {
             getGui().addItem(ItemBuilder.from(item).asGuiItem());
         }
 
-        Category[] var7 = Category.values();
-        int var8 = var7.length;
-
-        for(int var5 = 0; var5 < var8; ++var5) {
-            Category cat = var7[var5];
+        for (Category cat : Category.values()) {
             if (cat.getSkull() == null) {
-                setItem(cat.index * 9, makeColorfulItem(cat.getMat(), cat.color + cat.getName(), 1, 0, new String[0]));
+                setItem(cat.index * 9, makeColorfulItem(cat.getMat(), cat.color + cat.getName(), 1, 0));
             } else {
                 setItem(cat.index * 9, makeColorfulCustomSkullItem(cat.getSkull(), cat.color + cat.getName(), 1));
             }
 
-            setItem(cat.index * 9 + 1, ((ItemBuilder)ItemBuilder.from(new ItemStack(Material.STAINED_GLASS_PANE, 1, (short)((byte)((Category)openCategory.get(getOwner().getUniqueId())).glassColor))).name(Component.text(SUtil.colorize("&7 ")))).build());
+            setItem(cat.index * 9 + 1, (ItemBuilder.from(new ItemStack(Material.STAINED_GLASS_PANE, 1, ((byte) (openCategory.get(getOwner().getUniqueId())).glassColor))).name(Component.text(SUtil.colorize("&7 ")))).build());
         }
 
         setItem(53, next);
@@ -118,13 +112,13 @@ public class AuctionBrowserGUI extends PaginatedGUI implements Backable {
     }
 
     public List<ItemStack> getItems() {
-        List<ItemStack> list = new ArrayList();
-        Iterator var2 = AuctionItemHandler.ITEMS.values().iterator();
+        List<ItemStack> list = new ArrayList<>();
 
-        while(var2.hasNext()) {
-            AuctionItemHandler item = (AuctionItemHandler)var2.next();
+        for (AuctionItemHandler item : AuctionItemHandler.ITEMS.values()) {
             if (openCategory.get(getOwner().getUniqueId()) == item.getCategory()) {
-                list.add(item.createItem());
+                if(!item.hasEnded) {
+                    list.add(item.createItem(getOwner()));
+                }
             }
         }
 

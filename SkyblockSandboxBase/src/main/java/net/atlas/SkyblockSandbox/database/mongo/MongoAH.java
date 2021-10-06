@@ -143,6 +143,7 @@ public class MongoAH implements MongoDB {
             setData(id, "startTime", item.getStartTime().toInstant().toEpochMilli());
             setData(id, "endTime", item.getEndTime().toInstant().toEpochMilli());
             setData(id, "hasEnded", item.isHasEnded());
+            setData(id, "isClaimed", item.isClaimed());
             setData(id, "startingPrice", item.getStartingPrice());
             setData(id, "currentPrice", item.getCurrentPrice());
             setData(id, "highestBidder", item.getHighestBidder() != null ? item.getHighestBidder().toString() : "null");
@@ -159,6 +160,7 @@ public class MongoAH implements MongoDB {
             setData(id, "startTime", item.getStartTime().toInstant().toEpochMilli());
             setData(id, "endTime", item.getEndTime().toInstant().toEpochMilli());
             setData(id, "hasEnded", item.isHasEnded());
+            setData(id, "isClaimed", item.isClaimed());
             setData(id, "startingPrice", item.getStartingPrice());
             setData(id, "currentPrice", item.getCurrentPrice());
             setData(id, "highestBidder", item.getHighestBidder() != null ? item.getHighestBidder().toString() : "null");

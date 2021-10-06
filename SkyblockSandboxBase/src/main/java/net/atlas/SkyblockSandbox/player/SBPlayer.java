@@ -6,6 +6,8 @@ import com.xxmicloxx.NoteBlockAPI.model.Song;
 import com.xxmicloxx.NoteBlockAPI.songplayer.RadioSongPlayer;
 import com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder;
 import lombok.Setter;
+import net.atlas.SkyblockSandbox.AuctionHouse.AuctionBidHandler;
+import net.atlas.SkyblockSandbox.AuctionHouse.AuctionItemHandler;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.database.mongo.MongoAH;
 import net.atlas.SkyblockSandbox.island.islands.FairySouls;
@@ -30,6 +32,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static net.atlas.SkyblockSandbox.SBX.*;
 import static net.atlas.SkyblockSandbox.listener.sbEvents.PlayerJoin.bonusStats;
@@ -390,11 +393,27 @@ public class SBPlayer extends PluginPlayer {
         return false;
     }
 
+    public ArrayList<AuctionItemHandler> getItemsBided() {
+        ArrayList<AuctionItemHandler> list =  new ArrayList<>();
+        for (AuctionItemHandler item : AuctionItemHandler.ITEMS.values()) {
+            AtomicBoolean con = new AtomicBoolean(true);
+            if (AuctionBidHandler.bids.get(item.getAuctionID()) != null) {
+                for (AuctionBidHandler bid : AuctionBidHandler.bids.get(item.getAuctionID())) {
+                    if (bid.getUuid().toString().equals(getUniqueId().toString()) && con.get()) {
+                        list.add(item);
+                        con.set(false);
+                    }
+                }
+            }
+        }
+        return list;
+    }
+
     public enum PlayerStat {
         HEALTH("&a", "health", 100, true, makeColorfulItem(Material.GOLDEN_APPLE, "&cHealth", 1, 0, "")),
         DEFENSE("&a", "defense", 0, false, makeColorfulItem(Material.IRON_CHESTPLATE, "&aDefense", 1, 0, "")),
         STRENGTH("strength", 0, false, makeColorfulItem(Material.BLAZE_POWDER, "&cStrength", 1, 0, "")),
-        SPEED("speed", 100, false, makeColorfulItem(Material.SUGAR, "&rSpeed", 1, 0, "")),
+        SPEED("&a", "speed", 100, false, makeColorfulItem(Material.SUGAR, "&rSpeed", 1, 0, "")),
         CRIT_CHANCE("crit_chance", 30, false, makeColorfulSkullItem("&9Crit Chance", "http://textures.minecraft.net/texture/3e4f49535a276aacc4dc84133bfe81be5f2a4799a4c04d9a4ddb72d819ec2b2b", 1, "")),
         CRIT_DAMAGE("crit_damage", 50, false, makeColorfulSkullItem("&9Crit Damage", "http://textures.minecraft.net/texture/ddafb23efc57f251878e5328d11cb0eef87b79c87b254a7ec72296f9363ef7c", 1, "")),
         INTELLIGENCE("&a", "intelligence", 100, true, makeColorfulItem(Material.ENCHANTED_BOOK, "&bIntelligence", 1, 0, "")),
@@ -406,9 +425,9 @@ public class SBPlayer extends PluginPlayer {
         TRUE_DEFENSE("true_defense", 0, false, makeColorfulItem(Material.INK_SACK, "&rTrue Defense", 1, 15, "")),
         FEROCITY("&a", "ferocity", 0, false, makeColorfulItem(Material.INK_SACK, "&cFerocity", 1, 1, "")),
         ABILITY_DAMAGE("ability_damage", 0, false, makeColorfulItem(Material.BEACON, "&cAbility Damage", 1, 0, "")),
-        MINING_FORTUNE("mining_fortune", 0, false, makeColorfulSkullItem("&6Mining Fortune", "http://textures.minecraft.net/texture/f07dff657d61f302c7d2e725265d17b64aa73642391964fb48fc15be950831d8", 1, "")),
-        FARMING_FORTUNE("farming_fortune", 0, false, makeColorfulSkullItem("&6Farming Fortune", "http://textures.minecraft.net/texture/2ab879e1e590041146bc78c018af5877d39e5475eb7db368fcaf2acda373833d", 1, "")),
-        FORAGING_FORTUNE("foraging_fortune", 0, false, makeColorfulSkullItem("&6Foraging Fortune", "http://textures.minecraft.net/texture/4f960c639d4004d1882575aeba69f456fb3c744077935714947e19c1306d2733", 1, "")),
+        MINING_FORTUNE("&a", "mining_fortune", 0, false, makeColorfulSkullItem("&6Mining Fortune", "http://textures.minecraft.net/texture/f07dff657d61f302c7d2e725265d17b64aa73642391964fb48fc15be950831d8", 1, "")),
+        FARMING_FORTUNE("&a", "farming_fortune", 0, false, makeColorfulSkullItem("&6Farming Fortune", "http://textures.minecraft.net/texture/2ab879e1e590041146bc78c018af5877d39e5475eb7db368fcaf2acda373833d", 1, "")),
+        FORAGING_FORTUNE("&a", "foraging_fortune", 0, false, makeColorfulSkullItem("&6Foraging Fortune", "http://textures.minecraft.net/texture/4f960c639d4004d1882575aeba69f456fb3c744077935714947e19c1306d2733", 1, "")),
         PRISTINE("pristine", 0, false, makeColorfulSkullItem("&5Pristine", "http://textures.minecraft.net/texture/db6975af70724d6a44fd5946e60b2717737dfdb545b4dab1893351a9c9dd183c", 1, "")),
         DAMAGE("damage", 0, false, makeColorfulItem(Material.IRON_SWORD, "&cDamage", 1, 0, "")),
         GEAR_SCORE("&d", "gear_score", 0, false, makeColorfulItem(Material.INK_SACK, "&dGear Score", 1, 0, ""));

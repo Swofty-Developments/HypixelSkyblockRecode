@@ -6,6 +6,8 @@ import com.google.common.base.Enums;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import net.atlas.SkyblockSandbox.AuctionHouse.AuctionItemHandler;
+import net.atlas.SkyblockSandbox.command.abstraction.SBCommandArgs;
+import net.atlas.SkyblockSandbox.command.abstraction.SBCompleter;
 import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
 import net.atlas.SkyblockSandbox.command.commands.*;
 import net.atlas.SkyblockSandbox.customMining.BreakListener;
@@ -51,12 +53,14 @@ import org.bukkit.*;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.craftbukkit.libs.jline.internal.Log;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -81,6 +85,7 @@ import java.util.*;
 import static net.atlas.SkyblockSandbox.command.commands.Command_forward.MESSAGE_CHANNEL;
 import static net.atlas.SkyblockSandbox.listener.sbEvents.entityEvents.EntitySpawnEvent.holoMap;
 import static net.atlas.SkyblockSandbox.listener.sbEvents.entityEvents.EntitySpawnEvent.holoMap2;
+import static net.atlas.SkyblockSandbox.command.commands.Command_forward.MESSAGE_CHANNEL;
 
 public class SBX extends JavaPlugin {
     public static HashMap<UUID, Boolean> isSoulCryActive = new HashMap<>();
@@ -125,11 +130,22 @@ public class SBX extends JavaPlugin {
         mongoStats = new MongoCoins();
         mongoStats.connect();
         protocolManager = ProtocolLibrary.getProtocolManager();
-        new MongoAH().connect();
+        MongoAH mongoAH = new MongoAH();
+        mongoAH.connect();
         long time = System.currentTimeMillis();
         System.out.println("Starting to cache all ah data....");
         try {
-            AuctionItemHandler.mongoToCache();
+            for (Document doc : new MongoAH().getAllDocuments()) {
+                AuctionItemHandler item = AuctionItemHandler.mongoToCache(UUID.fromString(doc.getString("auctionID")));
+                if(AuctionItemHandler.time(item.getEndTime(), item.getStartTime()).equals("")) {
+                    item.setHasEnded(true);
+                    mongoAH.setData(item.getAuctionID(), "isClaimed", false);
+                    item.setClaimed(false);
+                }
+                if (!item.isClaimed()) {
+                    AuctionItemHandler.ITEMS.put(item.getAuctionID(), item);
+                }
+            }
             System.out.println("Successfully cached all ah data! (" + (System.currentTimeMillis() - time) + " ms)");
         } catch (Exception e) {
             System.err.println("Failed to cache all ah data! (" + (System.currentTimeMillis() - time) + " ms)");
@@ -218,6 +234,24 @@ public class SBX extends JavaPlugin {
     }
 
     void startOnlineRunnables() {
+        MongoAH mongo = new MongoAH();
+        BukkitTask updateAH = new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (Document doc : new MongoAH().getAllDocuments()) {
+                    AuctionItemHandler item = AuctionItemHandler.mongoToCache(UUID.fromString(doc.getString("auctionID")));
+                    if(AuctionItemHandler.time(item.getEndTime(), item.getStartTime()).equals("")) {
+                        item.setHasEnded(true);
+                        mongo.setData(item.getAuctionID(), "isClaimed", false);
+                        item.setClaimed(false);
+                    }
+                    if (!item.isClaimed()) {
+                        AuctionItemHandler.ITEMS.put(item.getAuctionID(), item);
+                    }
+                }
+            }
+        }.runTaskTimerAsynchronously(this, 0, 100);
+
         BukkitTask runnable = new BukkitRunnable() {
             @Override
             public void run() {
@@ -418,10 +452,11 @@ public class SBX extends JavaPlugin {
                                 }
                                 String parsedRarity = ChatColor.stripColor(lore.get(lore.size() - 1)).split(" ")[0];
                                 Rarity r = Enums.getIfPresent(Rarity.class, parsedRarity).orNull();
-
-                                NBTTagCompound nbt = MojangsonParser.parse(json.get("nbttag").toString());
                                 net.minecraft.server.v1_8_R3.ItemStack itemStack = CraftItemStack.asNMSCopy(StackUtils.makeColorfulItem(mat, displayname, 1, Integer.parseInt(json.get("damage").toString()), lore));
-                                itemStack.setTag(nbt);
+                                if (json.get("nbttag") != null) {
+                                    NBTTagCompound nbt = MojangsonParser.parse(json.get("nbttag").toString());
+                                    itemStack.setTag(nbt);
+                                }
                                 ItemStack bukkitStack = CraftItemStack.asBukkitCopy(itemStack);
                                 for (String s : lore) {
                                     String parsedStat = ChatColor.stripColor(s).replace(' ', '_').toUpperCase().split(":")[0];
@@ -488,7 +523,7 @@ public class SBX extends JavaPlugin {
                             } catch (MojangsonParseException e) {
                                 e.printStackTrace();
                             }
-                        } catch (NullPointerException ignored) {
+                        } catch (NullPointerException | IllegalArgumentException ignored) {
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }

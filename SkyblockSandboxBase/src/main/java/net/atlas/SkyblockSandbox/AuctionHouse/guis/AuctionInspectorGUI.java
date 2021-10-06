@@ -11,6 +11,7 @@ import net.atlas.SkyblockSandbox.AuctionHouse.AuctionBidHandler;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.AuctionHouse.AuctionItemHandler;
 import net.atlas.SkyblockSandbox.economy.CoinEvent;
+import net.atlas.SkyblockSandbox.economy.Coins;
 import net.atlas.SkyblockSandbox.gui.Backable;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
@@ -35,35 +36,79 @@ public class AuctionInspectorGUI extends NormalGUI implements Backable {
     public boolean setClickActions() {
         if (this.item.getOwner().equals(this.getOwner().getUniqueId())) {
             this.setAction(29, (e) -> {
-                this.getOwner().sendMessage("&aYou cannot bid on your own auction!");
+                if (item.hasEnded && !item.claimed) {
+                    if (item.getBids().isEmpty()) {
+                        if (getOwner().hasSpace()) {
+                            this.getOwner().getInventory().addItem(BukkitSerilization.itemStackFromBase64(this.item.getItemStack()));
+                            item.setClaimed(true);
+                            item.updateToDB();
+                            AuctionItemHandler.ITEMS.remove(this.item.auctionID);
+                            this.getOwner().closeInventory();
+                        } else {
+                            getOwner().sendMessage("&cYou don't have enough space in your inventory!");
+                        }
+                    } else {
+                        SBX.getInstance().coins.addCoins(getOwner(), item.getLastBid().getPrice(), CoinEvent.AH);
+                        item.setClaimed(true);
+                        item.updateToDB();
+                        AuctionItemHandler.ITEMS.remove(this.item.auctionID);
+                    }
+                } else {
+                    this.getOwner().sendMessage("&aYou cannot bid on your own auction!");
+                }
             });
-            if (this.item.getHighestBidder() == null) {
+            if (this.item.getBids().isEmpty()) {
                 this.setAction(31, (e) -> {
                     if (this.item.getBids().isEmpty()) {
-                        this.item.setHasEnded(true);
-                        this.item.updateToDB();
-                        AuctionItemHandler.ITEMS.remove(this.item.auctionID);
-                        this.getOwner().getInventory().addItem(BukkitSerilization.itemStackFromBase64(this.item.getItemStack()));
-                        this.getOwner().closeInventory();
+                        if (getOwner().hasSpace()) {
+                            this.item.setHasEnded(true);
+                            this.item.setClaimed(true);
+                            this.item.updateToDB();
+                            AuctionItemHandler.ITEMS.remove(this.item.auctionID);
+                            this.getOwner().getInventory().addItem(BukkitSerilization.itemStackFromBase64(this.item.getItemStack()));
+                            this.getOwner().closeInventory();
+                        } else {
+                            getOwner().sendMessage("&cYou don't have enough space in your inventory!");
+                        }
                     }
 
                 });
             }
-        } else if (SBX.getInstance().coins.getCoins(this.getOwner()) >= this.item.getCurrentPrice() * 1.15D) {
-            this.getOwner().sendMessage(String.valueOf(SBX.getInstance().coins.getCoins(this.getOwner())));
+        } else{
             this.setAction(29, (e) -> {
-                double lastPrice = 0.0D;
+                if (item.hasEnded && !item.claimed) {
+                    if(item.getLastBid().getUuid() == getOwner().getUniqueId()) {
+                        if (getOwner().hasSpace()) {
+                            this.getOwner().getInventory().addItem(BukkitSerilization.itemStackFromBase64(this.item.getItemStack()));
+                            this.getOwner().closeInventory();
+                        } else {
+                            getOwner().sendMessage("&cYou don't have enough space in your inventory!");
+                        }
+                    } else {
+                        double amount = 0D;
+                        for (AuctionBidHandler bid : item.getBids()) {
+                            if (bid.getUuid() == getOwner().getUniqueId()) {
+                                amount = bid.getPrice();
+                            }
+                        }
+                        SBX.getInstance().coins.addCoins(getOwner(), amount, CoinEvent.AH);
+                    }
+                } else {
+                    if (SBX.getInstance().coins.getCoins(this.getOwner()) >= this.item.getCurrentPrice() * 1.15D) {
+                        double lastPrice = 0.0D;
 
-                for (AuctionBidHandler data : item.bids) {
-                    if (data.uuid == this.getOwner().getUniqueId()) {
-                        lastPrice = data.price;
+                        for (AuctionBidHandler data : item.bids) {
+                            if (data.uuid == this.getOwner().getUniqueId()) {
+                                lastPrice = data.price;
+                            }
+                        }
+
+                        this.item.bid(this.getOwner());
+                        this.getOwner().sendMessage("&fSuccessfully placed a bid for &6" + (new DecimalFormat("#,###")).format(this.item.getCurrentPrice()) + " coins&f!");
+                        SBX.getInstance().coins.removeCoins(this.getOwner(), this.item.getCurrentPrice() - lastPrice, CoinEvent.AH);
+                        this.updateItems();
                     }
                 }
-
-                this.item.bid(this.getOwner());
-                this.getOwner().sendMessage("&fSuccessfully placed a bid for &6" + (new DecimalFormat("#,###")).format(this.item.getCurrentPrice()) + " coins&f!");
-                SBX.getInstance().coins.removeCoins(this.getOwner(), this.item.getCurrentPrice() - lastPrice, CoinEvent.AH);
-                this.updateItems();
             });
         }
 
@@ -80,17 +125,32 @@ public class AuctionInspectorGUI extends NormalGUI implements Backable {
 
     public void setItems() {
         this.setMenuGlass();
-        this.setItem(13, this.item.createInspectorItem());
+        this.setItem(13, this.item.createInspectorItem(getOwner()));
+
         if (this.item.getOwner().equals(this.getOwner().getUniqueId())) {
-            this.setItem(29, makeColorfulItem(Material.POISONOUS_POTATO, "&6Submit bid", 1, 0, "\n&7New bid: &6" + (new DecimalFormat("#,###")).format(this.item.getCurrentPrice() * 1.15D) + " coins\n\n&aThis is your own auction!"));
-            if (this.item.getBids().isEmpty()) {
-                this.setItem(31, makeColorfulItem(Material.STAINED_CLAY, "&cCancel Auction", 1, 14, new String[0]));
+            if (!item.hasEnded) {
+                this.setItem(29, makeColorfulItem(Material.POISONOUS_POTATO, "&6Submit bid", 1, 0, "\n&7New bid: &6" + (new DecimalFormat("#,###")).format(this.item.getCurrentPrice() * 1.15D) + " coins\n\n&aThis is your own auction!"));
+                if (this.item.getBids().isEmpty()) {
+                    this.setItem(31, makeColorfulItem(Material.STAINED_CLAY, "&cCancel Auction", 1, 14));
+                }
+            } else {
+                if (item.getBids().isEmpty()) {
+                    setItem(29, makeColorfulItem(Material.GOLD_BLOCK, "&7Collect Auction", 1, 0, "\n&7No one has bid on this item.\n&bYou may pick it back up.\n\n&eClick to pick up item!"));
+                } else {
+                    setItem(29, makeColorfulItem(Material.GOLD_BLOCK, "&7Collect Auction", 1, 0, "\n&7Item sold to " + item.getBids().get(item.getBids().size() - 1).getName() + "\n&7for &6" + item.getLastBid().getPrice() + " coins"));
+                }
             }
-        } else if (SBX.getInstance().coins.getCoins(this.getOwner()) >= this.item.getCurrentPrice() * 1.15D) {
-            this.setItem(29, makeColorfulItem(Material.GOLD_NUGGET, "&6Submit bid", 1, 0, new String[0]));
-            this.setItem(31, makeColorfulItem(Material.GOLD_INGOT, "&fBid amound: &6" + this.item.getCurrentPrice() * 1.15D + " coins", 1, 0, new String[0]));
         } else {
-            this.setItem(29, makeColorfulItem(Material.POISONOUS_POTATO, "&6Submit bid", 1, 0, new String[0]));
+            if(item.hasEnded) {
+                setItem(29, makeColorfulItem(Material.GOLD_BLOCK, "&7Collect Auction", 1, 0, "\n&7You had the top bid for &6" + new DecimalFormat("0,000").format(item.getLastBid().getPrice()) + " coins\nYou may collect the item.\n\n&eClick to pick up item!"));
+            } else {
+                if (SBX.getInstance().coins.getCoins(this.getOwner()) >= this.item.getCurrentPrice() * 1.15D) {
+                    this.setItem(29, makeColorfulItem(Material.GOLD_NUGGET, "&6Submit bid", 1, 0));
+                    this.setItem(31, makeColorfulItem(Material.GOLD_INGOT, "&fBid amound: &6" + this.item.getCurrentPrice() * 1.15D + " coins", 1, 0));
+                } else {
+                    this.setItem(29, makeColorfulItem(Material.POISONOUS_POTATO, "&6Submit bid", 1, 0));
+                }
+            }
         }
 
         if (this.item.getBids().isEmpty()) {

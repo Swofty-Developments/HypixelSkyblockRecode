@@ -60,7 +60,7 @@ public class YourAuctionsGUI extends NormalGUI implements Backable {
     public void setItems() {
         getGui().getFiller().fillBorder(ItemBuilder.from(FILLER_GLASS).asGuiItem());
         items.get(getOwner().getUniqueId()).forEach(item -> {
-            getGui().addItem(ItemBuilder.from(item.createInspectorItem()).asGuiItem());
+            getGui().addItem(ItemBuilder.from(item.createInspectorItem(getOwner())).asGuiItem());
         });
         setItem((Math.min(((int) ((items.get(getOwner().getUniqueId()).size() +1) / 9)) + 3, 6) * 9)-3, makeColorfulItem(Material.GOLD_BARDING, "&6Create auction", 1, 0));
     }

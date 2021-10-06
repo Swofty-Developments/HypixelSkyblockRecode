@@ -84,6 +84,8 @@ public class AuctionCreatorGUI extends NormalGUI implements Backable {
                         }
 
                         PlayerItems.remove(player.getUniqueId());
+                        playerTime.remove(player.getUniqueId());
+                        playerPrice.remove(player.getUniqueId());
                         (new AuctionHouseGUI(this.getOwner())).open();
                         (new BukkitRunnable() {
                             public void run() {

@@ -25,9 +25,9 @@ public class EntityBowEvent extends SkyblockListener<EntityShootBowEvent> {
             if (f > 1.0F) {
                 f = 1.0F;
             }
-            //CustomArrow customArrow = new CustomArrow(((CraftWorld)p.getWorld()).getHandle(),((CraftPlayer)p).getHandle(),0.4f);
-            //event.getProjectile().remove();
-            //((CraftWorld)p.getWorld()).getHandle().addEntity(customArrow);
+            CustomArrow customArrow = new CustomArrow(((CraftWorld)p.getWorld()).getHandle(),((CraftPlayer)p).getHandle(),0.4f);
+            event.getProjectile().remove();
+            ((CraftWorld)p.getWorld()).getHandle().addEntity(customArrow);
 
         }
     }
