@@ -22,7 +22,7 @@ public class Command_debugtest extends SkyblockCommandFramework
 		super(plugin);
 	}
 
-	@SBCommand(name = "debugtest")
+	@SBCommand(name = "debugtest",permission = "sbx.developer")
 	public void debugTest(SBCommandArgs cmd)
 	{
 		String[] args = cmd.getArgs();

@@ -278,7 +278,7 @@ public class Particle extends Function {
             new ParticleShapeGUI(getPlayer(),getAbilIndex(),getFunctionIndex()).open();
         });
         setAction(15,event -> {
-            anvilGUI(dataValues.PARTICLE_RANGE);
+            anvilGUI(dataValues.PARTICLE_RANGE,1,30);
         });
     }
 }

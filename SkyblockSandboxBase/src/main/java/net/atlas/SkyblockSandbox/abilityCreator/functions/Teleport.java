@@ -74,7 +74,7 @@ public class Teleport extends Function {
         setItem(13, makeColorfulItem(Material.ENDER_PEARL, "&aTeleport Range", 1, 0, "&7Edit the range of the\n&bTeleport Function&7!\n&7Maximum: &a100\n&7Minimum: &a0\n\n&eClick to set!"));
         setItem(14, makeColorfulItem(Material.FEATHER, "&aToggle message", 1, 0, "&7Turn on and off the\n&bTeleport Function &7message!\n\n&bRight-click to disable!\n&eLeft-click to enable!"));
         setAction(13,event -> {
-            anvilGUI(dataValues.TELEPORT_RANGE);
+            anvilGUI(dataValues.TELEPORT_RANGE,0,100);
         });
         setAction(14,event -> {
             ItemStack stack = getStack();

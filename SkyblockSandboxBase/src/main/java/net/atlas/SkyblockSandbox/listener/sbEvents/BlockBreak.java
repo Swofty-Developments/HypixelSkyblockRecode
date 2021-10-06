@@ -68,6 +68,7 @@ public class BlockBreak extends SkyblockListener<BlockBreakEvent> {
                 SkillEXPGainEvent expGainEvent = new SkillEXPGainEvent(pl, SkillType.FORAGING, 8.0D);
                 Bukkit.getPluginManager().callEvent(expGainEvent);
                 event.setCancelled(false);
+                loc.getBlock().setType(Material.AIR);
                 new BukkitRunnable() {
                     @Override
                     public void run() {

@@ -30,7 +30,7 @@ public class Command_importhead extends SkyblockCommandFramework {
         super(plugin);
     }
 
-    @SBCommand(name = "importhead", aliases = { "importcustomhead","gethead","customhead" }, description = "Gives you any custom head", usage = "/importhead <minecraft.net URL>")
+    @SBCommand(name = "importhead", aliases = { "importcustomhead","gethead","customhead" }, description = "Gives you any custom head", usage = "/importhead <minecraft.net URL>",permission = "sbx.admin.importhead")
     public void importHeadCmd(SBCommandArgs cmd) {
         if (cmd.getSender() instanceof Player) {
             SBPlayer p = new SBPlayer((Player) cmd.getSender());

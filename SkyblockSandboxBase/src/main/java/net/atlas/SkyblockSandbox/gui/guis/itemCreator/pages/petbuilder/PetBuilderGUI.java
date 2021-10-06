@@ -3,6 +3,7 @@ package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.petbuilder;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.gui.AnvilGUI;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
+import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.ItemCreatorGUIMain;
 import net.atlas.SkyblockSandbox.item.Rarity;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
@@ -13,10 +14,12 @@ import net.atlas.SkyblockSandbox.util.NumUtils;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -59,7 +62,7 @@ public class PetBuilderGUI extends NormalGUI {
         setItem(14,makeColorfulItem(Material.STICK,"&aSet Pet Texture",1,0,"","&eClick to set the texture &lIN CHAT.","&cNOTE: &7You will need to paste a texture","&7from minecraft-heads.com."));
         setItem(22,makeColorfulItem(Material.BOOK_AND_QUILL,"&aSet pet perks!",1,0,"","&eClick to add pet perks!"));
         setItem(23, makeColorfulSkullItem("&aSet Pet Type!", "http://textures.minecraft.net/texture/49d0e833d9bda32f2d736d8c3c3be8b9b964addd59357c12263ffccb8b8dae", 1, "&7Click to set the pet type!"));
-
+        setItem(35,makeColorfulItem(Material.STAINED_CLAY,"&aFinish pet!",1, DyeColor.GREEN.getData(),"&7Finish and get the stored pet!","","&eClick to finish!","&bRight-click to clear!"));
     }
 
     @Override
@@ -108,41 +111,34 @@ public class PetBuilderGUI extends NormalGUI {
         setAction(14,event -> {
             isTyping.put(getOwner().getUniqueId(),true);
             getOwner().closeInventory();
-            getOwner().sendMessage(SUtil.colorize("&a&lPlease type the texture ID from the bottom of the minecraft-heads page in chat now. ()"));
+            getOwner().sendMessage(SUtil.colorize("&a&lPlease type the texture ID from the bottom of the minecraft-heads page in chat now. (Example: https://i.imgur.com/T93IgIk.png)"));
         });
         setAction(22, event -> {
             new PetPerkGUI(getOwner()).open();
         });
 
         setAction(31, event -> {
-            ItemStack stack = PetBuilder.init().name("test")
-                    .rarity(Rarity.COMMON)
-                    .petType(Pet.PetType.COMBAT.getPetModifier())
-                    .perk(1, "Test1", "Perk1", "This is the 1st perk")
-                    .perk(2, "Test2", "Perk2", "This is the 2nd perk")
-                    .perk(3, "Test3", "Perk3", "This is the 3rd perk")
-                    .texture("http://textures.minecraft.net/texture/49d0e833d9bda32f2d736d8c3c3be8b9b964addd59357c12263ffccb8b8dae")
-                    .level(100)
-                    .xp(4000000)
-                    .build();
-            getOwner().getInventory().addItem(stack);
-
+            new ItemCreatorGUIMain(getOwner()).open();
         });
         setAction(23,event -> {
             petTypeGui(getOwner());
         });
+        setAction(35,event -> {
+            if(event.getClick()== ClickType.RIGHT) {
+                storedPets.remove(getOwner().getUniqueId());
+                getOwner().playSound(getOwner().getLocation(),Sound.CAT_MEOW,1,1);
+                updateItems();
+            } else {
+                getOwner().playSound(getOwner().getLocation(),Sound.ITEM_PICKUP,1,1);
+                getOwner().getInventory().addItem(new SBItemStack(storedPets.get(getOwner().getUniqueId()).build()).refreshLore());
+            }
+        });
         return true;
-    }
-
-    private void setPetType(String s,ItemStack i,Player player) {
-        ItemStack i1 = NBTUtil.setString(i, SUtil.colorize(s), "pet-type");
-        SBItemStack it = new SBItemStack(i1);
-        player.setItemInHand(it.refreshLore());
     }
 
     public AnvilGUI petTypeGui(SBPlayer player) {
         AnvilGUI gui = new AnvilGUI(player.getPlayer(), event1 -> {
-            setPetType(event1.getName(),player.getItemInHand(),player);
+            storedPets.get(getOwner().getUniqueId()).petType(event1.getName());
             new BukkitRunnable() {
                 @Override
                 public void run() {

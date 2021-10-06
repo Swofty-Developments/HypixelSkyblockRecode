@@ -119,6 +119,9 @@ public class ItemCreatorGUIMain extends NormalGUI {
         setAction(21,event -> {
             new PetBuilderGUI(getOwner()).open();
         });
+        setAction(40,event -> {
+            getOwner().closeInventory();
+        });
         return true;
     }
 

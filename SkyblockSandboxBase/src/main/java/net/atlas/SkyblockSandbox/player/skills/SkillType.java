@@ -31,8 +31,8 @@ public enum SkillType {
     }
 
     public static int getLvlXP(int lvl) {
-        if(lvl>60) {
-            lvl = 60;
+        if(lvl>=60) {
+            lvl = 59;
         }
         if(lvl<0) {
             lvl = 0;

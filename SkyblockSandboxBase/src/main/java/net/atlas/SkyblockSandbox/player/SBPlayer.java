@@ -282,10 +282,29 @@ public class SBPlayer extends PluginPlayer {
     }
 
     public double getCurrentSkillExp(SkillType type) {
+        if (cachedSkills.containsKey(sbPlayer.getUniqueId())) {
+            return cachedSkills.get(sbPlayer.getUniqueId()).get(type);
+        } else {
+            HashMap<SkillType,Double> map = new HashMap<>();
+            map.put(type,0D);
+            cachedSkills.put(sbPlayer.getUniqueId(),map);
+        }
         return cachedSkills.get(sbPlayer.getUniqueId()).get(type);
     }
 
     public int getSkillLvl(SkillType type) {
+        if (!cachedSkillLvls.containsKey(sbPlayer.getUniqueId())) {
+            HashMap<SkillType,Integer> map = new HashMap<>();
+            for(SkillType skill:SkillType.values()) {
+                map.put(skill,0);
+            }
+            cachedSkillLvls.put(sbPlayer.getUniqueId(),map);
+        }
+        if (!cachedSkillLvls.get(sbPlayer.getUniqueId()).containsKey(type)) {
+            HashMap<SkillType,Integer> map = new HashMap<>();
+            map.put(type,0);
+            cachedSkillLvls.put(sbPlayer.getUniqueId(),map);
+        }
         return cachedSkillLvls.get(sbPlayer.getUniqueId()).get(type);
     }
 
@@ -308,6 +327,11 @@ public class SBPlayer extends PluginPlayer {
             playSound(sbPlayer.getLocation(), Sound.LEVEL_UP, 2, 1);
             for (String s : getLevelUpMessage(type, curLvl + 1)) {
                 sendMessage(s);
+            }
+        }
+        if(sbPlayer.getCurrentSkillExp(type)>=SkillType.getLvlXP(getSkillLvl(type))) {
+            if(getSkillLvl(type)!=type.getMaxLvl()) {
+                levelSkill(type);
             }
         }
     }
@@ -350,6 +374,11 @@ public class SBPlayer extends PluginPlayer {
 
         cachedSkills.put(sbPlayer.getUniqueId(), map);
         sbPlayer.playSound(sbPlayer.getLocation(), Sound.ORB_PICKUP, 2, 2f);
+        if (sbPlayer.getCurrentSkillExp(type) >= SkillType.getLvlXP(getSkillLvl(type))) {
+            if(getSkillLvl(type)!=type.getMaxLvl()) {
+                levelSkill(type);
+            }
+        }
     }
 
     public boolean hasAuctions() {

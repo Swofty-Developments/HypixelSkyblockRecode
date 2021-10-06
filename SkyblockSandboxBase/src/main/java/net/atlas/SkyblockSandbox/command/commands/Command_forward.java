@@ -29,7 +29,7 @@ public class Command_forward extends SkyblockCommandFramework {
         super(plugin);
     }
 
-    @SBCommand(name = "forwardcmdtobungeecord", description = "forward a cmd to byngee")
+    @SBCommand(name = "forwardcmdtobungeecord", description = "forward a cmd to bungee",permission = "sbx.admin.bungee")
     public void forwardCmd(SBCommandArgs arguments) {
         String[] args = arguments.getArgs();
         CommandSender sender = arguments.getSender();

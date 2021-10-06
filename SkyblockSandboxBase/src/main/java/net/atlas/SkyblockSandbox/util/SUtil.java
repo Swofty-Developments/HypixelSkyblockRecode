@@ -39,7 +39,7 @@ public class SUtil {
     }
 
     public static String getProgressBar(int current, int max, int totalBars, char symbol, ChatColor completedColor,
-                                 ChatColor notCompletedColor) {
+                                        ChatColor notCompletedColor) {
         float percent = (float) current / max;
         int progressBars = (int) (totalBars * percent);
 
@@ -49,6 +49,9 @@ public class SUtil {
 
     public static String getProgressBar(double current, int max, int totalBars, char symbol, ChatColor completedColor,
                                         ChatColor notCompletedColor) {
+        if(current>max) {
+            current = max;
+        }
         float percent = (float) current / max;
         int progressBars = (int) (totalBars * percent);
 
@@ -62,7 +65,7 @@ public class SUtil {
     }
 
     public static String firstLetterUpper(String s) {
-        if(s.length()>1) {
+        if (s.length() > 1) {
             s = s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
             return s;
         }
@@ -72,7 +75,7 @@ public class SUtil {
     public static void unzipIgnoreFirstFolder(String zipFilePath, String destDir) {
         File dir = new File(destDir);
         // create output directory if it doesn't exist
-        if(!dir.exists()) dir.mkdirs();
+        if (!dir.exists()) dir.mkdirs();
         FileInputStream fis;
         //buffer for read and write data to file
         byte[] buffer = new byte[1024];
@@ -80,10 +83,10 @@ public class SUtil {
             fis = new FileInputStream(zipFilePath);
             ZipInputStream zis = new ZipInputStream(fis);
             ZipEntry ze = zis.getNextEntry();
-            while(ze != null){
-                if(!ze.isDirectory()) {
+            while (ze != null) {
+                if (!ze.isDirectory()) {
                     String fileName = ze.getName();
-                    fileName = fileName.substring(fileName.split("/")[0].length()+1);
+                    fileName = fileName.substring(fileName.split("/")[0].length() + 1);
                     File newFile = new File(destDir + File.separator + fileName);
                     //create directories for sub directories in zip
                     new File(newFile.getParent()).mkdirs();

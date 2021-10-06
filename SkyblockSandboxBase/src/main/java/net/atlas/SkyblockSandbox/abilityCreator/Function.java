@@ -7,7 +7,10 @@ import net.atlas.SkyblockSandbox.gui.AnvilGUI;
 import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.AbilityCreatorGUI;
 import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.functionCreator.FunctionsEditorGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
+import net.atlas.SkyblockSandbox.util.NumUtils;
+import net.atlas.SkyblockSandbox.util.SUtil;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -85,6 +88,47 @@ public abstract class Function {
         gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT,makeColorfulItem(Material.PAPER,"&aSet the " + value.name(),1,0,"&aInput: &e^^^^^"));
         gui.open();
         return gui;
+    }
+
+    public AnvilGUI anvilGUI(Enum<? extends dataValues> value,int min,int max) {
+        AnvilGUI gui = new AnvilGUI(player.getPlayer(),event -> {
+            event.setWillClose(true);
+            String output = String.valueOf(event.getName());
+            if(NumUtils.isInt(output)) {
+                int s = Integer.parseInt(output);
+                if (s < min || s > max) {
+                    invalidInputError("&cThat number is out of the provided range!");
+                    return;
+                }
+            } else {
+                invalidInputError("&cInvalid number!");
+                return;
+            }
+            ItemStack stack = FunctionUtil.setFunctionData(getStack(),getAbilIndex(),getFunctionIndex(),value,output);
+            player.setItemInHand(stack);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    new FunctionsEditorGUI(player,getFunctionType(),abilIndex,functionIndex).open();
+                }
+            }.runTaskLater(SBX.getInstance(), 2);
+        });
+
+        gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT,makeColorfulItem(Material.PAPER,"&aSet the " + value.name(),1,0,"&aInput: &e^^^^^"));
+        gui.open();
+        return gui;
+    }
+
+    public void invalidInputError(String msg) {
+        player.sendMessage(SUtil.colorize(msg));
+        player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT,1,0);
+        player.closeInventory();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                new FunctionsEditorGUI(player,getFunctionType(),abilIndex,functionIndex).open();
+            }
+        }.runTaskLater(SBX.getInstance(), 2);
     }
 
 }

@@ -44,6 +44,7 @@ import net.atlas.SkyblockSandbox.util.StackUtils;
 import net.atlas.SkyblockSandbox.util.signGUI.SignManager;
 import net.minecraft.server.v1_8_R3.*;
 import org.apache.commons.io.FileUtils;
+import org.bson.Document;
 import org.bukkit.Material;
 import org.bukkit.WorldType;
 import org.bukkit.*;
@@ -165,15 +166,19 @@ public class SBX extends JavaPlugin {
     }
 
     public static void cacheSkills() {
+
         for (UUID uid : cachedSkills.keySet()) {
+            Document playerDoc = SBX.getMongoStats().getPlayerDocument(uid);
+            Document skillDoc = (Document) playerDoc.get("Skills");
             for (SkillType type : cachedSkills.get(uid).keySet()) {
                 double amt = cachedSkills.get(uid).get(type);
-                mongoStats.setData(uid, type.getName() + "_xp", amt);
+                skillDoc.put(type.getName() + "_xp",amt);
             }
             for (SkillType type : cachedSkillLvls.get(uid).keySet()) {
                 int amt = cachedSkillLvls.get(uid).get(type);
-                mongoStats.setData(uid, type.getName() + "_lvl", amt);
+                skillDoc.put(type.getName() + "_lvl",amt);
             }
+            SBX.getMongoStats().setData(uid,"Skills",skillDoc);
         }
     }
 

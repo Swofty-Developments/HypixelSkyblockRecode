@@ -1,9 +1,6 @@
 package net.atlas.SkyblockSandbox.abilityCreator;
 
-import net.atlas.SkyblockSandbox.abilityCreator.functions.Implosion;
-import net.atlas.SkyblockSandbox.abilityCreator.functions.Particle;
-import net.atlas.SkyblockSandbox.abilityCreator.functions.Sound;
-import net.atlas.SkyblockSandbox.abilityCreator.functions.Teleport;
+import net.atlas.SkyblockSandbox.abilityCreator.functions.*;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import org.bukkit.inventory.ItemStack;
 
@@ -23,7 +20,8 @@ public enum AbilityValue {
         PARTICLE(Particle.class),
         SOUND(Sound.class),
         PROJECTILE(Implosion.class),
-        HEAD(Implosion.class);
+        HEAD(Implosion.class),
+        SHORTBOW(Shortbow.class);
 
         private Class<? extends Function> function;
 

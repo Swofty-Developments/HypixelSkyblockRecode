@@ -162,6 +162,7 @@ public class PetBuilder {
         stack = NBTUtil.setString(stack,"true","is-pet");
         stack = NBTUtil.setString(stack,"false","is-equipped");
         stack = NBTUtil.setString(stack,"true","non-legacy");
+        stack = NBTUtil.setString(stack,petType,"pet-type");
 
         return stack;
     }

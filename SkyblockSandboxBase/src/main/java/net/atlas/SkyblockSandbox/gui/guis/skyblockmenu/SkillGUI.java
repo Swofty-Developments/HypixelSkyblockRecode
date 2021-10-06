@@ -24,10 +24,10 @@ public class SkillGUI extends NormalGUI {
 
     @Override
     public boolean setClickActions() {
-        setAction(49,event -> {
+        setAction(49, event -> {
             getOwner().closeInventory();
         });
-        setAction(48,event -> {
+        setAction(48, event -> {
             new SBMenu(getOwner()).open();
         });
         return true;
@@ -58,36 +58,52 @@ public class SkillGUI extends NormalGUI {
         setItem(30, makeSkillItem(SkillType.RUNECRAFTING, Material.MAGMA_CREAM));
         setItem(32, makeSkillItem(SkillType.TAMING, Material.MONSTER_EGG));
 
-        setItem(49,makeColorfulItem(Material.BARRIER,"&cClose",1,0));
-        setItem(48,makeColorfulItem(Material.ARROW,"&aGo Back",1,0,"&7To SkyBlock Menu"));
+        setItem(49, makeColorfulItem(Material.BARRIER, "&cClose", 1, 0));
+        setItem(48, makeColorfulItem(Material.ARROW, "&aGo Back", 1, 0, "&7To SkyBlock Menu"));
 
     }
 
     ItemStack makeSkillItem(SkillType type, Material mat) {
         double curxp = getOwner().getCurrentSkillExp(type);
+        String curXpString = String.valueOf(curxp);
         int totalXp = SkillType.getLvlXP(getOwner().getSkillLvl(type));
         int percent = (int) (curxp * 100 / totalXp);
         double c = Math.round(percent * 10.0) / 10.0;
         String pcnt = "&e" + c + "%";
+        if (curxp > 999999) {
+            curXpString = NumberSuffix.format(curxp);
+        }
+        if (getOwner().getSkillLvl(type) >= type.getMaxLvl()) {
+            return makeColorfulItem(mat, "&a" + type.getName() + " " + getOwner().getSkillLvl(type),
+                    1, 0, "", "&8&oYou have reached the max", "&8&olevel for this Skill!", "", "&eClick to view!");
+        }
         return makeColorfulItem(mat, "&a" + type.getName() + " " + getOwner().getSkillLvl(type),
                 1, 0, "", "&7Progress to Level " + (getOwner().getSkillLvl(type) + 1) + ": " + pcnt,
-                SUtil.getProgressBar(curxp, totalXp, 20, '-', ChatColor.DARK_GREEN, ChatColor.WHITE) + " &e" + curxp + "&6/&e" + NumberSuffix.format(totalXp),
+                SUtil.getProgressBar(curxp, totalXp, 20, '-', ChatColor.DARK_GREEN, ChatColor.WHITE) + " &e" + curXpString + "&6/&e" + NumberSuffix.format(totalXp),
                 "",
-                "&7Level " + getOwner().getSkillLvl(type) + " Rewards:",
-                " &eComing Soon!");
+                "&7Level " + (getOwner().getSkillLvl(type) + 1) + " Rewards:",
+                " &eComing Soon!", "", "&eClick to view!");
     }
 
     ItemStack makeSkillItem(SkillType type, Material mat, int damage) {
         double curxp = getOwner().getCurrentSkillExp(type);
+        String curXpString = String.valueOf(curxp);
         int totalXp = SkillType.getLvlXP(getOwner().getSkillLvl(type));
         int percent = (int) (curxp * 100 / totalXp);
         double c = Math.round(percent * 10.0) / 10.0;
         String pcnt = "&e" + c + "%";
+        if (curxp > 999999) {
+            curXpString = NumberSuffix.format(curxp);
+        }
+        if (getOwner().getSkillLvl(type) >= type.getMaxLvl()) {
+            return makeColorfulItem(mat, "&a" + type.getName() + " " + getOwner().getSkillLvl(type),
+                    1, damage, "", "&8&oYou have reached the max", "&8&olevel for this Skill!", "", "&eClick to view!");
+        }
         return makeColorfulItem(mat, "&a" + type.getName() + " " + getOwner().getSkillLvl(type),
                 1, damage, "", "&7Progress to Level " + (getOwner().getSkillLvl(type) + 1) + ": " + pcnt,
-                SUtil.getProgressBar(curxp, totalXp, 20, '-', ChatColor.DARK_GREEN, ChatColor.WHITE) + " &e" + curxp + "&6/&e" + NumberSuffix.format(totalXp),
+                SUtil.getProgressBar(curxp, totalXp, 20, '-', ChatColor.DARK_GREEN, ChatColor.WHITE) + " &e" + curXpString + "&6/&e" + NumberSuffix.format(totalXp),
                 "",
-                "&7Level " + getOwner().getSkillLvl(type) + " Rewards:",
-                " &eComing Soon!");
+                "&7Level " + (getOwner().getSkillLvl(type) + 1) + " Rewards:",
+                " &eComing Soon!", "", "&eClick to view!");
     }
 }

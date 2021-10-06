@@ -54,7 +54,7 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
         Entity damager = event.getDamager();
         if (damagee.hasMetadata("entity-tag")) {
             event.setCancelled(true);
-            if(DamageUtil.getEntityByUniqueID(UUID.fromString(damagee.getMetadata("entity-tag").get(0).asString()))!=null) {
+            if (DamageUtil.getEntityByUniqueID(UUID.fromString(damagee.getMetadata("entity-tag").get(0).asString())) != null) {
                 damagee = DamageUtil.getEntityByUniqueID(UUID.fromString(damagee.getMetadata("entity-tag").get(0).asString()));
                 event = new EntityDamageByEntityEvent(damager, damagee, event.getCause(), event.getDamage());
                 callEvent(event);
@@ -67,17 +67,21 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
             event.setCancelled(true);
             SBPlayer p = new SBPlayer(((Player) damager));
             if (damagee instanceof LivingEntity) {
-                if(damagee instanceof Player) {
+                if (damagee instanceof Player) {
                     isBothPlayers = true;
+                    if (!SBX.pvpEnabled) {
+                        event.setCancelled(true);
+                        return;
+                    }
                 }
                 LivingEntity en = (LivingEntity) damagee;
                 if (en.getMetadata("summon").isEmpty()) {
-                    calculateHit(p, en, event);
+                    calculateHit(p, en, event,true);
                     int timeshit = 0;
-                    if(en.getMetadata("times-hit").size()>=1) {
+                    if (en.getMetadata("times-hit").size() >= 1) {
                         timeshit = en.getMetadata("times-hit").get(0).asInt();
                     }
-                    en.setMetadata("times-hit",new FixedMetadataValue(SBX.getInstance(),timeshit+1));
+                    en.setMetadata("times-hit", new FixedMetadataValue(SBX.getInstance(), timeshit + 1));
                 }
             }
 
@@ -93,10 +97,10 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                     dmg = Slayers.ENDERMAN.getSlayerClass().getDPS().get(tier) / 2D * dmgreduction;
                 }
             } else {
-                if(isBothPlayers) {
+                if (isBothPlayers) {
                     dmg = DamageUtil.calculateSingleHit(damagee, new SBPlayer((Player) damager))/* * dmgreduction*/;
                 } else {
-                    dmg = DamageUtil.calculateSingleHit(damagee,damager);
+                    dmg = DamageUtil.calculateSingleHit(damagee, damager);
                 }
             }
             p.setStat(SBPlayer.PlayerStat.HEALTH, p.getStat(SBPlayer.PlayerStat.HEALTH) - dmg);
@@ -128,11 +132,13 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
             Arrow arrow = (Arrow) damager;
             if (arrow.getShooter() instanceof Player) {
                 SBPlayer p = new SBPlayer((Player) arrow.getShooter());
-                p.playSound(p.getLocation(), Sound.SUCCESSFUL_HIT,1,1);
+                p.playSound(p.getLocation(), Sound.SUCCESSFUL_HIT, 1, 1);
                 if (damagee instanceof LivingEntity) {
                     LivingEntity en = (LivingEntity) damagee;
                     event.setCancelled(true);
-                    calculateHit(p, en, event);
+                    en.setMaximumNoDamageTicks(0);
+                    //en.setNoDamageTicks(0);
+                    calculateHit(p, en, event,true);
                     arrow.remove();
                 }
             }
@@ -142,8 +148,8 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
     }
 
 
-    public double calculateHit(SBPlayer p, LivingEntity damagee, EntityDamageByEntityEvent e) {
-        return calculateAttackSpeed(p, damagee, e);
+    public double calculateHit(SBPlayer p, LivingEntity damagee, EntityDamageByEntityEvent e,boolean arrow) {
+        return calculateAttackSpeed(p, damagee, e,arrow);
     }
 
     public void calculateFeroHit(SBPlayer p, LivingEntity damagee, double fero) {
@@ -152,7 +158,7 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
         double chance = random.nextDouble();
         if ((fero / 100) >= chance) {
             if (fero > 100) {
-                if(fero>5000) {
+                if (fero > 5000) {
                     fero = 5000;
                 }
                 fero -= 100;
@@ -166,7 +172,7 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                     }
                 }.runTaskLater(SBX.getInstance(), 10L);
             }
-            p.playJingle(Jingle.FEROCITY_START,false);
+            p.playJingle(Jingle.FEROCITY_START, false);
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -185,14 +191,14 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                                 public void run() {
                                     damagee.setNoDamageTicks(0);
                                     damagee.setMaximumNoDamageTicks(0);
-                                    if(!damagee.hasMetadata(Slayers.ENDERMAN.toString())) {
+                                    if (!damagee.hasMetadata(Slayers.ENDERMAN.toString())) {
                                         PacketPlayOutEntityStatus packet = new PacketPlayOutEntityStatus(((CraftEntity) damagee).getHandle(), (byte) 2);
                                         ((CraftPlayer) p.getPlayer()).getHandle().playerConnection.sendPacket(packet);
                                     }
                                 }
                             }.runTaskLater(SBX.getInstance(), 1L);
                         }
-                        p.playJingle(Jingle.FEROCITY,false);
+                        p.playJingle(Jingle.FEROCITY, false);
                     }
                 }
             }.runTaskLater(SBX.getInstance(), 10L);
@@ -205,7 +211,7 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
         double chance = random.nextDouble();
         if ((fero / 100) >= chance) {
             if (fero > 100) {
-                if(fero>5000) {
+                if (fero > 5000) {
                     fero = 5000;
                 }
                 fero -= 100;
@@ -234,7 +240,7 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                         public void run() {
                             damagee.setNoDamageTicks(0);
                             damagee.setMaximumNoDamageTicks(0);
-                            if(!damagee.hasMetadata(Slayers.ENDERMAN.toString())) {
+                            if (!damagee.hasMetadata(Slayers.ENDERMAN.toString())) {
                                 PacketPlayOutEntityStatus packet = new PacketPlayOutEntityStatus(((CraftEntity) damagee).getHandle(), (byte) 2);
                                 ((CraftPlayer) p.getPlayer()).getHandle().playerConnection.sendPacket(packet);
                             }
@@ -243,7 +249,7 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                 } else {
                     //damagee.damage(0);
                 }
-                p.playJingle(Jingle.FEROCITY,false);
+                p.playJingle(Jingle.FEROCITY, false);
             }
         }
     }
@@ -267,7 +273,7 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
         return dmg;
     }
 
-    public double calculateAttackSpeed(SBPlayer p, LivingEntity en, EntityDamageByEntityEvent event) {
+    public double calculateAttackSpeed(SBPlayer p, LivingEntity en, EntityDamageByEntityEvent event, boolean arrow) {
         if (en.hasMetadata("canDamage")) {
             //setting I frames for atck speed
             if (en.getMetadata("canDamage").get(0).asBoolean()) {
@@ -285,7 +291,9 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                 }
                 double atckSpeed = p.getMaxStat(SBPlayer.PlayerStat.ATTACK_SPEED);
                 int iframes = (int) (10 / (1 + (atckSpeed / 100)));
-                en.setMetadata("canDamage", new FixedMetadataValue(SBX.getInstance(), false));
+                if (!arrow) {
+                    en.setMetadata("canDamage", new FixedMetadataValue(SBX.getInstance(), false));
+                }
                 double dmg = DamageUtil.calculateSingleHit(en, p);
                 event.setCancelled(false);
                 if (event.getCause().equals(EntityDamageEvent.DamageCause.CUSTOM)) {
@@ -344,17 +352,19 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                     }
                 }
 
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        en.setMetadata("canDamage", new FixedMetadataValue(SBX.getInstance(), true));
-                    }
-                }.runTaskLater(SBX.getInstance(), iframes);
+                if (!arrow) {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            en.setMetadata("canDamage", new FixedMetadataValue(SBX.getInstance(), true));
+                        }
+                    }.runTaskLater(SBX.getInstance(), iframes);
+                }
                 return dmg;
             }
         } else {
             en.setMetadata("canDamage", new FixedMetadataValue(SBX.getInstance(), true));
-            calculateHit(p, en, event);
+            calculateHit(p, en, event,arrow);
         }
         return 0;
     }

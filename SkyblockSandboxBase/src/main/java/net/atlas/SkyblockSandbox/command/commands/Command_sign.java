@@ -22,7 +22,7 @@ public class Command_sign extends SkyblockCommandFramework {
         super(plugin);
     }
 
-    @SBCommand(name = "sign", aliases = {"signature"}, description = "Signs an item.", usage = "/sign <Line>")
+    @SBCommand(name = "sign", aliases = {"signature"}, description = "Signs an item.", usage = "/sign <Line>",permission = "sbx.admin.sign")
     public void signCommand(SBCommandArgs cmd) {
         if (cmd.getSender() instanceof Player) {
             String[] args = cmd.getArgs();
