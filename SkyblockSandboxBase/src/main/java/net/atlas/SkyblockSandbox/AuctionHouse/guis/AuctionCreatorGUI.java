@@ -14,6 +14,7 @@ import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.BukkitSerilization;
 import net.atlas.SkyblockSandbox.util.NumUtils;
+import net.atlas.SkyblockSandbox.util.NumberTruncation.NumberSuffix;
 import net.atlas.SkyblockSandbox.util.signGUI.SignGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -77,11 +78,10 @@ public class AuctionCreatorGUI extends NormalGUI implements Backable {
 
                         if (playerTime.get(player.getUniqueId()) < 1.0F) {
                             AuctionItemHandler.ITEMS.put(auctionID, new AuctionItemHandler(auctionID, getOwner().getUniqueId(), PlayerItems.get(getOwner().getUniqueId()), ZonedDateTime.now(ZoneId.of("-05:00")), ZonedDateTime.now(ZoneId.of("-05:00")).plusMinutes(Math.round(playerTime.get(player.getUniqueId()) * 60.0F)), false, playerPrice.get(getOwner().getUniqueId()), playerPrice.get(getOwner().getUniqueId()), new ArrayList<>(), false, category));
-                            AuctionBidHandler.bids.put(auctionID, new ArrayList<>());
                         } else {
                             AuctionItemHandler.ITEMS.put(auctionID, new AuctionItemHandler(auctionID, getOwner().getUniqueId(), PlayerItems.get(getOwner().getUniqueId()), ZonedDateTime.now(ZoneId.of("-05:00")), ZonedDateTime.now(ZoneId.of("-05:00")).plusHours(Math.round(playerTime.get(player.getUniqueId()))), false, playerPrice.get(getOwner().getUniqueId()), playerPrice.get(getOwner().getUniqueId()), new ArrayList<>(), false, category));
-                            AuctionBidHandler.bids.put(auctionID, new ArrayList<>());
                         }
+                        AuctionBidHandler.bids.put(auctionID, new ArrayList<>());
 
                         PlayerItems.remove(player.getUniqueId());
                         playerTime.remove(player.getUniqueId());
@@ -141,7 +141,7 @@ public class AuctionCreatorGUI extends NormalGUI implements Backable {
             this.setItem(13, makeColorfulItem(Material.STONE_BUTTON, "&7No item", 1, 0));
         }
 
-        this.setItem(31, makeColorfulItem(Material.POWERED_RAIL, "&fStarting bid &6" + playerPrice.get(this.getOwner().getUniqueId()) + " coins", 1, 0));
+        this.setItem(31, makeColorfulItem(Material.POWERED_RAIL, "&fStarting bid: &6" + NumberSuffix.format(playerPrice.get(this.getOwner().getUniqueId())) + " coins", 1, 0));
         if (PlayerItems.containsKey(this.getOwner().getUniqueId())) {
             this.setItem(29, makeColorfulItem(Material.STAINED_CLAY, "§aCreate", 1, 5, "§eClick to create auction!"));
         } else {
@@ -149,11 +149,11 @@ public class AuctionCreatorGUI extends NormalGUI implements Backable {
         }
 
         if (playerTime.get(this.getOwner().getUniqueId()) >= 24.0F) {
-            this.setItem(33, makeColorfulItem(Material.WATCH, "&fDuration: &e" + Math.round(playerTime.get(this.getOwner().getUniqueId())) / 24 + " days", 1, 0));
+            this.setItem(33, makeColorfulItem(Material.WATCH, "&fDuration: &e" + Math.round(playerTime.get(this.getOwner().getUniqueId())) / 24 + " days", 1, 0,"","&eClick to set auction duration!"));
         } else if (playerTime.get(this.getOwner().getUniqueId()) >= 1.0F) {
-            this.setItem(33, makeColorfulItem(Material.WATCH, "&fDuration: &e" + Math.round(playerTime.get(this.getOwner().getUniqueId())) + " hours", 1, 0));
+            this.setItem(33, makeColorfulItem(Material.WATCH, "&fDuration: &e" + Math.round(playerTime.get(this.getOwner().getUniqueId())) + " hours", 1, 0,"","&eClick to set auction duration!"));
         } else {
-            this.setItem(33, makeColorfulItem(Material.WATCH, "&fDuration: &e" + Math.round(playerTime.get(this.getOwner().getUniqueId()) * 60.0F) + " minutes", 1, 0));
+            this.setItem(33, makeColorfulItem(Material.WATCH, "&fDuration: &e" + Math.round(playerTime.get(this.getOwner().getUniqueId()) * 60.0F) + " minutes", 1, 0,"","&eClick to set auction duration!"));
         }
 
     }

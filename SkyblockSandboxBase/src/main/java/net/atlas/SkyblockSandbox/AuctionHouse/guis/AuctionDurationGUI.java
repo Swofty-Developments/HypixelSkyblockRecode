@@ -81,7 +81,7 @@ public class AuctionDurationGUI extends NormalGUI implements Backable {
                         player.sendMessage("§cThat's not a valid number!");
                     }
 
-                })).withLines(new String[]{"", "^^^^^^^^^^^^^^^", "Auction", "minutes"}).open(player.getPlayer());
+                })).withLines("", "^^^^^^^^^^^^^^^", "Auction", "minutes").open(player.getPlayer());
             }
 
         });
@@ -109,7 +109,7 @@ public class AuctionDurationGUI extends NormalGUI implements Backable {
     }
 
     public void openBack() {
-        new AuctionCreatorGUI(this.getOwner(), false);
+        new AuctionCreatorGUI(this.getOwner(), false).open();
     }
 
     public String backTitle() {

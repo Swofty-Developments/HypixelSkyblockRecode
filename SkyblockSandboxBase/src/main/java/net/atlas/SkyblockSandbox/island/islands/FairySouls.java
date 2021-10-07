@@ -8,6 +8,7 @@ import java.util.UUID;
 public class FairySouls {
 
     private final static int initHealthBonus = 3;
+    public final static int maxFairySouls = 227;
 
     public static HashMap<UUID,Integer> cachedFairySouls = new HashMap<>();
 

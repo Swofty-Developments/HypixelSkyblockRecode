@@ -8,6 +8,7 @@ import net.atlas.SkyblockSandbox.util.BukkitSerilization;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import org.bson.Document;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -61,7 +62,7 @@ public class AuctionItemHandler {
         ItemMeta meta = s1.getItemMeta();
         List<String> lore = s1.getItemMeta().getLore() != null ? s1.getItemMeta().getLore() : new ArrayList<>();
         lore.add("§8§m---------------");
-        lore.add("§7Seller: " + this.getOwner());
+        lore.add("§7Seller: " + Bukkit.getPlayer(this.getOwner()).getName());
         if (this.getBids().isEmpty()) {
             lore.add("§7Starting bid: §6" + (new DecimalFormat("#,###")).format(this.getStartingPrice()) + " coins");
         } else {
@@ -101,7 +102,7 @@ public class AuctionItemHandler {
         ItemMeta meta = s1.getItemMeta();
         List<String> lore = s1.getItemMeta().getLore() != null ? s1.getItemMeta().getLore() : new ArrayList<>();
         lore.add("§8§m---------------");
-        lore.add("§7Seller: " + this.getOwner());
+        lore.add("§7Seller: " + Bukkit.getPlayer(this.getOwner()).getName());
         if (this.getBids().isEmpty()) {
             lore.add("§7Starting bid: §6" + (new DecimalFormat("#,###")).format(this.getStartingPrice()) + " coins");
         } else {

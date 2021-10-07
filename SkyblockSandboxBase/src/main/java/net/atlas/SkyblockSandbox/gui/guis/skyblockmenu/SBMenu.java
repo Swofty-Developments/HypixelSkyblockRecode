@@ -57,6 +57,13 @@ public class SBMenu extends NormalGUI {
             gui.open(getOwner().getPlayer());
         });
         setAction(8, event -> {
+            if(cachedFairySouls.containsKey(getOwner().getUniqueId())) {
+                if(cachedFairySouls.get(getOwner().getUniqueId())>=FairySouls.maxFairySouls) {
+                    getOwner().sendMessage(SUtil.colorize("&cMax fairy souls!"));
+                    getOwner().playSound(getOwner().getLocation(),Sound.ENDERMAN_TELEPORT,1,0);
+                    return;
+                }
+            }
             switch (event.getClick()) {
                 case RIGHT:
                     cachedFairySouls.put(getOwner().getUniqueId(),cachedFairySouls.get(getOwner().getUniqueId())+20);
@@ -101,15 +108,15 @@ public class SBMenu extends NormalGUI {
                 "",
                 "&bMiddle-click to reset to default."));
         setItem(13, makeColorfulSkullItem("&a" + owner.getName() + "'s Profile", owner.getName(), 1,
-                Arrays.asList("&cHealth &r" + format.format(owner.getMaxStat(SBPlayer.PlayerStat.HEALTH)),
-                        "&aDefense &r" + format.format(owner.getMaxStat(SBPlayer.PlayerStat.DEFENSE)),
-                        "&cStrength &r" + format.format(owner.getMaxStat(SBPlayer.PlayerStat.STRENGTH)),
-                        "&rSpeed &r" + format.format(owner.getMaxStat(SBPlayer.PlayerStat.SPEED)),
-                        "&9Crit Chance &r" + format.format(owner.getMaxStat(SBPlayer.PlayerStat.CRIT_CHANCE)) + "%",
-                        "&9Crit Damage &r" + format.format(owner.getMaxStat(SBPlayer.PlayerStat.CRIT_DAMAGE)) + "%",
-                        "&bIntelligence &r" + format.format(owner.getMaxStat(SBPlayer.PlayerStat.INTELLIGENCE)),
-                        "&eBonus Attack Speed &r" + format.format(owner.getMaxStat(SBPlayer.PlayerStat.ATTACK_SPEED)) + "%",
-                        "&cFerocity &r" + format.format(owner.getMaxStat(SBPlayer.PlayerStat.FEROCITY)))));
+                Arrays.asList("&cHealth&r: " + format.format(owner.getMaxStat(SBPlayer.PlayerStat.HEALTH)),
+                        "&aDefense&r: " + format.format(owner.getMaxStat(SBPlayer.PlayerStat.DEFENSE)),
+                        "&cStrength&r: " + format.format(owner.getMaxStat(SBPlayer.PlayerStat.STRENGTH)),
+                        "&rSpeed&r: " + format.format(owner.getMaxStat(SBPlayer.PlayerStat.SPEED)),
+                        "&9Crit Chance&r: " + format.format(owner.getMaxStat(SBPlayer.PlayerStat.CRIT_CHANCE)) + "%",
+                        "&9Crit Damage&r: " + format.format(owner.getMaxStat(SBPlayer.PlayerStat.CRIT_DAMAGE)) + "%",
+                        "&bIntelligence&r: " + format.format(owner.getMaxStat(SBPlayer.PlayerStat.INTELLIGENCE)),
+                        "&eBonus Attack Speed&r: " + format.format(owner.getMaxStat(SBPlayer.PlayerStat.ATTACK_SPEED)) + "%",
+                        "&cFerocity&r: " + format.format(owner.getMaxStat(SBPlayer.PlayerStat.FEROCITY)))));
         setItem(20, makeColorfulItem(Material.BLAZE_POWDER, "&aItem Catalogue", 1, 0, "&7View a list of every Skyblock item and &emore!", "", "&eClick to open!"));
         setItem(22, makeColorfulItem(Material.EMERALD, "&aUtilities panel", 1, 0, "&8Personal Troubleshooting", "&7Troubleshoot various minor bugs/glitches", "&7that may occur to you.", "", "&eClick to open!"));
         setItem(23, makeColorfulItem(Material.BOOK_AND_QUILL, "&aQuest Log", 1, 0, "&7View your active quests,", "&7progress, and rewards.", "", "&eClick to view!"));
