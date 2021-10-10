@@ -52,11 +52,11 @@ public class FunctionsEditorGUI extends NormalGUI {
 
     @Override
     public void handleMenu(InventoryClickEvent event) {
-        if (event.getClickedInventory().equals(getOwner().getInventory())) return;
-        event.setCancelled(true);
-        SBPlayer player = getOwner();
-        setAction(31,event1 -> new FunctionsMainGUI(getOwner(), index).open());
-
+        Function function = functionType.getFunction(getOwner(),getOwner().getItemInHand(),index,funcIndex);
+        function.getGuiLayout();
+        if(function.getDefaultClickAction()!=null) {
+            function.getDefaultClickAction().execute(event);
+        }
     }
 
     @Override
@@ -69,7 +69,7 @@ public class FunctionsEditorGUI extends NormalGUI {
         setAction(31,event -> {
             new AbilityCreatorGUI(getOwner(),index).open();
         });
-        return true;
+        return function.getDefaultClickAction() == null;
     }
 
     @Override
@@ -100,23 +100,6 @@ public class FunctionsEditorGUI extends NormalGUI {
                 }
                 if (AbilityData.booleanFromFunction(playerItem, EnumFunctionsData.HEAD_SHOOTER_DAMAGE_ENTITY, index, funcIndex, false)) {
                     setItem(20, makeColorfulItem(Material.IRON_BLOCK, "&aSet the base damage", 1, 0, "&7Set the base damage of the\n&7head spawned!\n&7Maximum: &a100,000\n&7Minimum: &a1000\n\n&eClick to set!"));
-                } else {
-                    setItem(20, FILLER_GLASS);
-                }
-                break;
-            }
-            case PROJECTILE: {
-                ItemStack playerItem = getOwner().getItemInHand();
-                if (AbilityData.stringFromFunction(playerItem, EnumFunctionsData.PROJECTILE_SHOOTER_TYPE, index, funcIndex, null) == null) {
-                    setItem(13, makeColorfulItem(Material.IRON_SWORD, "&aSet the projectile", 1, 0, "&7Set the projectile of the\n&bprojectile shooter function&7!\n&eClick to set!"));
-                } else {
-                    setItem(13, makeColorfulItem(Material.valueOf(AbilityData.stringFromFunction(playerItem, EnumFunctionsData.PROJECTILE_SHOOTER_TYPE, index, funcIndex, null)), "&aSet the projectile", 1, 0, "&7Set the projectile of the\n&bprojectile shooter function&7!\n\n&eClick to set!"));
-                }
-                setItem(11, makeColorfulItem(Material.IRON_SWORD, "&aToggle Entity Damage", 1, 0, "&7Toggle if the spawned\n&7projectile will damage an\n&7entity\n\n&eLeft-Click to enable!\n&bRight-Click to disable!"));
-                setItem(15, FILLER_GLASS);
-
-                if (AbilityData.booleanFromFunction(playerItem, EnumFunctionsData.PROJECTILE_SHOOTER_DAMAGE_ENTITY, index, funcIndex, false)) {
-                    setItem(20, makeColorfulItem(Material.IRON_BLOCK, "&aSet the base damage", 1, 0, "&7Set the base damage of the\n&7projectile spawned!\n&7Maximum: &a100,000\n&7Minimum: &a1000\n\n&eClick to set!"));
                 } else {
                     setItem(20, FILLER_GLASS);
                 }

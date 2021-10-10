@@ -120,7 +120,6 @@ public class DamageUtil {
 
     public static double calculateSingleHit(Entity en, SBPlayer p) {
         boolean isCrit = false;
-        HashMap<SBPlayer.PlayerStat, Double> playerStats = NBTUtil.getAllStats(p);
         double cc = p.getMaxStat(CRIT_CHANCE);
         Random random = new Random();
         double crit = random.nextDouble();
@@ -158,7 +157,50 @@ public class DamageUtil {
         return dmg;
     }
 
-    public static double calculateSingleHit(Entity damagee, Entity damager) {
+    public static double calculateSingleHit(Entity en, SBPlayer p,boolean spawnMarker) {
+        boolean isCrit = false;
+        double cc = p.getMaxStat(CRIT_CHANCE);
+        Random random = new Random();
+        double crit = random.nextDouble();
+        if (cc / 100 >= crit) {
+            isCrit = true;
+        }
+        double wpDmg = p.getMaxStat(DAMAGE);
+        double str = p.getMaxStat(STRENGTH);
+        double cd = p.getMaxStat(CRIT_DAMAGE);
+        double init = (wpDmg + 5D) * (1D + (str / 100D));
+        double mult = 1 + (/*combat lvl*/0 * 0.04);
+        double dmg = 0;
+        if (isCrit) {
+            dmg = init * mult * (1 + (cd / 100D));
+            dmg = calculateEnchants(p, (LivingEntity) en, dmg);
+            dmg = calculateDefense((LivingEntity) en, dmg);
+            if (checkHitShield(en, p, dmg)) {
+                dmg = 0;
+            } else {
+                if (spawnMarker) {
+                    DamageUtil.spawnMarker(en, p, dmg, true);
+                }
+                ((LivingEntity) en).damage(0);
+            }
+        } else {
+            dmg = init * mult;
+            dmg = calculateEnchants(p, (LivingEntity) en, dmg);
+            dmg = calculateDefense((LivingEntity) en, dmg);
+            if (checkHitShield(en, p, dmg)) {
+                dmg = 0;
+            } else {
+                if (spawnMarker) {
+                    DamageUtil.spawnMarker(en, p, dmg, false);
+                }
+                ((LivingEntity) en).damage(0);
+            }
+        }
+
+        return dmg;
+    }
+
+    public static double calculateSingleHit(Entity damagee) {
         boolean isCrit = false;
         HashMap<SBPlayer.PlayerStat, Double> playerStats = new HashMap<>();
         for (SBPlayer.PlayerStat stat : SBPlayer.PlayerStat.values()) {

@@ -54,10 +54,7 @@ public class CScoreboard {
     }
 
     public @Nullable Row addRow(String message){
-        if(this.finished){
-            new NullPointerException("Can not add rows if scoreboard is already finished").printStackTrace();
-            return null;
-        }
+
 
         try{
             final Row row = new Row(this, message, rows.length);
@@ -67,6 +64,7 @@ public class CScoreboard {
 
             return row;
         }catch(Exception e){
+            e.printStackTrace();
             return null;
         }
     }

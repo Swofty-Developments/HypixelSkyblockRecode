@@ -30,8 +30,11 @@ public abstract class Function {
     private final int abilIndex;
     private final int functionIndex;
 
+    public final int CENTER_SLOT = 13;
+
     HashMap<Integer, ItemStack> guiItems = new HashMap<>();
     HashMap<Integer, GuiAction<InventoryClickEvent>> clickActions = new HashMap<>();
+    GuiAction<InventoryClickEvent> defaultAction = null;
 
     public Function(SBPlayer player, ItemStack stack, int abilIndex, int functionIndex) {
         this.player = player;
@@ -57,6 +60,10 @@ public abstract class Function {
         return clickActions;
     }
 
+    public GuiAction<InventoryClickEvent> getDefaultClickAction() {
+        return defaultAction;
+    }
+
     public enum FunctionValues implements dataValues {
         SEND_MESSAGE, NAME;
     }
@@ -65,7 +72,11 @@ public abstract class Function {
         clickActions.put(slot,event);
     }
 
-    public void setItem(int slot,ItemStack item) {
+    public void setDefaultClickAction(GuiAction<InventoryClickEvent> event) {
+        this.defaultAction = event;
+    }
+
+    public void setItem(int slot, ItemStack item) {
         guiItems.put(slot,item);
     }
 
@@ -129,6 +140,10 @@ public abstract class Function {
                 new FunctionsEditorGUI(player,getFunctionType(),abilIndex,functionIndex).open();
             }
         }.runTaskLater(SBX.getInstance(), 2);
+    }
+
+    public void updateItems() {
+        new FunctionsEditorGUI(player,getFunctionType(),abilIndex,functionIndex).open();
     }
 
 }

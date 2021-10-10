@@ -76,7 +76,7 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                 }
                 LivingEntity en = (LivingEntity) damagee;
                 if (en.getMetadata("summon").isEmpty()) {
-                    calculateHit(p, en, event,true);
+                    calculateHit(p, en, event,false);
                     int timeshit = 0;
                     if (en.getMetadata("times-hit").size() >= 1) {
                         timeshit = en.getMetadata("times-hit").get(0).asInt();
@@ -100,7 +100,7 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                 if (isBothPlayers) {
                     dmg = DamageUtil.calculateSingleHit(damagee, new SBPlayer((Player) damager))/* * dmgreduction*/;
                 } else {
-                    dmg = DamageUtil.calculateSingleHit(damagee, damager);
+                    dmg = DamageUtil.calculateSingleHit(damagee);
                 }
             }
             p.setStat(SBPlayer.PlayerStat.HEALTH, p.getStat(SBPlayer.PlayerStat.HEALTH) - dmg);
@@ -262,7 +262,7 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                 damagee.setMaximumNoDamageTicks(0);
             }
         }.runTaskLater(SBX.getInstance(), 1L);
-        double dmg = DamageUtil.calculateSingleHit(damagee, damager);
+        double dmg = DamageUtil.calculateSingleHit(damagee);
         if (damagee.hasMetadata(Slayers.ENDERMAN.toString())) {
             //
             if (damagee.getMetadata("hitshield").get(0).asInt() != 0) {

@@ -227,8 +227,7 @@ public class TradeGUI extends TwoPlayerGUI {
             }
         });
         getP1Gui().setCloseGuiAction(inventoryCloseEvent -> {
-            if (player1confirm && player2confirm) {
-            } else {
+            if (!player1confirm || !player2confirm) {
                 getP2Gui().close(player2);
                 for (ItemStack i : p1Items) {
                     player1.getInventory().addItem(i);
@@ -243,8 +242,7 @@ public class TradeGUI extends TwoPlayerGUI {
             }
         });
         getP2Gui().setCloseGuiAction(inventoryCloseEvent -> {
-            if (player1confirm && player2confirm) {
-            } else {
+            if (!player1confirm || !player2confirm) {
                 getP1Gui().close(player1);
             }
         });
@@ -284,13 +282,31 @@ public class TradeGUI extends TwoPlayerGUI {
         }
         int i = 0;
         for (ItemStack item : p1Items) {
-            getP1Gui().updateItem(p1Items.indexOf(item), ItemBuilder.from(item).asGuiItem());
+            int index = p1Items.indexOf(item);
+            if(!baseLeftSide.contains(index)) {
+                for(int ii:baseLeftSide) {
+                    if (getP1Gui().getGuiItem(ii).getItemStack().getType() == Material.AIR) {
+                        index = ii;
+                        break;
+                    }
+                }
+            }
+            getP1Gui().updateItem(index, ItemBuilder.from(item).asGuiItem());
             getP2Gui().updateItem(p2rightside.get(i), ItemBuilder.from(item).asGuiItem());
             i++;
         }
         i = 0;
         for (ItemStack item : p2Items) {
-            getP2Gui().updateItem(p2Items.indexOf(item), ItemBuilder.from(item).asGuiItem());
+            int index = p2Items.indexOf(item);
+            if(!baseLeftSide.contains(index)) {
+                for(int ii:baseLeftSide) {
+                    if (getP2Gui().getGuiItem(ii).getItemStack().getType() == Material.AIR) {
+                        index = ii;
+                        break;
+                    }
+                }
+            }
+            getP2Gui().updateItem(index, ItemBuilder.from(item).asGuiItem());
             getP1Gui().updateItem(p1rightside.get(i), ItemBuilder.from(item).asGuiItem());
             i++;
         }

@@ -13,10 +13,12 @@ import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class DragonScoreboard {
     CScoreboard scoreboard = null;
+    public static HashMap<Player, CScoreboard> scoreboards = new HashMap<>();
     private final SBX plugin;
 
     public DragonScoreboard(SBX plugin) {
@@ -72,6 +74,7 @@ public class DragonScoreboard {
 
         scoreboard.finish();
         scoreboard.display(p);
+        scoreboards.put(p, scoreboard);
 
         Bukkit.getScheduler().runTaskTimer(SBX.getInstance(), () -> {
             updateScoreboard(p);
@@ -85,66 +88,66 @@ public class DragonScoreboard {
 
     void updateScoreboard(Player p) {
         Coins coins = plugin.coins;
-        Double playercoins = coins.getCoins(p);
-        double dragHealth;
-        double dmg;
-        String dragHealthScore = "";
-        String yourDamageScore = "";
-        if (StartFight.fightActive) {
-            dragHealth = StartFight.dragonHealth;
-            if (!StartFight.playerDMG.containsKey(p)) {
-                StartFight.playerDMG.put(p, 0D);
-            }
-            dmg = StartFight.playerDMG.get(p);
+        Double basecoins = coins.getCoins(p);
+        scoreboard = new CScoreboard("sidemenu", "", colorize("&e&lSKYBLOCK"));
 
-            dragHealthScore = "Dragon Health: " + ChatColor.GREEN + new DecimalFormat("#").format(dragHealth) + ChatColor.RED + "❤";
-            yourDamageScore = "Your Damage: " + ChatColor.RED + new DecimalFormat("#").format(dmg);
-            if (yourDamageScore.length() > 32) {
-                yourDamageScore = yourDamageScore.substring(0, 31);
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yy");
+        LocalDateTime now = LocalDateTime.now();
+
+
+        double dragHealth = StartFight.dragonHealth;
+        String dragHealthScore = "Dragon HP: " + ChatColor.GREEN + new DecimalFormat("#").format(dragHealth) + ChatColor.RED + " ❤";
+        String yourDamageScore;
+        if (StartFight.playerDMG.get(p) != null) {
+            yourDamageScore = "Your Damage: " + ChatColor.RED + new DecimalFormat("###,###.#").format(StartFight.playerDMG.get(p));
+        } else {
+            yourDamageScore = "0";
+        }
+        List<Row> rows = new ArrayList<>();
+        //line 1
+        Row row1 = scoreboard.addRow(colorize("&7" + dtf.format(now) + " &8" + SBX.getInstance().getServer().getServerName()));
+        //line 2
+        Row row2 = scoreboard.addRow("");
+        //line 3
+        Row row3 = scoreboard.addRow(colorize("&r" + "Early Summer 1st"));
+        //line 4
+        Row row4 = scoreboard.addRow(colorize("&7" + "12:00pm"));
+        //line 5
+        Row row5 = scoreboard.addRow(colorize("&7⏣ None"));
+        //line 6
+        Row row6 = scoreboard.addRow(" ");
+        //line 7 and 8
+        DecimalFormat format = new DecimalFormat("###,###");
+        if (basecoins != null) {
+            String purse = "Purse: " + ChatColor.GOLD + format.format(basecoins);
+
+            if (purse.length() >= 31) {
+                purse = ChatColor.WHITE + "Purse: " + ChatColor.GOLD + NumberSuffix.format(basecoins.longValue());
             }
-            if (dragHealthScore.length() > 32) {
+            Row row7 = scoreboard.addRow(purse);
+        }
+
+        //line 9
+        if (StartFight.fightActive) {
+            Row row9 = scoreboard.addRow("  ");
+            if (dragHealthScore.length() > 31) {
                 dragHealthScore = dragHealthScore.substring(0, 31);
             }
-        }
-
-        for (Row r : scoreboard.getRowCache()) {
-            DecimalFormat format = new DecimalFormat("###,###");
-            String purse = "Purse: " + ChatColor.GOLD + "0";
-            if(playercoins!=null) {
-                purse = "Purse: " + ChatColor.GOLD + format.format(playercoins);
-                String purse2 = format.format(playercoins);
+            Row row10 = scoreboard.addRow(dragHealthScore);
+            //line 10
+            if (yourDamageScore.length() > 31) {
+                yourDamageScore = yourDamageScore.substring(0, 31);
             }
-            switch (r.getRowInScoreboard()) {
-                case 0:
-                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yy");
-                    LocalDateTime now = LocalDateTime.now();
-                    String line = colorize("&7" + dtf.format(now)) + ChatColor.DARK_GRAY + " " + SBX.getInstance().getServer().getServerName();
-                    r.setMessage(line);
-                    break;
-                case 6:
-                    if (purse.length() >= 31) {
-                        purse = ChatColor.WHITE + "Purse: " + ChatColor.GOLD + NumberSuffix.format(playercoins.longValue());
-                    }
-                    r.setMessage(purse);
-                    break;
-                case 8:
-                    if (StartFight.fightActive) {
-                        r.setMessage(dragHealthScore);
-                    } else {
-                        r.setMessage(ChatColor.YELLOW + "mc.the-atlas.net");
-                    }
-                    break;
-                case 9:
-                    if (StartFight.fightActive) {
-                        scoreboard.addRow(yourDamageScore);
-                        //r.setMessage(yourDamageScore);
-                    } else {
-                        r.setMessage(" ");
-                    }
-                    break;
-            }
-
+            Row row11 = scoreboard.addRow(yourDamageScore);
+            Row row12 = scoreboard.addRow("   ");
+            Row row13 = scoreboard.addRow(ChatColor.YELLOW + "mc.the-atlas.net");
+        } else {
+            Row row9 = scoreboard.addRow("  ");
+            //line 10
+            Row row10 = scoreboard.addRow(ChatColor.YELLOW + "mc.the-atlas.net");
         }
+        scoreboard.finish();
+        scoreboard.display(p);
     }
 
     String colorize(String s) {

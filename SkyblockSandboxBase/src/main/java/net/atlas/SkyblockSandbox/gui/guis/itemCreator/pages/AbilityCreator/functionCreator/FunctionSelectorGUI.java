@@ -55,6 +55,16 @@ public class FunctionSelectorGUI extends NormalGUI {
             player.setItemInHand(i);
             new FunctionsEditorGUI(getOwner(),AbilityValue.FunctionType.SOUND,index,funcIndex).open();
         });
+        setAction(15,event1 -> {
+            ItemStack i = FunctionUtil.setFunctionData(player.getItemInHand(),index,funcIndex,Function.FunctionValues.NAME, AbilityValue.FunctionType.HEAD.name());
+            player.setItemInHand(i);
+            new FunctionsEditorGUI(getOwner(),AbilityValue.FunctionType.HEAD,index,funcIndex).open();
+        });
+        setAction(16,event1 -> {
+            ItemStack i = FunctionUtil.setFunctionData(player.getItemInHand(),index,funcIndex,Function.FunctionValues.NAME, AbilityValue.FunctionType.PROJECTILE.name());
+            player.setItemInHand(i);
+            new FunctionsEditorGUI(getOwner(),AbilityValue.FunctionType.PROJECTILE,index,funcIndex).open();
+        });
         setAction(17,event1 -> {
             ItemStack i = FunctionUtil.setFunctionData(player.getItemInHand(),index,funcIndex,Function.FunctionValues.NAME, AbilityValue.FunctionType.SHORTBOW.name());
             player.setItemInHand(i);
@@ -83,7 +93,7 @@ public class FunctionSelectorGUI extends NormalGUI {
         setItem(14, makeColorfulSkullItem("&aHead Shooter", "http://textures.minecraft.net/texture/41b830eb4082acec836bc835e40a11282bb51193315f91184337e8d3555583", 1, "&7Set the head, range, toggle\n&7the damage and set the\n&7base damage.\n\n&6Functionality:\n&7Choose any skull in your\n&7inventory and shoot it!\n\n&eClick to set!"));
         setItem(15, makeColorfulSkullItem("&aEntity Shooter", "http://textures.minecraft.net/texture/9e99deef919db66ac2bd28d6302756ccd57c7f8b12b9dca8f41c3e0a04ac1cc", 1, "&7Set the entity.\n\n&c&lTHIS HASN'T BEEN IMPLEMENTED YET!\n\n&eClick to set!"));
         setItem(16, makeColorfulItem(Material.DIAMOND_AXE, "&aProjectile Shooter", 1, 0, "&7Set the projectile and toggle\n&7the message.\n\n&6Functionality:\n&7Launch a projectile\n&7forward!\n\n&eClick to set!"));
-        setItem(17,makeColorfulItem(Material.BOW,"&aShortbow Function",1,2,"&7Set the arrow amount.","","&6Functionality: &7Shoot arrows forward instantly!","","&eClick to set!"));
+        setItem(17,makeColorfulItem(Material.BOW,"&aShortbow Function",1,0,"&7Set the arrow amount.","","&6Functionality: &7Shoot arrows forward instantly!","","&eClick to set!"));
 
 
         /*int ii = 0;

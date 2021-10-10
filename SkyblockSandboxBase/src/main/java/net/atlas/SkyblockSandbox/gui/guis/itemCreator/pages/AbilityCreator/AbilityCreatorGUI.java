@@ -48,9 +48,9 @@ public class AbilityCreatorGUI extends NormalGUI {
                     SBItemStack i = new SBItemStack(player.getItemInHand());
                     if (i.getAbilityData(index, AbilityValue.MANA_COST).isEmpty()) {
                         player.setItemInHand(i.setAbilityData(index, AbilityValue.MANA_COST, 0));
-                        i = new SBItemStack(player.getItemInHand());
-                        player.setItemInHand(i.setAbilityData(index, AbilityValue.NAME, event12.getName()));
                     }
+                    i = new SBItemStack(player.getItemInHand());
+                    player.setItemInHand(i.setAbilityData(index, AbilityValue.NAME, event12.getName()));
 
                     new BukkitRunnable() {
                         @Override

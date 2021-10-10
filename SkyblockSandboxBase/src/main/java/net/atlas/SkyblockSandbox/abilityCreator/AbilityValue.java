@@ -19,8 +19,8 @@ public enum AbilityValue {
         TELEPORT(Teleport.class),
         PARTICLE(Particle.class),
         SOUND(Sound.class),
-        PROJECTILE(Implosion.class),
-        HEAD(Implosion.class),
+        PROJECTILE(Projectile.class),
+        HEAD(Head.class),
         SHORTBOW(Shortbow.class);
 
         private Class<? extends Function> function;
