@@ -140,21 +140,19 @@ public class Projectile extends Function {
                                     if (validEntity(entity)) {
                                         LivingEntity e = (LivingEntity) entity;
                                         double damage = 10000 + ((DamageUtil.calculateSingleHit(e, new SBPlayer(player), false) * 0.10));
-                                        if (cooldownMap.get(entityArmorStand) > 10) {
-                                            DamageUtil.spawnMarker(e, new SBPlayer(player), damage, false);
-                                            cooldownMap.put(entityArmorStand, 0);
-                                            if (e instanceof EnderDragon) {
-                                                if (StartFight.fightActive) {
-                                                    DragonScoreboard dragonScoreboard = new DragonScoreboard(SBX.getInstance());
-                                                    dragonScoreboard.updateDragonDMG(player, damage);
-                                                    LootListener.damage.put(player, StartFight.playerDMG.get(player));
-                                                    e.damage((damage));
-                                                }
-                                            } else {
-                                                e.damage((damage));
+                                        //if (cooldownMap.get(entityArmorStand) > 10) {
+                                        DamageUtil.spawnMarker(e, new SBPlayer(player), damage, false);
+                                        //cooldownMap.put(entityArmorStand, 0);
+                                        if (e instanceof EnderDragon) {
+                                            if (StartFight.fightActive) {
+                                                DragonScoreboard dragonScoreboard = new DragonScoreboard(SBX.getInstance());
+                                                dragonScoreboard.updateDragonDMG(player, damage);
+                                                LootListener.damage.put(player, StartFight.playerDMG.get(player));
                                             }
-                                            player.playSound(e.getLocation(), Sound.ORB_PICKUP, 10f, 1.5f);
                                         }
+                                        e.damage((damage));
+                                        player.playSound(e.getLocation(), Sound.ORB_PICKUP, 10f, 1.5f);
+                                        //}
                                     }
 
                                 }
@@ -229,8 +227,12 @@ public class Projectile extends Function {
             if (event.getCurrentItem().getType() == Material.SKULL_ITEM || event.getCurrentItem().getType() == Material.SKULL) {
                 return;
             }
+            if (event.getRawSlot() > getPlayer().getInventory().getSize()) {
+                return;
+            }
             getPlayer().setItemInHand(FunctionUtil.setFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.PROJECTILE_MATERIAL, event.getCurrentItem().getType().name()));
             updateItems();
+
         });
     }
 

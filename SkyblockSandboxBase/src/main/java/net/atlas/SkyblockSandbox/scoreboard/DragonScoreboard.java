@@ -5,6 +5,7 @@ import net.atlas.SkyblockSandbox.economy.Coins;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.StartFight;
 import net.atlas.SkyblockSandbox.scoreboard.CScoreboard.Row;
 import net.atlas.SkyblockSandbox.util.NumberTruncation.NumberSuffix;
+import net.atlas.SkyblockSandbox.util.SUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -96,7 +97,7 @@ public class DragonScoreboard {
 
 
         double dragHealth = StartFight.dragonHealth;
-        String dragHealthScore = "Dragon HP: " + ChatColor.GREEN + new DecimalFormat("#").format(dragHealth) + ChatColor.RED + " ❤";
+        String dragHealthScore = SUtil.colorize("Dragon HP:&a &a") + new DecimalFormat("#").format(dragHealth) + ChatColor.RED + " ❤";
         String yourDamageScore;
         if (StartFight.playerDMG.get(p) != null) {
             yourDamageScore = "Your Damage: " + ChatColor.RED + new DecimalFormat("###,###.#").format(StartFight.playerDMG.get(p));

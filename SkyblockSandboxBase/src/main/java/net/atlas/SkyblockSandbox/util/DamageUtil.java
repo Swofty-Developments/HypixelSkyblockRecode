@@ -2,10 +2,13 @@ package net.atlas.SkyblockSandbox.util;
 
 import com.google.common.base.Enums;
 import net.atlas.SkyblockSandbox.SBX;
+import net.atlas.SkyblockSandbox.island.islands.end.dragFight.LootListener;
+import net.atlas.SkyblockSandbox.island.islands.end.dragFight.StartFight;
 import net.atlas.SkyblockSandbox.item.ItemType;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.item.enchant.Enchantment;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
+import net.atlas.SkyblockSandbox.scoreboard.DragonScoreboard;
 import net.atlas.SkyblockSandbox.slayer.SlayerTier;
 import net.atlas.SkyblockSandbox.slayer.Slayers;
 import net.minecraft.server.v1_8_R3.EntityArmorStand;
@@ -16,6 +19,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEnderDragon;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -116,6 +120,38 @@ public class DamageUtil {
             }
         }.runTaskLater(SBX.getInstance(), 20L);
 
+    }
+
+    public static boolean doDragonDamage(LivingEntity damagee,SBPlayer p,double dmg) {
+        if (StartFight.fightActive) {
+            if (damagee instanceof CraftEnderDragon) {
+                DragonScoreboard dragonScoreboard = new DragonScoreboard(SBX.getInstance());
+                CraftEnderDragon dragon = (CraftEnderDragon) damagee;
+                double hlth = StartFight.maxDragHealth;
+
+                if (dmg > 120000) {
+                    dmg = 120000 + (dmg * 0.00003);
+                }
+                dragonScoreboard.updateDragonDMG(p.getPlayer(), dmg);
+                LootListener.damage.put(p.getPlayer(), StartFight.playerDMG.get(p.getPlayer()));
+                StartFight.dragonHealth -= dmg;
+                if (StartFight.dragonHealth < 0) {
+                    StartFight.dragonHealth = 0;
+                }
+                double pcntHealth = (StartFight.dragonHealth / StartFight.maxDragHealth) * 200;
+                if (pcntHealth > 200) {
+                    pcntHealth = 200;
+                }
+                if (pcntHealth == 0) {
+                    damagee.setHealth(0);
+                } else {
+                    damagee.setHealth(pcntHealth);
+                    damagee.damage(0);
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     public static double calculateSingleHit(Entity en, SBPlayer p) {

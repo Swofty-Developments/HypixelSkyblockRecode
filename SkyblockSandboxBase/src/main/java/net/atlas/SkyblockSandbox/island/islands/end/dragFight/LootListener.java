@@ -4,6 +4,7 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.dragClasses.AbstractDragon;
 import net.atlas.SkyblockSandbox.database.mongo.MongoCoins;
+import net.atlas.SkyblockSandbox.item.Rarity;
 import net.atlas.SkyblockSandbox.util.StandUtils;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Material;
@@ -34,10 +35,10 @@ import static net.atlas.SkyblockSandbox.island.islands.end.dragFight.StartFight.
 public class LootListener implements Listener {
 
     HashMap<Location, Material> storedBlocks = new HashMap<>();
-    public static HashMap<String,ItemStack> lootDrops = new HashMap<>();
+    public static HashMap<String, ItemStack> lootDrops = new HashMap<>();
     public static HashMap<String, EntityItem> itemDropID = new HashMap<>();
     public static HashMap<String, EntityArmorStand> armorstandHoloID = new HashMap<>();
-    public static Map<Player,Double> damage = new HashMap<>();
+    public static Map<Player, Double> damage = new HashMap<>();
     public static Location lootLoc;
     static MongoCoins db;
 
@@ -52,11 +53,11 @@ public class LootListener implements Listener {
             public void run() {
 
                 try {
-                    for(ArmorStand armor : as) {
-                        if(armor.isOnGround()) {
-                            Block b = armor.getLocation().clone().add(0,-1,0).getBlock();
-                            if(b.getLocation().getY()>=10) {
-                                double wtfisthis = Math.abs(Math.sqrt((spawnLoc.getX()-(b.getLocation().getX())*(spawnLoc.getX()-(b.getLocation().getX()))) + (spawnLoc.getZ()-(b.getLocation().getZ())) * (spawnLoc.getZ()-(b.getLocation().getZ()))));
+                    for (ArmorStand armor : as) {
+                        if (armor.isOnGround()) {
+                            Block b = armor.getLocation().clone().add(0, -1, 0).getBlock();
+                            if (b.getLocation().getY() >= 10) {
+                                double wtfisthis = Math.abs(Math.sqrt((spawnLoc.getX() - (b.getLocation().getX()) * (spawnLoc.getX() - (b.getLocation().getX()))) + (spawnLoc.getZ() - (b.getLocation().getZ())) * (spawnLoc.getZ() - (b.getLocation().getZ()))));
                                 if (!(wtfisthis >= 70)) {
                                     b.getLocation().setY(9);
                                 }
@@ -70,8 +71,9 @@ public class LootListener implements Listener {
                             as.remove(armor);
                         }
                     }
-                } catch(ConcurrentModificationException ignored) {}
-                if(as.isEmpty()) {
+                } catch (ConcurrentModificationException ignored) {
+                }
+                if (as.isEmpty()) {
                     startBlockResetter(reset, resetData);
                     this.cancel();
                 }
@@ -83,7 +85,7 @@ public class LootListener implements Listener {
 
         Bukkit.getScheduler().runTaskLater(SBX.getInstance(), () -> {
 
-            for(Location loc : reset.keySet()) {
+            for (Location loc : reset.keySet()) {
                 loc.getBlock().setType(reset.get(loc));
                 loc.getBlock().setData(resetData.get(loc));
             }
@@ -130,49 +132,49 @@ public class LootListener implements Listener {
             p.sendMessage(ChatColor.YELLOW + "             Runecrafting Experience: " + ChatColor.LIGHT_PURPLE + "0");
             p.sendMessage(ChatColor.GREEN + "----------------------------------------------------");
         }
-        HashMap<Player,Double> weightCopy = new HashMap<>(StartFight.weight);
-        for(Player p: weightCopy.keySet()) {
+        HashMap<Player, Double> weightCopy = new HashMap<>(StartFight.weight);
+        for (Player p : weightCopy.keySet()) {
             Double playerWeight = StartFight.weight.get(p);
             damage = sortByValue(damage);
             List<Player> damagers = new ArrayList<>(damage.keySet());
-            int place = (damagers.indexOf(p)+1);
+            int place = (damagers.indexOf(p) + 1);
 
-            if(killer.getName().equals(p.getName())) {
-                playerWeight+=50;
+            if (killer.getName().equals(p.getName())) {
+                playerWeight += 50;
             }
-            if(place>=16) {
+            if (place >= 16) {
                 playerWeight += 75;
             } else {
-                if(place<15 && place>=11) {
-                    playerWeight+=100;
+                if (place < 15 && place >= 11) {
+                    playerWeight += 100;
                 } else {
-                    if(place<10 && place>=4) {
-                        playerWeight+=125;
+                    if (place < 10 && place >= 4) {
+                        playerWeight += 125;
                     } else {
                         switch (place) {
                             case 1:
-                                playerWeight+=300;
+                                playerWeight += 300;
                             case 2:
-                                playerWeight+=250;
+                                playerWeight += 250;
                             case 3:
-                                playerWeight+=200;
+                                playerWeight += 200;
                         }
                     }
                 }
             }
             StartFight.weight.remove(p);
-            StartFight.weight.put(p,playerWeight);
+            StartFight.weight.put(p, playerWeight);
             System.out.println(StartFight.weight.get(p));
-            ArmorStand lootAs = (ArmorStand) location.getWorld().spawnEntity(location,EntityType.ARMOR_STAND);
+            ArmorStand lootAs = (ArmorStand) location.getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
             lootAs.setVisible(false);
             Double finalPlayerWeight = playerWeight;
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if(lootAs.isOnGround()) {
-                        lootLoc = lootAs.getLocation().clone().subtract(0,1,0);
+                    if (lootAs.isOnGround()) {
+                        lootLoc = lootAs.getLocation().clone().subtract(0, 1, 0);
                         p.sendMessage(String.valueOf(finalPlayerWeight));
-                        calculateDrop(p,lootLoc,finalPlayerWeight);
+                        calculateDrop(p, lootLoc, finalPlayerWeight);
                         damage.remove(p);
                         StartFight.weight.remove(p);
                         StartFight.aotdChance.remove(p);
@@ -182,10 +184,10 @@ public class LootListener implements Listener {
                         this.cancel();
                     }
                 }
-            }.runTaskTimer(SBX.getInstance(),0,0);
+            }.runTaskTimer(SBX.getInstance(), 0, 0);
         }
         ArrayList<ArmorStand> as = new ArrayList<>();
-        for(Location loc : StandUtils.generateSphere(location, 6, false)) {
+        for (Location loc : StandUtils.generateSphere(location, 6, false)) {
             ArmorStand uff = (ArmorStand) loc.getWorld().spawnEntity(loc.clone().add(0.5, 0, 0.5), EntityType.ARMOR_STAND);
             uff.setVisible(false);
             uff.setMarker(false);
@@ -196,11 +198,11 @@ public class LootListener implements Listener {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if(uff.isOnGround()) {
+                    if (uff.isOnGround()) {
                         this.cancel();
                     }
                 }
-            }.runTaskTimer(SBX.getInstance(),0,0);
+            }.runTaskTimer(SBX.getInstance(), 0, 0);
 
         }
         strangeCircleStuff(as);
@@ -238,31 +240,31 @@ public class LootListener implements Listener {
         entityArmorStand.setCustomNameVisible(true);
         entityArmorStand.setPosition(location.getX() + 0.5, location.getY() + 1, location.getZ() + 0.5);
         entityArmorStand.setInvisible(true);
-        entityArmorStand.setPosition(entityArmorStand.locX,entityArmorStand.locY-1,entityArmorStand.locZ);
+        entityArmorStand.setPosition(entityArmorStand.locX, entityArmorStand.locY - 1, entityArmorStand.locZ);
 
 
         PacketPlayOutSpawnEntityLiving standPacket = new PacketPlayOutSpawnEntityLiving(entityArmorStand);
         (entityPlayer.getHandle()).playerConnection.sendPacket(standPacket);
 
         //detector stand
-        ArmorStand as = location.getWorld().spawn(location,ArmorStand.class);
+        ArmorStand as = location.getWorld().spawn(location, ArmorStand.class);
         as.setVisible(false);
         as.setGravity(true);
-        Location asLoc = new Location(location.getWorld(), entityItem.locX,entityItem.locY,entityItem.locZ);
-        as.teleport(asLoc.subtract(0,1,0));
+        Location asLoc = new Location(location.getWorld(), entityItem.locX, entityItem.locY, entityItem.locZ);
+        as.teleport(asLoc.subtract(0, 1, 0));
 
 
         net.minecraft.server.v1_8_R3.ItemStack nmsItem1 = CraftItemStack.asNMSCopy(item);
         NBTTagCompound tag1 = (nmsItem1.hasTag()) ? nmsItem1.getTag() : new NBTTagCompound();
         NBTTagCompound data1 = tag1.getCompound("ExtraAttributes");
         String uuid = data1.getString("UUID");
-        lootDrops.put(uuid,item);
-        itemDropID.put(uuid,entityItem);
-        armorstandHoloID.put(uuid,entityArmorStand);
-        as.setMetadata(player.getName() + "_drag_loot",new FixedMetadataValue(SBX.getInstance(),uuid));
+        lootDrops.put(uuid, item);
+        itemDropID.put(uuid, entityItem);
+        armorstandHoloID.put(uuid, entityArmorStand);
+        as.setMetadata(player.getName() + "_drag_loot", new FixedMetadataValue(SBX.getInstance(), uuid));
     }
 
-    static void calculateDrop(Player p,Location spawnLoc,double playerWeight) {
+    static void calculateDrop(Player p, Location spawnLoc, double playerWeight) {
         Location loc = spawnLoc.clone();
 
         ItemStack drop = null;
@@ -270,35 +272,45 @@ public class LootListener implements Listener {
         String[] splitDrag = StartFight.activeDrag.getName().split(" ");
         String dragID = ChatColor.stripColor(splitDrag[0]);
 
-        double random = Math.random()*100;
-        double aotdChance = StartFight.aotdChance.get(p) + Math.random() * 100;
+        double random = Math.random() * 100;
+        double petChance = Math.random()-(StartFight.aotdChance.get(p)/1000000);
+        double aotdChance = StartFight.aotdChance.get(p) + (Math.random() * 100);
         p.sendMessage(String.valueOf(aotdChance));
         try {
-            if (playerWeight >= 450 && !StartFight.activeDrag.getBukkitEntity().hasMetadata(DragonTypes.SUPERIOR.getMobName()) && StartFight.aotdChance.containsKey(p) && aotdChance > 130) {
-                drop = DragonDrop.SWORD.getItem();
+            if (playerWeight >= 450) {
+                if (petChance <0.0008) {
+                    drop = DragonDrop.Universal.PET.getDrop(Rarity.EPIC);
+                    double legChance = Math.random();
+                    if(legChance<=0.5) {
+                        drop = DragonDrop.Universal.PET.getDrop(Rarity.LEGENDARY);
+                    }
+                }
+            }
+            if (playerWeight >= 450 && !StartFight.activeDrag.getBukkitEntity().hasMetadata(DragonTypes.SUPERIOR.getMobName()) && StartFight.aotdChance.containsKey(p) && aotdChance > 130 && drop == null) {
+                drop = DragonDrop.Universal.SWORD.getDrop();
                 playerWeight -= 450;
             }
             if (drop == null && playerWeight >= 400) {
                 if (random > 65) {
-                    drop = DragonDrop.CHESTPLATE.setArmorType(DragonTypes.valueOf(dragID.toUpperCase()));
+                    DragonDrop.CHESTPLATE.getDrop(DragonTypes.valueOf(dragID.toUpperCase()));
                     playerWeight -= 400;
                 }
             }
             if (drop == null && playerWeight >= 350) {
                 if (random > 55) {
-                    drop = DragonDrop.LEGGINGS.setArmorType(DragonTypes.valueOf(dragID.toUpperCase()));
+                    DragonDrop.LEGGINGS.getDrop(DragonTypes.valueOf(dragID.toUpperCase()));
                     playerWeight -= 350;
                 }
             }
             if (drop == null && playerWeight >= 325) {
                 if (random > 40) {
-                    drop = DragonDrop.HELMET.setArmorType(DragonTypes.valueOf(dragID.toUpperCase()));
+                    DragonDrop.HELMET.getDrop(DragonTypes.valueOf(dragID.toUpperCase()));
                     playerWeight -= 325;
                 }
             }
             if (drop == null && playerWeight >= 300) {
                 if (random > 30) {
-                    drop = DragonDrop.BOOTS.setArmorType(DragonTypes.valueOf(dragID.toUpperCase()));
+                    drop = DragonDrop.BOOTS.getDrop(DragonTypes.valueOf(dragID.toUpperCase()));
                     playerWeight -= 300;
                 }
             }
@@ -316,12 +328,12 @@ public class LootListener implements Listener {
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
         Player p = e.getPlayer();
-        for(Entity en : p.getNearbyEntities(0.2,0.2,0.2)) {
-            if(en.hasMetadata(p.getName() + "_drag_loot")) {
+        for (Entity en : p.getNearbyEntities(0.2, 0.2, 0.2)) {
+            if (en.hasMetadata(p.getName() + "_drag_loot")) {
                 en.remove();
                 p.playSound(p.getLocation(), Sound.ITEM_PICKUP, 1, 1);
 
-                try{
+                try {
                     String uuid = "";
                     for (MetadataValue value : en.getMetadata(p.getName() + "_drag_loot")) {
                         uuid = value.asString();
@@ -330,7 +342,6 @@ public class LootListener implements Listener {
                         pl.sendMessage(ChatColor.GOLD + p.getName() + ChatColor.YELLOW + " has obtained " + lootDrops.get(uuid).getItemMeta().getDisplayName() + ChatColor.YELLOW + "!");
                     }
                     p.getInventory().addItem(lootDrops.get(uuid));
-
 
 
                     //deleting clientside item

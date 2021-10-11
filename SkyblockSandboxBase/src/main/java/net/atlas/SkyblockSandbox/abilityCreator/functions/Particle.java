@@ -39,7 +39,11 @@ public class Particle extends Function {
     public void applyFunction() {
         SBPlayer player = getPlayer();
         ParticleShape shape = Enums.getIfPresent(ParticleShape.class, FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.PARTICLE_SHAPE)).orNull();
-        int range = Integer.parseInt(FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.PARTICLE_RANGE));
+        String strRange = FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.PARTICLE_RANGE);
+        if(strRange.isEmpty()) {
+            strRange = "1";
+        }
+        int range = Integer.parseInt(strRange);
         Particles particles = Enums.getIfPresent(Particles.class, FunctionUtil.getFunctionData(getStack(), getAbilIndex(), getFunctionIndex(), dataValues.PARTICLE_TYPE)).orNull();
         if (shape == null) {
             getPlayer().sendMessage(SUtil.colorize("&cYou don't have a shape set!"));

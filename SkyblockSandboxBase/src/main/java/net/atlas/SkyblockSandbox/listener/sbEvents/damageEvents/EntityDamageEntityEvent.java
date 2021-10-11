@@ -62,13 +62,11 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
             }
 
         }
-        boolean isBothPlayers = false;
         if (damager instanceof Player) {
             event.setCancelled(true);
             SBPlayer p = new SBPlayer(((Player) damager));
             if (damagee instanceof LivingEntity) {
                 if (damagee instanceof Player) {
-                    isBothPlayers = true;
                     if (!SBX.pvpEnabled) {
                         event.setCancelled(true);
                         return;
@@ -76,15 +74,16 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                 }
                 LivingEntity en = (LivingEntity) damagee;
                 if (en.getMetadata("summon").isEmpty()) {
-                    calculateHit(p, en, event,false);
+                    calculateHit(p, en, event, false);
                     int timeshit = 0;
                     if (en.getMetadata("times-hit").size() >= 1) {
                         timeshit = en.getMetadata("times-hit").get(0).asInt();
                     }
                     en.setMetadata("times-hit", new FixedMetadataValue(SBX.getInstance(), timeshit + 1));
+                    return;
                 }
             }
-
+            return;
         }
         if (damagee instanceof Player) {
             SBPlayer p = new SBPlayer((Player) damagee);
@@ -97,14 +96,10 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                     dmg = Slayers.ENDERMAN.getSlayerClass().getDPS().get(tier) / 2D * dmgreduction;
                 }
             } else {
-                if (isBothPlayers) {
-                    dmg = DamageUtil.calculateSingleHit(damagee, new SBPlayer((Player) damager))/* * dmgreduction*/;
-                } else {
-                    dmg = DamageUtil.calculateSingleHit(damagee);
-                }
+                dmg = DamageUtil.calculateSingleHit(damagee);
             }
             p.setStat(SBPlayer.PlayerStat.HEALTH, p.getStat(SBPlayer.PlayerStat.HEALTH) - dmg);
-            double newHealth = Math.ceil((p.getStat(SBPlayer.PlayerStat.HEALTH) / 100) * 20);
+            double newHealth;
             double oldrng = (p.getMaxStat(SBPlayer.PlayerStat.HEALTH) - 0);
             if (oldrng == 0)
                 newHealth = 0;
@@ -123,10 +118,10 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
             }
             event.setDamage(0);
             return;
-        } else {
-            if (!(damager instanceof Player) && damager instanceof LivingEntity) {
-                calculateEntityHit((LivingEntity) damagee, (LivingEntity) damager, event);
-            }
+        }
+        if (damager instanceof LivingEntity) {
+            calculateEntityHit((LivingEntity) damagee, (LivingEntity) damager, event);
+            return;
         }
         if (damager instanceof Arrow) {
             Arrow arrow = (Arrow) damager;
@@ -138,18 +133,78 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                     event.setCancelled(true);
                     en.setMaximumNoDamageTicks(0);
                     //en.setNoDamageTicks(0);
-                    calculateHit(p, en, event,true);
+                    calculateHit(p, en, event, true);
                     arrow.remove();
                 }
             }
-
         }
 
     }
 
 
-    public double calculateHit(SBPlayer p, LivingEntity damagee, EntityDamageByEntityEvent e,boolean arrow) {
-        return calculateAttackSpeed(p, damagee, e,arrow);
+    public double calculateHit(SBPlayer p, LivingEntity damagee, EntityDamageByEntityEvent e, boolean arrow) {
+        return calculateAttackSpeed(p, damagee, e, arrow);
+    }
+
+    public double calculateAttackSpeed(SBPlayer p, LivingEntity damagee, EntityDamageByEntityEvent event, boolean arrow) {
+        if (damagee.hasMetadata("canDamage")) {
+            //setting I frames for atck speed
+            if (damagee.getMetadata("canDamage").get(0).asBoolean()) {
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        damagee.setNoDamageTicks(0);
+                        damagee.setMaximumNoDamageTicks(0);
+                    }
+                }.runTaskLater(SBX.getInstance(), 1L);
+                //calculating and doing ferocity hits, checks if its greater than 0
+                if (p.getMaxStat(SBPlayer.PlayerStat.FEROCITY) > 0) {
+                    double fero = p.getMaxStat(SBPlayer.PlayerStat.FEROCITY);
+                    calculateFeroHit(p, damagee, fero);
+                }
+                double atckSpeed = p.getMaxStat(SBPlayer.PlayerStat.ATTACK_SPEED);
+                int iframes = (int) (10 / (1 + (atckSpeed / 100)));
+                if (!arrow) {
+                    damagee.setMetadata("canDamage", new FixedMetadataValue(SBX.getInstance(), false));
+                }
+                double dmg = DamageUtil.calculateSingleHit(damagee, p);
+                event.setCancelled(false);
+                if (event.getCause().equals(EntityDamageEvent.DamageCause.CUSTOM)) {
+                    //Actually dealing damage
+                    damagee.damage(dmg);
+                } else {
+                    if (damagee.hasMetadata(Slayers.ENDERMAN.toString())) {
+                        if (damagee.getMetadata("hitshield").get(0).asInt() == 0) {
+                            damagee.damage(dmg);
+                        }
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                damagee.setVelocity(damagee.getVelocity().normalize().multiply(0.1));
+                            }
+                        }.runTaskLater(SBX.getInstance(), 1L);
+                    } else {
+                        if(!DamageUtil.doDragonDamage(damagee,p,dmg)) {
+                            damagee.damage(dmg);
+                        }
+                    }
+                }
+
+                if (!arrow) {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            damagee.setMetadata("canDamage", new FixedMetadataValue(SBX.getInstance(), true));
+                        }
+                    }.runTaskLater(SBX.getInstance(), iframes);
+                }
+                return dmg;
+            }
+        } else {
+            damagee.setMetadata("canDamage", new FixedMetadataValue(SBX.getInstance(), true));
+            calculateHit(p, damagee, event, arrow);
+        }
+        return 0;
     }
 
     public void calculateFeroHit(SBPlayer p, LivingEntity damagee, double fero) {
@@ -186,6 +241,7 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                             } else {
                                 damagee.setHealth(damagee.getHealth() - dmg);
                             }
+                            DamageUtil.doDragonDamage(damagee, p, dmg);
                             new BukkitRunnable() {
                                 @Override
                                 public void run() {
@@ -235,6 +291,7 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                     } else {
                         damagee.setHealth(damagee.getHealth() - dmg);
                     }
+                    DamageUtil.doDragonDamage(damagee,p,dmg);
                     new BukkitRunnable() {
                         @Override
                         public void run() {
@@ -272,102 +329,5 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
         }
         return dmg;
     }
-
-    public double calculateAttackSpeed(SBPlayer p, LivingEntity en, EntityDamageByEntityEvent event, boolean arrow) {
-        if (en.hasMetadata("canDamage")) {
-            //setting I frames for atck speed
-            if (en.getMetadata("canDamage").get(0).asBoolean()) {
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        en.setNoDamageTicks(0);
-                        en.setMaximumNoDamageTicks(0);
-                    }
-                }.runTaskLater(SBX.getInstance(), 1L);
-                //calculating and doing ferocity hits, checks if its greater than 0
-                if (p.getMaxStat(SBPlayer.PlayerStat.FEROCITY) > 0) {
-                    double fero = p.getMaxStat(SBPlayer.PlayerStat.FEROCITY);
-                    calculateFeroHit(p, en, fero);
-                }
-                double atckSpeed = p.getMaxStat(SBPlayer.PlayerStat.ATTACK_SPEED);
-                int iframes = (int) (10 / (1 + (atckSpeed / 100)));
-                if (!arrow) {
-                    en.setMetadata("canDamage", new FixedMetadataValue(SBX.getInstance(), false));
-                }
-                double dmg = DamageUtil.calculateSingleHit(en, p);
-                event.setCancelled(false);
-                if (event.getCause().equals(EntityDamageEvent.DamageCause.CUSTOM)) {
-                    //Actually dealing damage
-                    en.damage(dmg);
-                } else {
-                    if (en.hasMetadata(Slayers.ENDERMAN.toString())) {
-                        //
-                        if (en.getMetadata("hitshield").get(0).asInt() != 0) {
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
-                                    en.setVelocity(en.getVelocity().normalize().multiply(0.1));
-                                }
-                            }.runTaskLater(SBX.getInstance(), 1L);
-                        } else {
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
-                                    en.setVelocity(en.getVelocity().normalize().multiply(0.1));
-                                }
-                            }.runTaskLater(SBX.getInstance(), 1L);
-                            en.damage(dmg);
-                        }
-                    } else {
-                        if (StartFight.fightActive) {
-                            if (event.getEntity() instanceof CraftEnderDragon) {
-                                CraftEnderDragon dragon = (CraftEnderDragon) event.getEntity();
-                                double hlth = StartFight.maxDragHealth;
-
-                                if (dmg > 120000) {
-                                    dmg = 120000 + (dmg * 0.00003);
-                                }
-                            }
-
-                            dragonScoreboard.updateDragonDMG(p.getPlayer(), dmg);
-                            LootListener.damage.put(p.getPlayer(), StartFight.playerDMG.get(p.getPlayer()));
-                            StartFight.dragonHealth -= dmg;
-                            if (StartFight.dragonHealth < 0) {
-                                StartFight.dragonHealth = 0;
-                            }
-                            double pcntHealth = (StartFight.dragonHealth / StartFight.maxDragHealth) * 200;
-                            if (pcntHealth > 200) {
-                                pcntHealth = 200;
-                            }
-                            if (pcntHealth == 0) {
-                                event.setDamage(2147483647);
-                            } else {
-                                ((LivingEntity) event.getEntity()).setHealth(pcntHealth);
-                                event.setDamage(0.1);
-                            }
-                        } else {
-                            en.damage(dmg);
-                        }
-
-                    }
-                }
-
-                if (!arrow) {
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            en.setMetadata("canDamage", new FixedMetadataValue(SBX.getInstance(), true));
-                        }
-                    }.runTaskLater(SBX.getInstance(), iframes);
-                }
-                return dmg;
-            }
-        } else {
-            en.setMetadata("canDamage", new FixedMetadataValue(SBX.getInstance(), true));
-            calculateHit(p, en, event,arrow);
-        }
-        return 0;
-    }
-
 
 }
