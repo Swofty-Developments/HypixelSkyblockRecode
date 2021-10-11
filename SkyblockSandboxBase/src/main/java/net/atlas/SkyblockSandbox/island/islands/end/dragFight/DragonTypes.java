@@ -2,6 +2,7 @@ package net.atlas.SkyblockSandbox.island.islands.end.dragFight;
 
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.dragClasses.*;
 import net.minecraft.server.v1_8_R3.Entity;
+import net.royawesome.jlibnoise.module.modifier.Abs;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
@@ -10,21 +11,22 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 public enum DragonTypes {
-    PROTECTOR("protector", "Protector Dragon", 63, ProtectorDragon.class),
-    OLD("old", "Old Dragon", 63, OldDragon.class),
-    WISE("wise", "Wise Dragon", 63, WiseDragon.class),
-    UNSTABLE("unstable", "Unstable Dragon", 63, UnstableDragon.class),
-    YOUNG("young", "Young Dragon", 63, YoungDragon.class),
-    STRONG("strong", "Strong Dragon", 63, StrongDragon.class),
-    SUPERIOR("superior", "Superior Dragon", 63, SuperiorDragon.class),
-    VOIDGLOOM("voidgloom", "Voidgloom Dragon", 63, VoidgloomDragon.class);
+    PROTECTOR("protector", "Protector Dragon",9000000,0.75),
+    OLD("old", "Old Dragon",15000000,0.6),
+    WISE("wise", "Wise Dragon",9000000,0.75),
+    UNSTABLE("unstable", "Unstable Dragon",9000000,0.75),
+    YOUNG("young", "Young Dragon",7500000,1.3),
+    STRONG("strong", "Strong Dragon",9000000,0.75),
+    SUPERIOR("superior", "Superior Dragon", 12000000,1),
+    VOIDGLOOM("voidgloom", "Voidgloom Dragon", 75000000,0.6);
 
     public String mobName;
     public String prefix;
-    public Class<? extends Entity> entity;
+    private DragonBuilder builder;
 
-    private DragonTypes(String prefix, String name, int id, Class<? extends Entity> custom) {
-        addToMaps(custom, name, id);
+    private DragonTypes(String prefix, String name,double health,double moveSpeed) {
+        addToMaps(AbstractDragon.class, name, 63);
+        builder = DragonBuilder.init().health(health).name(name).moveSpeed(moveSpeed);
         this.mobName = name;
         this.prefix = prefix;
     }
@@ -34,12 +36,8 @@ public enum DragonTypes {
     }
 
 
-    public static Entity spawnEntity(Location loc, Entity entity, DragonTypes type) {
-        String mobName = type.getMobName();
-        entity.setLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        entity.setCustomName(ChatColor.RED + "" + ChatColor.BOLD + mobName);
-        ((CraftWorld) loc.getWorld()).getHandle().addEntity(entity);
-        return entity;
+    public Entity spawnEntity(Location loc) {
+        return builder.build(loc);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})

@@ -318,8 +318,9 @@ public class LootListener implements Listener {
             if (drop != null) {
                 spawnLoot(p, loc, drop);
             }
-        } catch (Exception ignored) {
-            System.out.println("[ERROR] Dragon loot could not be dropped!");
+        } catch (Exception ex) {
+            System.out.println("[SkyblockSandboxBase] Dragon loot could not be dropped at: ");
+            ex.printStackTrace();
             p.sendMessage(ChatColor.RED + "Something went wrong while dropping loot! Please contact a staff member if this issue persists.");
         }
     }

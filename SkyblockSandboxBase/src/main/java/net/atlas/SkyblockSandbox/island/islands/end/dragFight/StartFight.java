@@ -91,23 +91,18 @@ public class StartFight {
                     value.getLoc().getBlock().setData((byte) 0);
                 }
                 if (dragType >= 96) {
-                    dragon = (SuperiorDragon) DragonTypes.spawnEntity(spawnLoc, new SuperiorDragon(spawnLoc.getWorld()), DragonTypes.SUPERIOR);
-                    activeDrag = dragon;
+                    dragon = (SuperiorDragon) DragonTypes.SUPERIOR.spawnEntity(spawnLoc);
                 } else if (dragType >= 80) {
-                    dragon = (StrongDragon) DragonTypes.spawnEntity(spawnLoc, new StrongDragon(spawnLoc.getWorld()), DragonTypes.STRONG);
-                    activeDrag = dragon;
+                    dragon = (StrongDragon) DragonTypes.STRONG.spawnEntity(spawnLoc);
                 } else if (dragType >= 64) {
-                    dragon = (WiseDragon) DragonTypes.spawnEntity(spawnLoc, new WiseDragon(spawnLoc.getWorld()), DragonTypes.WISE);
-                    activeDrag = dragon;
+                    dragon = (WiseDragon) DragonTypes.WISE.spawnEntity(spawnLoc);
                 } else if (dragType >= 48) {
-                    dragon = (YoungDragon) DragonTypes.spawnEntity(spawnLoc, new YoungDragon(spawnLoc.getWorld()), DragonTypes.YOUNG);
-                    activeDrag = dragon;
+                    dragon = (YoungDragon) DragonTypes.YOUNG.spawnEntity(spawnLoc);
 
                 } else if (dragType >= 32) {
                     double random = Math.random() * 100;
                     if (random > 60) {
-                        dragon = (UnstableDragon) DragonTypes.spawnEntity(spawnLoc, new UnstableDragon(spawnLoc.getWorld()), DragonTypes.UNSTABLE);
-                        activeDrag = dragon;
+                        dragon = (UnstableDragon) DragonTypes.UNSTABLE.spawnEntity(spawnLoc);
                             /*new BukkitRunnable() {
                                 @Override
                                 public void run() {
@@ -120,27 +115,16 @@ public class StartFight {
                                 }
                             }.runTaskTimer(Items.getInstance(),50L,150L);*/
                     } else {
-                        dragon = (UnstableDragon) DragonTypes.spawnEntity(spawnLoc, new UnstableDragon(spawnLoc.getWorld()), DragonTypes.UNSTABLE);
-                        activeDrag = dragon;
+                        dragon = (UnstableDragon) DragonTypes.UNSTABLE.spawnEntity(spawnLoc);
                     }
 
                 } else if (dragType >= 16) {
-                    dragon = (ProtectorDragon) DragonTypes.spawnEntity(spawnLoc, new ProtectorDragon(spawnLoc.getWorld()), DragonTypes.PROTECTOR);
-                    activeDrag = dragon;
-
+                    dragon = (ProtectorDragon) DragonTypes.PROTECTOR.spawnEntity(spawnLoc);
                 } else if (dragType >= 0) {
-                    dragon = (OldDragon) DragonTypes.spawnEntity(spawnLoc, new OldDragon(spawnLoc.getWorld()), DragonTypes.OLD);
-                    activeDrag = dragon;
+                    dragon = (OldDragon) DragonTypes.OLD.spawnEntity(spawnLoc);
+
                 }
-
-
-                as = (ArmorStand) spawnLoc.getWorld().spawnEntity(spawnLoc.subtract(0, 0, 0), EntityType.ARMOR_STAND);
-                as.setVisible(false);
-                as.setGravity(false);
-                as.setCustomName("follower");
-                as.setCustomNameVisible(false);
-                PathFind.getDragDirection(activeDrag, as);
-
+                activeDrag = dragon;
                 //PathFind.goToLocation(activeDrag, as);
 
             }

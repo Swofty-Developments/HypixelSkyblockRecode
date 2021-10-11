@@ -54,7 +54,7 @@ public class PathFind {
 
     }
 
-    public static void getDragDirection(AbstractDragon dragon, ArmorStand as) {
+    public static void getDragDirection(AbstractDragon dragon, ArmorStand as,double moveSpeed) {
         new BukkitRunnable() {
 
             @Override
@@ -92,11 +92,7 @@ public class PathFind {
                     if(curve.size()>=1) {
                         testdir = curve.get(0).toVector().subtract(origin.toVector()).normalize();
                     }
-                    if (StartFight.activeDrag instanceof YoungDragon) {
-                        dragon.getBukkitEntity().setVelocity(testdir.multiply(1.4));
-                    } else {
-                        dragon.getBukkitEntity().setVelocity(testdir.multiply(0.75));
-                    }
+                    dragon.getBukkitEntity().setVelocity(testdir.multiply(moveSpeed));
                     if(curve.size()>=1) {
                         if (dragon.getBukkitEntity().getLocation().distance(curve.get(0)) < 2) {
                             curve.remove(0);
@@ -118,7 +114,7 @@ public class PathFind {
 
                 } else {
                     dragon.getBukkitEntity().setVelocity(new Vector(0, 0, 0));
-                    dragon.getBukkitEntity().teleport(dragon.getBukkitEntity().getLocation());
+                    dragon.getBukkitEntity().teleport(dragon.getBukkitEntity().getLocation().subtract(0,0.1,0));
                 }
 
             }
