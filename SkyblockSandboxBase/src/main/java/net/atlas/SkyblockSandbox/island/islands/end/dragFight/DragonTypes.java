@@ -22,7 +22,7 @@ public enum DragonTypes {
 
     public String mobName;
     public String prefix;
-    private DragonBuilder builder;
+    private final DragonBuilder builder;
 
     private DragonTypes(String prefix, String name,double health,double moveSpeed) {
         addToMaps(CustomEnderDragon.class, name, 63);

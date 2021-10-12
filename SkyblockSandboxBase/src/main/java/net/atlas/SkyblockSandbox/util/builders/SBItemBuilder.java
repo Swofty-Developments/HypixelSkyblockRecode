@@ -5,8 +5,12 @@ import net.atlas.SkyblockSandbox.item.Rarity;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.item.ability.Ability;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -19,6 +23,7 @@ public class SBItemBuilder {
     private ItemType type;
     private String url;
     private boolean stackable;
+    private String hexColor;
     private HashMap<SBPlayer.PlayerStat,Double> stats = new HashMap<>();
     private HashMap<Integer,Ability> abilities = new HashMap<>();
 
@@ -69,6 +74,11 @@ public class SBItemBuilder {
         return this;
     }
 
+    public SBItemBuilder hexColor(String hexColor) {
+        this.hexColor = hexColor;
+        return this;
+    }
+
     public SBItemBuilder ability(Ability abil,int index) {
         abilities.put(index,abil);
         return this;
@@ -87,6 +97,15 @@ public class SBItemBuilder {
             }
             return item;
         }
-        return new SBItemStack(name,id,mat,rarity,type,0,stackable,true,stats);
+        SBItemStack stack = new SBItemStack(name,id,mat,rarity,type,0,stackable,true,stats);
+        if(!hexColor.equals("")) {
+            Color color = Color.decode(hexColor);
+            LeatherArmorMeta meta = (LeatherArmorMeta) stack.asBukkitItem().getItemMeta();
+            meta.setColor(org.bukkit.Color.fromRGB(color.getRGB()));
+            ItemStack temp = stack.asBukkitItem();
+            temp.setItemMeta(meta);
+            stack = new SBItemStack(temp);
+        }
+        return stack;
     }
 }
