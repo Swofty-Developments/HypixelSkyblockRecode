@@ -25,8 +25,8 @@ public enum DragonTypes {
     private DragonBuilder builder;
 
     private DragonTypes(String prefix, String name,double health,double moveSpeed) {
-        addToMaps(AbstractDragon.class, name, 63);
-        builder = DragonBuilder.init().health(health).name(name).moveSpeed(moveSpeed);
+        addToMaps(CustomEnderDragon.class, name, 63);
+        builder = DragonBuilder.init().health(health).name(name).moveSpeed(moveSpeed).dragonType(this);
         this.mobName = name;
         this.prefix = prefix;
     }

@@ -16,17 +16,8 @@ public abstract class AbstractDragon extends EntityEnderDragon {
         EnderDragon craftDragon = (EnderDragon) this.getBukkitEntity();
 
         //craftDragon.setMaxHealth(this.getEnHealth());
-        //this.setHealth((float) this.getEnHealth());
-        craftDragon.setMetadata(this.getDragonType().getMobName(),new FixedMetadataValue(SBX.getInstance(),this));
-        StartFight.maxDragHealth = this.getEnHealth();
-        StartFight.dragonHealth = this.getEnHealth();
-
+        //this.setHealth((float) this.getEnHealth())
 
     }
-
-    public abstract DragonTypes getDragonType();
-
-    public abstract double getEnHealth();
-
 
 }

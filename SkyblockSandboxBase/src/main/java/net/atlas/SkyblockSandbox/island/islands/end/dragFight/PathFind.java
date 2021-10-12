@@ -2,7 +2,6 @@ package net.atlas.SkyblockSandbox.island.islands.end.dragFight;
 
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.dragClasses.AbstractDragon;
-import net.atlas.SkyblockSandbox.island.islands.end.dragFight.dragClasses.YoungDragon;
 import net.minecraft.server.v1_8_R3.EnumParticle;
 import net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles;
 import org.bukkit.Bukkit;

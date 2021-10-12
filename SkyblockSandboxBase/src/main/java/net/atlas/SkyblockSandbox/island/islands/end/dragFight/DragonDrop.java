@@ -37,7 +37,7 @@ public enum DragonDrop {
 
     public enum Universal {
         SWORD("Aspect of the Dragons",SBItemBuilder.init().mat(Material.DIAMOND_SWORD)),
-        PET("Ender Dragon", PetBuilder.init().petType(Pet.PetType.COMBAT.getPetModifier()).texture("a1d08c0289d9efe519e87f7b814cb2349f4475bd3c37d44f9c4f0e508e77981e"));
+        PET("Ender Dragon", PetBuilder.init().petType(Pet.PetType.COMBAT.getPetModifier()).texture("http://textures.minecraft.net/texture/a1d08c0289d9efe519e87f7b814cb2349f4475bd3c37d44f9c4f0e508e77981e"));
 
 
         private String name;

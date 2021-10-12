@@ -24,8 +24,10 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -144,6 +146,8 @@ public class DamageUtil {
                 }
                 if (pcntHealth == 0) {
                     damagee.setHealth(0);
+                    EntityDeathEvent event = new EntityDeathEvent(damagee,null,0);
+                    Bukkit.getPluginManager().callEvent(event);
                 } else {
                     damagee.setHealth(pcntHealth);
                     damagee.damage(0);

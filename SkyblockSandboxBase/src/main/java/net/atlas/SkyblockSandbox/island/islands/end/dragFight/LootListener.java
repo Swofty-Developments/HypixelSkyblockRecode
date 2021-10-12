@@ -5,6 +5,7 @@ import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.dragClasses.AbstractDragon;
 import net.atlas.SkyblockSandbox.database.mongo.MongoCoins;
 import net.atlas.SkyblockSandbox.item.Rarity;
+import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.util.StandUtils;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Material;
@@ -279,9 +280,10 @@ public class LootListener implements Listener {
         try {
             if (playerWeight >= 450) {
                 if (petChance <0.0008) {
+                //if(petChance>0.0001) {
                     drop = DragonDrop.Universal.PET.getDrop(Rarity.EPIC);
                     double legChance = Math.random();
-                    if(legChance<=0.5) {
+                    if(legChance<=0.2) {
                         drop = DragonDrop.Universal.PET.getDrop(Rarity.LEGENDARY);
                     }
                 }
@@ -316,6 +318,7 @@ public class LootListener implements Listener {
             }
             //spawning drop
             if (drop != null) {
+                drop = new SBItemStack(drop).refreshLore();
                 spawnLoot(p, loc, drop);
             }
         } catch (Exception ex) {

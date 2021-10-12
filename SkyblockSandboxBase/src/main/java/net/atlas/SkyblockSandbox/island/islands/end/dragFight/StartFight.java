@@ -91,18 +91,18 @@ public class StartFight {
                     value.getLoc().getBlock().setData((byte) 0);
                 }
                 if (dragType >= 96) {
-                    dragon = (SuperiorDragon) DragonTypes.SUPERIOR.spawnEntity(spawnLoc);
+                    dragon = (AbstractDragon) DragonTypes.SUPERIOR.spawnEntity(spawnLoc);
                 } else if (dragType >= 80) {
-                    dragon = (StrongDragon) DragonTypes.STRONG.spawnEntity(spawnLoc);
+                    dragon = (AbstractDragon) DragonTypes.STRONG.spawnEntity(spawnLoc);
                 } else if (dragType >= 64) {
-                    dragon = (WiseDragon) DragonTypes.WISE.spawnEntity(spawnLoc);
+                    dragon= (AbstractDragon) DragonTypes.WISE.spawnEntity(spawnLoc);
                 } else if (dragType >= 48) {
-                    dragon = (YoungDragon) DragonTypes.YOUNG.spawnEntity(spawnLoc);
+                    dragon = (AbstractDragon) DragonTypes.YOUNG.spawnEntity(spawnLoc);
 
                 } else if (dragType >= 32) {
                     double random = Math.random() * 100;
                     if (random > 60) {
-                        dragon = (UnstableDragon) DragonTypes.UNSTABLE.spawnEntity(spawnLoc);
+                        dragon = (AbstractDragon) DragonTypes.UNSTABLE.spawnEntity(spawnLoc);
                             /*new BukkitRunnable() {
                                 @Override
                                 public void run() {
@@ -115,13 +115,13 @@ public class StartFight {
                                 }
                             }.runTaskTimer(Items.getInstance(),50L,150L);*/
                     } else {
-                        dragon = (UnstableDragon) DragonTypes.UNSTABLE.spawnEntity(spawnLoc);
+                        dragon = (AbstractDragon) DragonTypes.UNSTABLE.spawnEntity(spawnLoc);
                     }
 
                 } else if (dragType >= 16) {
-                    dragon = (ProtectorDragon) DragonTypes.PROTECTOR.spawnEntity(spawnLoc);
+                    dragon = (AbstractDragon) DragonTypes.PROTECTOR.spawnEntity(spawnLoc);
                 } else if (dragType >= 0) {
-                    dragon = (OldDragon) DragonTypes.OLD.spawnEntity(spawnLoc);
+                    dragon = (AbstractDragon) DragonTypes.OLD.spawnEntity(spawnLoc);
 
                 }
                 activeDrag = dragon;

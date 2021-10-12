@@ -19,13 +19,4 @@ public class CustomEnderDragon extends AbstractDragon {
         super(loc);
     }
 
-    @Override
-    public DragonTypes getDragonType() {
-        return null;
-    }
-
-    @Override
-    public double getEnHealth() {
-        return 0;
-    }
 }
