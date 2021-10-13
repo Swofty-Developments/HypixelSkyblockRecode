@@ -5,6 +5,7 @@ import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.minecraft.server.v1_8_R3.ChatComponentText;
 import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 
 import java.io.*;
@@ -49,7 +50,7 @@ public class SUtil {
 
     public static String getProgressBar(double current, int max, int totalBars, char symbol, ChatColor completedColor,
                                         ChatColor notCompletedColor) {
-        if(current>max) {
+        if (current > max) {
             current = max;
         }
         float percent = (float) current / max;
@@ -108,6 +109,13 @@ public class SUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static Color hexToRgb(String colorStr) {
+        return Color.fromRGB(Integer.valueOf(colorStr.substring(1, 3), 16),
+                Integer.valueOf(colorStr.substring(3, 5), 16),
+                Integer.valueOf(colorStr.substring(5, 7), 16));
+
     }
 
 }

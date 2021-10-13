@@ -21,6 +21,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 
+import static net.atlas.SkyblockSandbox.SBX.cachedPets;
 import static net.atlas.SkyblockSandbox.island.islands.end.dragFight.StartFight.spawnLoc;
 
 public class PlayerInteractEvent extends SkyblockListener<org.bukkit.event.player.PlayerInteractEvent> {
@@ -74,7 +75,7 @@ public class PlayerInteractEvent extends SkyblockListener<org.bukkit.event.playe
             SBItemStack itnew = new SBItemStack(it);
             it = itnew.refreshLore();
             String serialized = Serialization.itemStackToBase64(it);
-            SBX.getMongoStats().setData(e.getPlayer().getUniqueId(), "pet_" + serialized, serialized);
+            cachedPets.get(e.getPlayer().getUniqueId()).put("pet_" + serialized, serialized);
 
             p.sendMessage(SUtil.colorize("&aAdded " + e.getItem().getItemMeta().getDisplayName() + "&a to your pets menu!"));
             p.playSound(p.getLocation(), Sound.ORB_PICKUP, 5, 1);

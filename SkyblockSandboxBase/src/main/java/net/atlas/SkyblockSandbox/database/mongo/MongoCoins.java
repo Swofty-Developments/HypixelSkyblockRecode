@@ -138,7 +138,7 @@ public class MongoCoins implements MongoDB {
         return query;
     }
 
-    public void removeData(UUID uuid, String key) {
+    public void removePetData(UUID uuid, String key) {
 
         Document query = new Document("uuid", uuid.toString());
         Document found = col.find(query).first();

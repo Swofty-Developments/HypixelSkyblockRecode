@@ -13,8 +13,7 @@ import org.bson.Document;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import static net.atlas.SkyblockSandbox.SBX.cachedSkillLvls;
-import static net.atlas.SkyblockSandbox.SBX.cachedSkills;
+import static net.atlas.SkyblockSandbox.SBX.*;
 
 public class PlayerLeave extends SkyblockListener<PlayerQuitEvent> {
 
@@ -39,6 +38,8 @@ public class PlayerLeave extends SkyblockListener<PlayerQuitEvent> {
         }
         playerData.setData(event.getPlayer().getUniqueId(),"Skills",doc);
         playerData.setData(event.getPlayer().getUniqueId(),"fairy-souls", FairySouls.cachedFairySouls.get(event.getPlayer().getUniqueId()));
+        playerData.setData(event.getPlayer().getUniqueId(),"pets",cachedPets.get(event.getPlayer().getUniqueId()));
+        cachedPets.remove(event.getPlayer().getUniqueId());
         cachedSkillLvls.remove(event.getPlayer().getUniqueId());
         cachedSkills.remove(event.getPlayer().getUniqueId());
         StorageCache storage = new StorageCache(new SBPlayer(event.getPlayer()));

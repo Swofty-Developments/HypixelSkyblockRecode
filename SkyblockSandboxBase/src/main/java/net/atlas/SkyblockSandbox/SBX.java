@@ -104,6 +104,7 @@ public class SBX extends JavaPlugin {
     public static HashMap<Player, Boolean> canfire = new HashMap<>();
     public static HashMap<Player, List<EntityArmorStand>> thrownAxes = new HashMap<>();
     public static final TreeMap<String, ItemStack> hypixelItemMap = new TreeMap<>();
+    public static HashMap<UUID,Document> cachedPets = new HashMap<>();
     public static boolean pvpEnabled;
     public MySQL sql;
     public SignManager signManager;
@@ -179,6 +180,7 @@ public class SBX extends JavaPlugin {
     @Override
     public void onDisable() {
         cacheSkills();
+        cachePets();
     }
 
     public static void cacheSkills() {
@@ -195,6 +197,12 @@ public class SBX extends JavaPlugin {
                 skillDoc.put(type.getName() + "_lvl",amt);
             }
             SBX.getMongoStats().setData(uid,"Skills",skillDoc);
+        }
+    }
+
+    public static void cachePets() {
+        for (UUID uid : cachedPets.keySet()) {
+            getMongoStats().setData(uid,"pets",cachedPets.get(uid));
         }
     }
 

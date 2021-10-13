@@ -352,6 +352,7 @@ public class SBItemStack extends ItemStack {
                     }
 
                     if (Boolean.parseBoolean(NBTUtil.getString(stack, "is-equipped"))) {
+
                         int totalXp = petXP[NBTUtil.getInteger(stack, "pet-level")];
                         if (totalXp != 0) {
                             if (NBTUtil.getInteger(stack, "pet-level") < 100) {
@@ -391,6 +392,14 @@ public class SBItemStack extends ItemStack {
                 }
                 if (getString(stack, "reforgable").equals("true")) {
                     newLore.add(ChatColor.DARK_GRAY + "This item can be reforged!");
+                }
+                if (Boolean.parseBoolean(NBTUtil.getString(stack, "is-equipped"))) {
+                    rarity = null;
+                    if (!Boolean.parseBoolean(NBTUtil.getString(stack, "is-active"))) {
+                        newLore.add(SUtil.colorize("&eClick to summon."));
+                    } else {
+                        newLore.add(SUtil.colorize("&cClick to despawn."));
+                    }
                 }
                 if (rarity != null) {
                     ItemType type = Enums.getIfPresent(ItemType.class, NBTUtil.getString(stack, "item-type")).or(ItemType.ITEM);

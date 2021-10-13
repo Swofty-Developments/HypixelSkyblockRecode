@@ -23,16 +23,26 @@ public enum DragonDrop {
 
     private String prefix;
     private SBItemBuilder builder;
+    private SkullBuilder skullBuilder;
 
     DragonDrop(String prefix, SBItemBuilder builder) {
         this.prefix = prefix;
         this.builder = builder;
     }
 
+    DragonDrop(String prefix, SkullBuilder builder) {
+        this.prefix = prefix;
+        this.skullBuilder = builder;
+    }
+
     public ItemStack getDrop(DragonTypes type) {
-        builder.name(type.getMobName() + " " + prefix).type(ItemType.ITEM);
-        builder.hexColor(ArmorColors.getFromDragType(type).getHexColorFromPiece(this));
-        return builder.build();
+        builder.name(type.getMobName() + " " + prefix).type(ItemType.ITEM).id((type.getMobName() + "_" + prefix).toUpperCase());
+        if(!builder.build().asBukkitItem().getType().equals(Material.SKULL_ITEM)) {
+            builder.hexColor(ArmorColors.getFromDragType(type).getHexColorFromPiece(this));
+        } else {
+            builder.url(ArmorColors.getFromDragType(type).getHexColorFromPiece(this));
+        }
+        return builder.build().asBukkitItem();
     }
 
     public enum ArmorColors {
@@ -65,7 +75,7 @@ public enum DragonDrop {
                     return c;
                 }
             }
-            return null;
+            return ArmorColors.SUPERIOR;
         }
 
         public String getHexColorFromPiece(DragonDrop dragonDrop) {
@@ -85,7 +95,7 @@ public enum DragonDrop {
     }
 
     public enum Universal {
-        SWORD("Aspect of the Dragons", SBItemBuilder.init().mat(Material.DIAMOND_SWORD)),
+        SWORD("Aspect of the Dragons", SBItemBuilder.init().mat(Material.DIAMOND_SWORD).rarity(Rarity.LEGENDARY)),
         PET("Ender Dragon", PetBuilder.init().petType(Pet.PetType.COMBAT.getPetModifier()).texture("http://textures.minecraft.net/texture/a1d08c0289d9efe519e87f7b814cb2349f4475bd3c37d44f9c4f0e508e77981e"));
 
 
@@ -110,7 +120,7 @@ public enum DragonDrop {
             if (builder == null) {
                 return petBuilder.build();
             } else {
-                return builder.build();
+                return builder.build().asBukkitItem();
             }
         }
 
@@ -118,7 +128,7 @@ public enum DragonDrop {
             if (builder == null) {
                 return petBuilder.rarity(rarity).build();
             } else {
-                return builder.rarity(rarity).build();
+                return builder.rarity(rarity).build().asBukkitItem();
             }
         }
     }

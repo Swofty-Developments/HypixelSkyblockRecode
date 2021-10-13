@@ -29,6 +29,7 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.HashMap;
 import java.util.UUID;
 
+import static net.atlas.SkyblockSandbox.SBX.cachedPets;
 import static net.atlas.SkyblockSandbox.SBX.cachedSkills;
 import static net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat.*;
 
@@ -147,6 +148,13 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
         } else {
             FairySouls.cachedFairySouls.put(p.getUniqueId(), playerDoc.getInteger("fairy-souls"));
         }
+
+        //pets cache
+        Document petsDoc = (Document) playerDoc.get("pets");
+        if(petsDoc==null) {
+            petsDoc = new Document();
+        }
+        cachedPets.put(p.getUniqueId(),petsDoc);
 
 
     }
