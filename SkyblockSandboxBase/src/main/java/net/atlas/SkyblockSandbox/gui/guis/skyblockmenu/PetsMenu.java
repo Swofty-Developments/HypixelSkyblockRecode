@@ -7,6 +7,7 @@ import net.atlas.SkyblockSandbox.database.mongo.MongoCoins;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
+import net.atlas.SkyblockSandbox.util.SUtil;
 import net.atlas.SkyblockSandbox.util.Serialization;
 import org.bson.Document;
 import org.bukkit.DyeColor;
@@ -74,7 +75,7 @@ public class PetsMenu extends PaginatedGUI {
                 String petStr = Serialization.itemStackToBase64(pet);
 
                 if (getOwner().hasSpace()) {
-                    getOwner().getInventory().addItem(NBTUtil.setString(NBTUtil.setString(pet, "false", "is-equipped"), "false", "is-active"));
+                    getOwner().getInventory().addItem(new SBItemStack(NBTUtil.setString(NBTUtil.setString(pet, "false", "is-equipped"), "false", "is-active")).refreshLore());
                     petsDoc.remove("pet_" + petStr);
                 }
 
@@ -100,6 +101,9 @@ public class PetsMenu extends PaginatedGUI {
                                         String petStr3 = Serialization.itemStackToBase64(it);
                                         petsDoc.remove("pet_" + ss);
                                         petsDoc.put("pet_" + petStr3, petStr3);
+                                        String name = it.getItemMeta().getDisplayName();
+                                        name = name.split(" ")[1];
+                                        getOwner().sendMessage(SUtil.colorize("&aYou summoned your " + name + "&a!"));
                                         return;
                                     }
                                 } catch (IOException ignored) {
@@ -111,6 +115,10 @@ public class PetsMenu extends PaginatedGUI {
                 } else {
                     petsDoc.put("active-pet", "");
                     petsDoc.put("pet_" + petStr2, petStr2);
+                    String name = pet.getItemMeta().getDisplayName();
+                    name = name.split(" ")[1];
+                    getOwner().sendMessage(SUtil.colorize("&aYou despawned your " + name + "&a!"));
+                    //todo perks and logic
                     cachedPets.put(getOwner().getUniqueId(), petsDoc);
                 }
             }

@@ -71,6 +71,7 @@ public class PlayerInteractEvent extends SkyblockListener<org.bukkit.event.playe
         if(Boolean.parseBoolean(NBTUtil.getString(e.getItem(),"is-pet"))) {
             Player p = e.getPlayer();
             ItemStack it = NBTUtil.setString(e.getItem(), "true", "is-equipped");
+            it = NBTUtil.setString(it, "false", "is-active");
             it = NBTUtil.removeTag(it,"mf-gui");
             SBItemStack itnew = new SBItemStack(it);
             it = itnew.refreshLore();
