@@ -13,6 +13,7 @@ import net.atlas.SkyblockSandbox.item.ability.EnumAbilityData;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.SUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
@@ -38,7 +39,8 @@ public class AbilityHandler {
                 ClickType type = Enums.getIfPresent(ClickType.class, clickTypeString).orNull();
                 if (type != null) {
                     if (event.getAction().name().contains(type.name())) {
-                        ManaEvent manaEvent = new ManaEvent(p, ManaEvent.ManaCause.ABILITY,manaCostInt);
+                        ManaEvent manaEvent = new ManaEvent(p, ManaEvent.ManaCause.ABILITY,manaCostInt,abilName);
+                        Bukkit.getPluginManager().callEvent(manaEvent);
                         if (FunctionUtil.getFunctionAmount(craftItem, i) != 0) {
                             for (int ii = 0; ii <= FunctionUtil.getFunctionAmount(craftItem, i); ii++) {
                                 FunctionType funcType = getFunction(p, craftItem, i, ii);

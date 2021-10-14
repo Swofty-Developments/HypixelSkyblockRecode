@@ -14,10 +14,7 @@ import net.atlas.SkyblockSandbox.util.SUtil;
 import net.atlas.SkyblockSandbox.util.TeleportAbility;
 import net.minecraft.server.v1_8_R3.EnumParticle;
 import net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.*;
@@ -94,9 +91,10 @@ public class WitherImpact extends Ability {
             player.teleport(targetLocation.add(0.5D, 0.0D, 0.5D));
             player.playSound(player.getLocation(), Sound.EXPLODE, 5, 1);
             player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 1.0F);
-            ManaEvent manaEvent = new ManaEvent(p, ManaEvent.ManaCause.ABILITY,250);
+            ManaEvent manaEvent = new ManaEvent(p, ManaEvent.ManaCause.ABILITY, (int) getManaCost(),getAbilityName());
+            Bukkit.getPluginManager().callEvent(manaEvent);
             SBX.abilityUsed.put(player, true);
-            p.queueMiddleActionText(p, "§b    §b-250 Mana (§6Wither Impact§b)    ", 20L);
+            //p.queueMiddleActionText(p, "§b    §b-250 Mana (§6Wither Impact§b)    ", 20L);
             PacketPlayOutWorldParticles packet = new PacketPlayOutWorldParticles(EnumParticle.EXPLOSION_LARGE, true, (float) p.getLocation().getX(),
                     (float) p.getLocation().getY(), (float) p.getLocation().getZ(),
                     0, 0, 0, 7, 6);
