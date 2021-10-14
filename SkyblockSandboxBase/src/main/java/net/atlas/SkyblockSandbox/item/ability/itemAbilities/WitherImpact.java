@@ -94,7 +94,7 @@ public class WitherImpact extends Ability {
             player.teleport(targetLocation.add(0.5D, 0.0D, 0.5D));
             player.playSound(player.getLocation(), Sound.EXPLODE, 5, 1);
             player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 1.0F);
-            ManaEvent manaEvent = new ManaEvent(p, ManaEvent.ManaCause.ABILITY);
+            ManaEvent manaEvent = new ManaEvent(p, ManaEvent.ManaCause.ABILITY,250);
             SBX.abilityUsed.put(player, true);
             p.queueMiddleActionText(p, "§b    §b-250 Mana (§6Wither Impact§b)    ", 20L);
             PacketPlayOutWorldParticles packet = new PacketPlayOutWorldParticles(EnumParticle.EXPLOSION_LARGE, true, (float) p.getLocation().getX(),

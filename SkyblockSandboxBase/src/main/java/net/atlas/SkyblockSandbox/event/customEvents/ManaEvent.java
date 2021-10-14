@@ -11,10 +11,12 @@ public class ManaEvent extends Event implements Cancellable {
         private boolean isCancelled = false;
         private final ManaCause manaCause;
         private final SBPlayer p;
+        private final int manaCost;
 
-        public ManaEvent(SBPlayer p, ManaCause manaCause) {
+        public ManaEvent(SBPlayer p, ManaCause manaCause,int manaCost) {
                 this.manaCause = manaCause;
                 this.p = p;
+                this.manaCost = manaCost;
         }
 
         public ManaCause getManaCause() {
