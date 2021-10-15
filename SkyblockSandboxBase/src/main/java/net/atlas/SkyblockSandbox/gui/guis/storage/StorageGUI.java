@@ -1,6 +1,7 @@
 package net.atlas.SkyblockSandbox.gui.guis.storage;
 
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
+import net.atlas.SkyblockSandbox.gui.guis.skyblockmenu.SBMenu;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -33,6 +34,16 @@ public class StorageGUI extends NormalGUI
 		if (event.getCurrentItem().getType() == Material.PAPER) {
 			new EnderChestPage(getOwner(), event.getSlot() - 8).open();
 			getOwner().playSound(player.getLocation(), Sound.CHEST_OPEN, 1, 0);
+		}
+
+		if (event.getCurrentItem().getType() == Material.ARROW && event.getSlot() == 45) {
+			new Thread(() -> {
+				try {
+					Thread.sleep(100);
+				} catch (Exception ignored) { }
+
+				new SBMenu(player).open();
+			}).start();
 		}
 	}
 
@@ -67,5 +78,7 @@ public class StorageGUI extends NormalGUI
 		setItem(15, makeColorfulItem(Material.PAPER, "&aEnder Chest Page 7", 1, 0, "&7\n&eLeft-Click to open!\n&bRight-Click to do nothing!"));
 		setItem(16, makeColorfulItem(Material.PAPER, "&aEnder Chest Page 8", 1, 0, "&7\n&eLeft-Click to open!\n&bRight-Click to do nothing!"));
 		setItem(17, makeColorfulItem(Material.PAPER, "&aEnder Chest Page 9", 1, 0, "&7\n&eLeft-Click to open!\n&bRight-Click to do nothing!"));
+
+		setItem(45, makeColorfulItem(Material.ARROW, "&aGo Back", 1, 0, "&7To Skyblock Menu"));
 	}
 }
