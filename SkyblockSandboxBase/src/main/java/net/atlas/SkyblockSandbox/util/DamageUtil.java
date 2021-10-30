@@ -160,7 +160,7 @@ public class DamageUtil {
 
     public static double calculateSingleHit(Entity en, SBPlayer p) {
         boolean isCrit = false;
-        double cc = p.getMaxStat(CRIT_CHANCE);
+        double cc = p.getMaxStat(CRITICAL_CHANCE);
         Random random = new Random();
         double crit = random.nextDouble();
         if (cc / 100 >= crit) {
@@ -168,7 +168,7 @@ public class DamageUtil {
         }
         double wpDmg = p.getMaxStat(DAMAGE);
         double str = p.getMaxStat(STRENGTH);
-        double cd = p.getMaxStat(CRIT_DAMAGE);
+        double cd = p.getMaxStat(CRITICAL_DAMAGE);
         double init = (wpDmg + 5D) * (1D + (str / 100D));
         double mult = 1 + (/*combat lvl*/0 * 0.04);
         double dmg = 0;
@@ -199,7 +199,7 @@ public class DamageUtil {
 
     public static double calculateSingleHit(Entity en, SBPlayer p,boolean spawnMarker) {
         boolean isCrit = false;
-        double cc = p.getMaxStat(CRIT_CHANCE);
+        double cc = p.getMaxStat(CRITICAL_CHANCE);
         Random random = new Random();
         double crit = random.nextDouble();
         if (cc / 100 >= crit) {
@@ -207,7 +207,7 @@ public class DamageUtil {
         }
         double wpDmg = p.getMaxStat(DAMAGE);
         double str = p.getMaxStat(STRENGTH);
-        double cd = p.getMaxStat(CRIT_DAMAGE);
+        double cd = p.getMaxStat(CRITICAL_DAMAGE);
         double init = (wpDmg + 5D) * (1D + (str / 100D));
         double mult = 1 + (/*combat lvl*/0 * 0.04);
         double dmg = 0;
@@ -246,7 +246,7 @@ public class DamageUtil {
         for (SBPlayer.PlayerStat stat : SBPlayer.PlayerStat.values()) {
             playerStats.put(stat, stat.getBase());
         }
-        double cc = playerStats.get(CRIT_CHANCE);
+        double cc = playerStats.get(CRITICAL_CHANCE);
         Random random = new Random();
         double crit = random.nextDouble();
         if (cc / 100 >= crit) {
@@ -254,7 +254,7 @@ public class DamageUtil {
         }
         double wpDmg = playerStats.get(SBPlayer.PlayerStat.DAMAGE);
         double str = playerStats.get(SBPlayer.PlayerStat.STRENGTH);
-        double cd = playerStats.get(SBPlayer.PlayerStat.CRIT_DAMAGE);
+        double cd = playerStats.get(CRITICAL_DAMAGE);
         double init = (wpDmg + 5) * (1 + (str / 100));
         double mult = 1 + (/*combat lvl*/0 * 0.04); /*+enchants + weaponbonus*/
         double dmg = 0;
@@ -424,7 +424,6 @@ public class DamageUtil {
     }
 
     public static double calculateEnchants(SBPlayer p, LivingEntity en, double curDmg) {
-
         for (Enchantment ench : Enchantment.values()) {
             if (ench.getItemType().equals(ItemType.SWORD) || ench.getItemType().equals(ItemType.ITEM)) {
                 int enchLvl = new SBItemStack(p.getItemInHand()).getEnchantment(ench);

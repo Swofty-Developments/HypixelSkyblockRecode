@@ -1,29 +1,51 @@
 package net.atlas.SkyblockSandbox.util;
 
+import net.atlas.SkyblockSandbox.island.islands.FairySouls;
+import net.atlas.SkyblockSandbox.item.ItemType;
+import net.atlas.SkyblockSandbox.item.SBItemBuilder;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
+import net.atlas.SkyblockSandbox.item.enchant.Enchantment;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
-import net.atlas.SkyblockSandbox.player.pets.PetPerk;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class NBTUtil {
-
     public static HashMap<SBPlayer.PlayerStat, Double> getAllStats(SBPlayer p) {
         HashMap<SBPlayer.PlayerStat, Double> statMap = new HashMap<>();
         for (SBPlayer.PlayerStat s : SBPlayer.PlayerStat.values()) {
             double tempStat = s.getBase();
             for (ItemStack i : p.getInventory().getArmorContents()) {
                 if (i != null && i.hasItemMeta()) {
-                    tempStat += new SBItemStack(i).getStat(s);
+                    SBItemBuilder item = new SBItemBuilder(i);
+                    if (getString(i, "non-legacy").equals("true")) {
+                        if(item.stats.get(s) != null) {
+                            tempStat += item.stats.get(s);
+                        }
+                    } else {
+                        tempStat += new SBItemStack(i).getStat(s);
+                    }
                 }
             }
-            tempStat += new SBItemStack(p.getItemInHand()).getStat(s);
+            if (!(p.getItemInHand().getType().equals(Material.AIR) || p.getItemInHand() == null)) {
+                SBItemBuilder item = new SBItemBuilder(p.getItemInHand());
+                if (getString(p.getItemInHand(), "non-legacy").equals("true")) {
+                    if (item.stats.get(s) != null) {
+                        tempStat += item.stats.get(s);
+                    }
+                } else {
+                    tempStat += new SBItemStack(p.getItemInHand()).getStat(s);
+                }
+                HashMap<SBPlayer.PlayerStat, Double> fairyMap = FairySouls.getPlayerRewards(p);
+                if (fairyMap.containsKey(s)) {
+                    tempStat += fairyMap.get(s);
+                }
+            }
             statMap.put(s, tempStat);
         }
         return statMap;
@@ -164,6 +186,143 @@ public class NBTUtil {
                 nmsItem.setTag(tag);
                 return CraftItemStack.asBukkitCopy(nmsItem);
 
+            }
+        }
+        return null;
+    }
+
+    public static ItemStack setStat(ItemStack stack, double value, SBPlayer.PlayerStat stat) {
+        if (stack != null) {
+            if (stack.hasItemMeta()) {
+                net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
+                NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+                NBTTagCompound data = tag.getCompound("ExtraAttributes") != null ? tag.getCompound("ExtraAttributes") : new NBTTagCompound();
+                NBTTagCompound stats = data.getCompound("Stats");
+                if (stats == null) {
+                    stats = new NBTTagCompound();
+                }
+
+                stats.setDouble(stat.name(), value);
+                data.set("Stats",stats);
+                tag.set("ExtraAttributes", data);
+                nmsItem.setTag(tag);
+                return CraftItemStack.asBukkitCopy(nmsItem);
+            }
+        }
+        return stack;
+    }
+
+    public static Double getStat(ItemStack stack, SBPlayer.PlayerStat key) {
+        if (stack != null) {
+            if (stack.hasItemMeta()) {
+                net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
+                NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+                NBTTagCompound data = tag.getCompound("ExtraAttributes");
+                NBTTagCompound stats = data.getCompound("Stats");
+                if (stats == null) {
+                    stats = new NBTTagCompound();
+                }
+
+                return stats.get(key.name()) != null ? stats.getDouble(key.name()) : null;
+            }
+        }
+        return null;
+    }
+
+    public static ItemStack setDescription(ItemStack stack, int index, String line) {
+        if (stack != null) {
+            if (stack.hasItemMeta()) {
+                net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
+                NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+                NBTTagCompound data = tag.getCompound("ExtraAttributes") != null ? tag.getCompound("ExtraAttributes") : new NBTTagCompound();
+                NBTTagCompound stats = data.getCompound("Description");
+                if (stats == null) {
+                    stats = new NBTTagCompound();
+                }
+
+                stats.setString(String.valueOf(index), line);
+                data.set("Description",stats);
+                tag.set("ExtraAttributes", data);
+                nmsItem.setTag(tag);
+                return CraftItemStack.asBukkitCopy(nmsItem);
+            }
+        }
+        return stack;
+    }
+
+    public static String getDescription(ItemStack stack, int index) {
+        if (stack != null) {
+            if (stack.hasItemMeta()) {
+                net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
+                NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+                NBTTagCompound data = tag.getCompound("ExtraAttributes");
+                NBTTagCompound stats = data.getCompound("Description");
+                if (stats == null) {
+                    stats = new NBTTagCompound();
+                }
+
+                return stats.get(String.valueOf(index)) != null ? stats.getString(String.valueOf(index)) : null;
+            }
+        }
+        return null;
+    }
+
+    public static List<String> getDescription(ItemStack stack) {
+        if (stack != null) {
+            if (stack.hasItemMeta()) {
+                net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
+                NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+                NBTTagCompound data = tag.getCompound("ExtraAttributes");
+                NBTTagCompound stats = data.getCompound("Description");
+                if (stats == null) {
+                    stats = new NBTTagCompound();
+                }
+                List<String> list = new ArrayList<>();
+                for(String key : stats.c()) {
+                    list.add(stats.getString(key));
+                }
+                return list;
+            }
+        }
+        return null;
+    }
+
+    public static ItemStack setEnchant(ItemStack stack, Enchantment enchant, int value) {
+        if (stack != null) {
+            if (stack.hasItemMeta()) {
+                net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
+                NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+                NBTTagCompound data = tag.getCompound("ExtraAttributes") != null ? tag.getCompound("ExtraAttributes") : new NBTTagCompound();
+                NBTTagCompound stats = data.getCompound("Enchants");
+                if (stats == null) {
+                    stats = new NBTTagCompound();
+                }
+
+                stats.setInt(enchant.name(), value);
+                data.set("Enchants",stats);
+                tag.set("ExtraAttributes", data);
+                nmsItem.setTag(tag);
+                return CraftItemStack.asBukkitCopy(nmsItem);
+            }
+        }
+        return stack;
+    }
+
+    public static HashMap<Enchantment, Integer> getEnchants(ItemStack stack) {
+        if (stack != null) {
+            if (stack.hasItemMeta()) {
+                net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
+                NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+                NBTTagCompound data = tag.getCompound("ExtraAttributes");
+                NBTTagCompound stats = data.getCompound("Enchants");
+                if (stats == null) {
+                    stats = new NBTTagCompound();
+                }
+                HashMap<Enchantment, Integer> list = new HashMap<>();
+                for(String key : stats.c()) {
+                    list.put(Enchantment.valueOf(key), stats.getInt(key));
+                }
+                return list;
             }
         }
         return null;

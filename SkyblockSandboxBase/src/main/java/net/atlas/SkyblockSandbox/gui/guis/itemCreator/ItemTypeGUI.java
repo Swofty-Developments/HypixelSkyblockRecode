@@ -56,7 +56,7 @@ public class ItemTypeGUI extends NormalGUI implements Backable {
         setItem(14,ItemBuilder.from(makeColorfulItem(Material.GOLD_AXE,"&aAxe",1,0,"","&7Click to set the item type to axe")).setNbt("type",ItemType.AXE.name()).asGuiItem().getItemStack());
         setItem(15,ItemBuilder.from(makeColorfulItem(Material.PRISMARINE_SHARD,"&aDrill",1,0,"","&7Click to set the item type to drill")).setNbt("type",ItemType.DRILL.name()).asGuiItem().getItemStack());
         setItem(20,ItemBuilder.from(makeColorfulItem(Material.IRON_HELMET,"&aHelmet",1,0,"","&7Click to set the item type to helmet")).setNbt("type",ItemType.HELMET.name()).asGuiItem().getItemStack());
-        setItem(21,ItemBuilder.from(makeColorfulItem(Material.DIAMOND_CHESTPLATE,"&aChestplate",1,0,"","&7Click to set the item type to chestplate")).setNbt("type",ItemType.CHESPLATE.name()).asGuiItem().getItemStack());
+        setItem(21,ItemBuilder.from(makeColorfulItem(Material.DIAMOND_CHESTPLATE,"&aChestplate",1,0,"","&7Click to set the item type to chestplate")).setNbt("type",ItemType.CHESTPLATE.name()).asGuiItem().getItemStack());
         setItem(22,ItemBuilder.from(makeColorfulItem(Material.GOLD_LEGGINGS,"&aLeggings",1,0,"","&7Click to set the item type to leggings")).setNbt("type",ItemType.LEGGINGS.name()).asGuiItem().getItemStack());
         setItem(23,ItemBuilder.from(makeColorfulItem(Material.LEATHER_BOOTS,"&aBoots",1,0,"","&7Click to set the item type to boots")).setNbt("type",ItemType.BOOTS.name()).asGuiItem().getItemStack());
     }

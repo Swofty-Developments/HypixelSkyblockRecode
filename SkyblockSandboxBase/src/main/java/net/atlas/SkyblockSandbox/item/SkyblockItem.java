@@ -110,12 +110,23 @@ public interface SkyblockItem {
     enum Sword implements SkyblockItem {
         ASPECT_OF_DRAGONS(SBItemBuilder.init().name("Aspect of the Dragons").id("ASPECT_OF_DRAGONS").mat(Material.DIAMOND_SWORD).rarity(Rarity.LEGENDARY).type(type()).build()),
         ATOMSPLIT_KATANA(SBItemBuilder.init().name("Atomsplit Katana").id("ATOMSPLIT_KATANA").mat(Material.DIAMOND_SWORD).ability(new SoulCry(),0).rarity(Rarity.LEGENDARY).type(type()).stat(PlayerStat.DAMAGE,5000D).build()),
-        HELLS_COMPLEMENT(SBItemBuilder.init().name("Hell's Complement").id("HELLS_COMPLEMENT").mat(Material.BLAZE_ROD).ability(new HellShatter(),0).rarity(Rarity.MYTHIC).type(type()).stat(PlayerStat.DAMAGE,666D).stat(PlayerStat.STRENGTH,666D).build(),false);
+        HELLS_COMPLEMENT(SBItemBuilder.init().name("Hell's Complement").id("HELLS_COMPLEMENT").mat(Material.BLAZE_ROD).ability(new HellShatter(),0).rarity(Rarity.MYTHIC).type(type()).stat(PlayerStat.DAMAGE,666D).stat(PlayerStat.STRENGTH,666D).build(),false),
+        HYPERION(new net.atlas.SkyblockSandbox.item.SBItemBuilder().material(Material.IRON_SWORD).type(ItemType.SWORD).rarity(Rarity.LEGENDARY).name("Hyperion").id("hyperion").stat(PlayerStat.GEAR_SCORE, 615).stat(PlayerStat.DAMAGE, 260).stat(PlayerStat.STRENGTH, 150).stat(PlayerStat.INTELLIGENCE, 350).stat(PlayerStat.FEROCITY, 30)
+                .addDescriptionLine("&7Deals +&a50% &7damage to")
+                .addDescriptionLine("&7Withers. Grants &c+1 Damage")
+                .addDescriptionLine("&7and &a+2 &bIntelligence")
+                .addDescriptionLine("&7per &cCatacombs &7level.")
+                .addDescriptionLine("")
+                .addDescriptionLine("&7Your Catacombs level: &c0").build());
 
-        private final SBItemStack item;
+        private final ItemStack item;
         private boolean ispublic = true;
 
         Sword(SBItemStack item) {
+            this.item = item;
+        }
+
+        Sword(ItemStack item) {
             this.item = item;
         }
 
@@ -126,7 +137,7 @@ public interface SkyblockItem {
 
         @Override
         public SBItemStack item() {
-            return item;
+            return new SBItemStack(item);
         }
 
         @Override

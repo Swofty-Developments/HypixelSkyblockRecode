@@ -12,7 +12,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class SBItemBuilder {
@@ -23,7 +25,9 @@ public class SBItemBuilder {
     private Rarity rarity;
     private ItemType type;
     private String url;
+    private String texture;
     private boolean stackable;
+    private ArrayList<String> description = new ArrayList<>();
     private String hexColor = "";
     private HashMap<SBPlayer.PlayerStat, Double> stats = new HashMap<>();
     private HashMap<Integer, Ability> abilities = new HashMap<>();
@@ -52,6 +56,11 @@ public class SBItemBuilder {
 
     public SBItemBuilder url(String url) {
         this.url = url;
+        return this;
+    }
+
+    public SBItemBuilder texture(String texture) {
+        this.texture = texture;
         return this;
     }
 
@@ -86,27 +95,46 @@ public class SBItemBuilder {
         return this;
     }
 
+    public SBItemBuilder description(String desc) {
+        description.add(desc);
+        return this;
+    }
+
     public SBItemStack build() {
+        SBItemStack item = new SBItemStack(name, id, mat, rarity, type, 0, stackable, true);
         if (url != null) {
             if (!url.equals("") && mat.equals(Material.SKULL_ITEM)) {
-                return new SBItemStack(name, id, mat, rarity, type, url, 3, stackable, true, stats);
+                item = new SBItemStack(name, id, mat, rarity, type, url, 3, stackable, true, stats);
+            }
+        } else if (texture != null) {
+            if (!texture.equals("") && mat.equals(Material.SKULL_ITEM)) {
+                item = new SBItemStack(name, id, mat, rarity, type, texture, 3, stackable, true, stats);
             }
         }
         if (!abilities.isEmpty()) {
-            SBItemStack item = new SBItemStack(name, id, mat, rarity, type, 0, stackable, true, stats);
             for (int i : abilities.keySet()) {
                 item.setAbility(abilities.get(i), i);
             }
-            return item;
         }
-        SBItemStack stack = new SBItemStack(name, id, mat, rarity, type, 0, stackable, true, stats);
+        if(!stats.isEmpty()) {
+            for (Map.Entry<SBPlayer.PlayerStat, Double> entry : stats.entrySet()) {
+                SBPlayer.PlayerStat stat = entry.getKey();
+                Double value = entry.getValue();
+                item.setStat(item, stat, value);
+            }
+        }
+        if (!description.isEmpty()) {
+            for (int i = 0; i < description.size(); i++) {
+                item.addDescriptionLine(description.get(i), i);
+            }
+        }
         if (hexColor != null && !hexColor.isEmpty()) {
-            LeatherArmorMeta meta = (LeatherArmorMeta) stack.asBukkitItem().getItemMeta();
+            LeatherArmorMeta meta = (LeatherArmorMeta) item.asBukkitItem().getItemMeta();
             meta.setColor(SUtil.hexToRgb("#" + hexColor));
-            ItemStack temp = stack.asBukkitItem();
+            ItemStack temp = item.asBukkitItem();
             temp.setItemMeta(meta);
-            stack = new SBItemStack(temp);
+            item = new SBItemStack(temp);
         }
-        return stack;
+        return item;
     }
 }

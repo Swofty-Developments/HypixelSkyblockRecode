@@ -64,27 +64,50 @@ public class SBItemStack extends ItemStack {
             stack = setString(stack, UUID.randomUUID().toString(), "UUID");
         }
         stack = setString(stack, Boolean.toString(reforgeable), "reforgeable");
-
+        stack = refreshLore();
+    }
+    public SBItemStack(String name, String id, Material mat, Rarity rarity, ItemType type, int durability, boolean stackable, boolean reforgeable) {
+        stack = new ItemStack(mat, 1);
+        itemID = id;
+        setName(stack, name);
+        setString(stack, id.toUpperCase(), "ID");
+        setString(stack, rarity.name(), "RARITY");
+        setString(stack, "true", "non-legacy");
+        if (type != null) {
+            setString(stack, type.getValue(), "item-type");
+        } else {
+            setString(stack, ItemType.ITEM.getValue(), "item-type");
+        }
+        setDurability(stack, durability);
+        if (!stackable) {
+            stack = setString(stack, UUID.randomUUID().toString(), "UUID");
+        }
+        stack = setString(stack, Boolean.toString(reforgeable), "reforgeable");
+        stack = refreshLore();
     }
 
     public SBItemStack(String name, String id, Material mat, Rarity rarity, ItemType type, String url, int durability, boolean stackable, boolean reforgeable, HashMap<PlayerStat, Double> stats) {
         stack = new ItemStack(mat, 1);
         itemID = id;
-        setName(stack, name);
-        setDurability(stack, durability);
         setString(stack, id.toUpperCase(), "ID");
         setString(stack, rarity.name(), "RARITY");
         setString(stack, type.getValue(), "item-type");
+        setName(stack, name);
+        setDurability(stack, durability);
+
         setString(stack, "true", "non-legacy");
         for (PlayerStat stat : stats.keySet()) {
             stack = setStat(stack, stat, stats.get(stat));
         }
-        stack = applyTexture(stack, url);
+        if(url.contains(".")) {
+            stack = applyUrl(stack, url);
+        } else {
+            stack = applyTexture(stack , url);
+        }
         if (!stackable) {
             stack = setString(stack, UUID.randomUUID().toString(), "UUID");
         }
         stack = setString(stack, Boolean.toString(reforgeable), "reforgeable");
-
     }
 
     public SBItemStack(ItemStack item, String itemID) {
@@ -282,26 +305,10 @@ public class SBItemStack extends ItemStack {
                         }
                     }
                 }
-                /*if (!description.isEmpty()) {
+                if (!description.isEmpty()) {
                     newLore.addAll(description);
                     newLore.add("");
-                } else {
-                    if (oldLore != null) {
-                        List<String> oldLoreClone = new ArrayList<>(oldLore);
-                        for (String s : oldLoreClone) {
-                            for (String b : statsformat) {
-                                if (ChatColor.stripColor(s).contains(b.replace('_', ' '))) {
-                                    oldLore.remove(s);
-                                }
-                            }
-                        }
-                        newLore.addAll(oldLore);
-                        for (String d : oldLore) {
-                            stack = addDescriptionLine(stack, d);
-                            assert stack != null;
-                        }
-                    }
-                }*/
+                }
 
                 HashMap<String, String> abilityNames = new HashMap<>();
                 List<String> abilityType = new ArrayList<>();
@@ -560,10 +567,23 @@ public class SBItemStack extends ItemStack {
             if (stack.hasItemMeta()) {
                 net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
                 NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
-                NBTTagCompound data = tag.getCompound("ExtraAttributes");
-                if (data == null) {
-                    data = new NBTTagCompound();
-                }
+                NBTTagCompound data = tag.getCompound("ExtraAttributes") != null ? tag.getCompound("ExtraAttributes") : new NBTTagCompound();
+
+                data.setString(key, msg);
+                tag.set("ExtraAttributes", data);
+                nmsItem.setTag(tag);
+                this.stack = CraftItemStack.asBukkitCopy(nmsItem);
+                return this.stack;
+            }
+        }
+        return null;
+    }
+    public ItemStack setString(String msg, String key) {
+        if (stack != null) {
+            if (stack.hasItemMeta()) {
+                net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
+                NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+                NBTTagCompound data = tag.getCompound("ExtraAttributes") != null ? tag.getCompound("ExtraAttributes") : new NBTTagCompound();
 
                 data.setString(key, msg);
                 tag.set("ExtraAttributes", data);
@@ -889,9 +909,9 @@ public class SBItemStack extends ItemStack {
 
     private ItemStack setName(ItemStack stack, String name) {
         ItemMeta meta = stack.getItemMeta();
+        StringBuilder builder = new StringBuilder();
         meta.setDisplayName(SUtil.colorize(name));
         stack.setItemMeta(meta);
-        stack = setString(stack, SUtil.colorize(name), "item-name");
         return stack;
     }
 
@@ -907,12 +927,29 @@ public class SBItemStack extends ItemStack {
         return stack;
     }
 
-    public ItemStack applyTexture(ItemStack item, String url) {
+    public ItemStack applyUrl(ItemStack item, String url) {
         if (item == null) return item;
-
         SkullMeta itemMeta = (SkullMeta) item.getItemMeta();
         GameProfile profile = new GameProfile(UUID.randomUUID(), null);
         byte[] encodedData = Base64.getEncoder().encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", url).getBytes());
+        profile.getProperties().put("textures", new Property("textures", new String(encodedData)));
+        Field profileField;
+        try {
+            profileField = itemMeta.getClass().getDeclaredField("profile");
+            profileField.setAccessible(true);
+            profileField.set(itemMeta, profile);
+        } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        item.setItemMeta(itemMeta);
+        return item;
+    }
+    public ItemStack applyTexture(ItemStack item, String texture) {
+        if (item == null) return item;
+        SkullMeta itemMeta = (SkullMeta) item.getItemMeta();
+        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
+        byte[] encodedData = texture.getBytes();
         profile.getProperties().put("textures", new Property("textures", new String(encodedData)));
         Field profileField;
         try {

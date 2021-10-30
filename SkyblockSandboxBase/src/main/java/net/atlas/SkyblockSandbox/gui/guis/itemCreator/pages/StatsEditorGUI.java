@@ -6,6 +6,7 @@ import dev.triumphteam.gui.guis.GuiItem;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.gui.AnvilGUI;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
+import net.atlas.SkyblockSandbox.item.SBItemBuilder;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
@@ -66,7 +67,11 @@ public class StatsEditorGUI extends NormalGUI {
         getGui().getFiller().fillBetweenPoints(1, 5, 5, 5, ItemBuilder.from(FILLER_GLASS).name(Component.text(SUtil.colorize("&7"))).asGuiItem());
         getGui().getFiller().fillBetweenPoints(1, 7, 5, 7, ItemBuilder.from(FILLER_GLASS).name(Component.text(SUtil.colorize("&7"))).asGuiItem());
         for (SBPlayer.PlayerStat s : SBPlayer.PlayerStat.values()) {
-            getGui().addItem(ItemBuilder.from(s.getStack()).lore(Component.text(""), Component.text(SUtil.colorize("&bClick to set the " + s.getStack().getItemMeta().getDisplayName() + " &bamount!"))).setNbt("Stat", s.name()).asGuiItem());
+            if(s == SBPlayer.PlayerStat.BREAKING_POWER) {
+                getGui().setItem(4, ItemBuilder.from(s.getStack()).lore(Component.text(""), Component.text(SUtil.colorize("&bClick to set the " + s.getStack().getItemMeta().getDisplayName() + " &bamount!"))).setNbt("Stat", s.name()).asGuiItem());
+            } else {
+                getGui().addItem(ItemBuilder.from(s.getStack()).lore(Component.text(""), Component.text(SUtil.colorize("&bClick to set the " + s.getStack().getItemMeta().getDisplayName() + " &bamount!"))).setNbt("Stat", s.name()).asGuiItem());
+            }
         }
         for (int in = 0; in < getGui().getInventory().getSize(); in++) {
             if (getGui().getGuiItem(in) != null) {
@@ -129,43 +134,10 @@ public class StatsEditorGUI extends NormalGUI {
                 int strength = Integer.parseInt(s);
 
                 ItemStack is = player.getItemInHand();
-                ItemMeta im = is.getItemMeta();
-                ArrayList<String> new_lore;
-                if (player.getItemInHand().getItemMeta().getLore() == null) {
-                    new_lore = new ArrayList<>();
-                    new_lore.add("§7" + ChatColor.translateAlternateColorCodes('&', "&7" + formattedname + ": §a+" + strength));
-                    im.setLore(new_lore);
-                    is.setItemMeta(im);
-                    SBItemStack it = new SBItemStack(is);
-                    ItemStack i = it.setInteger(is, strength, stat.name());
-                    player.setItemInHand(i);
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aAdded " + event1.getName() + " " + stat.name().toLowerCase() + " to the item in your hand!"));
-                } else {
-                    new_lore = new ArrayList<>();
-                    Iterator<String> var12 = player.getItemInHand().getItemMeta().getLore().iterator();
-
-                    String str;
-                    while (var12.hasNext()) {
-                        str = var12.next();
-                        if (!str.contains("§7" + ChatColor.translateAlternateColorCodes('&', formattedname + ": §a+"))) {
-                            new_lore.add(str);
-                        } else {
-                            new_lore.add("§7" + ChatColor.translateAlternateColorCodes('&', formattedname + ": §a+" + strength));
-                        }
-                    }
-
-                    str = "§7" + ChatColor.translateAlternateColorCodes('&', formattedname + " §a+" + strength);
-                    if (!new_lore.contains(str)) {
-                        new_lore.add(str);
-                    }
-
-                    im.setLore(new_lore);
-                    is.setItemMeta(im);
-                    SBItemStack it = new SBItemStack(is);
-                    ItemStack i = it.setInteger(is, strength, stat.name());
-                    player.setItemInHand(i);
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aAdded " + event1.getName() + " " + stat.name().toLowerCase() + " to the item in your hand!"));
-                }
+                SBItemBuilder item = new SBItemBuilder(is);
+                item.stat(stat, strength);
+                player.setItemInHand(item.build());
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aAdded " + event1.getName() + " " + stat.name().toLowerCase() + " to the item in your hand!"));
             } else {
                 invalidNumberError(event1, player);
             }

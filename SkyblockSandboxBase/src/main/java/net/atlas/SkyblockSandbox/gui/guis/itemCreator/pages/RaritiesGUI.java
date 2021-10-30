@@ -5,6 +5,7 @@ import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.gui.AnvilGUI;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.item.Rarity;
+import net.atlas.SkyblockSandbox.item.SBItemBuilder;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
@@ -87,15 +88,18 @@ public class RaritiesGUI extends NormalGUI {
             player.playSound(player.getLocation(), Sound.ITEM_PICKUP, 1, 1);
         });
         setAction(22, event -> {
-
-            SBItemStack item = new SBItemStack(getOwner().getItemInHand());
-            String rarityStr = item.getString(getOwner().getItemInHand(), "RARITY");
-
-            Rarity rarity = Enums.getIfPresent(Rarity.class, rarityStr).or(Rarity.COMMON);
-            recomb(rarity, item.asBukkitItem(), getOwner());
+            SBItemBuilder builder = new SBItemBuilder(getOwner().getItemInHand());
+            if(event.isRightClick()) {
+                unRecomb(builder.rarity, getOwner().getItemInHand(), getOwner());
+            } else {
+                recomb(builder.rarity, getOwner().getItemInHand(), getOwner());
+            }
         });
         setAction(21, event -> {
             addStar(getOwner().getItemInHand(), event.getClick().isRightClick());
+        });
+        setAction(23, event -> {
+            removeStar(getOwner().getItemInHand(), event.getClick().isRightClick());
         });
 
         return true;
@@ -123,75 +127,110 @@ public class RaritiesGUI extends NormalGUI {
         setItem(14, makeColorfulItem(Material.STAINED_CLAY, "§6Legendary", 1, 4, "§7Set your item's rarity", "§7to §6Legendary§7!", "", "§eClick to set!"));
         setItem(15, makeColorfulItem(Material.STAINED_CLAY, "§dMythic", 1, 2, "§7Set your item's rarity", "§7to §dMythic§7!", "", "§eClick to set!"));
         setItem(16, makeColorfulItem(Material.STAINED_CLAY, "§cSpecial", 1, 14, "§7Set your item's rarity", "§7to §cSpecial§7!", "", "§eClick to set!"));
-        setItem(22, makeColorfulSkullItem("&6Recombobulate", "http://textures.minecraft.net/texture/57ccd36dc8f72adcb1f8c8e61ee82cd96ead140cf2a16a1366be9b5a8e3cc3fc", 1, "&7Automatically recombobulate your item!", "", "&eClick to recombobulate!"));
+        setItem(22, makeColorfulSkullItem("&6Recombobulate", "http://textures.minecraft.net/texture/57ccd36dc8f72adcb1f8c8e61ee82cd96ead140cf2a16a1366be9b5a8e3cc3fc", 1, "&7Automatically recombobulate your item!", "", "&eLeft-Click to recombobulate!", "&bRight-Click to remove the recombobulator!"));
         setItem(21, makeColorfulItem(Material.QUARTZ, "&c✪✪✪✪&6✪ Add dungeon stars", 1, 0, "&7Add a dungeon star to your item!", "", "&eRight click for master stars!"));
+        setItem(23, makeColorfulItem(Material.QUARTZ, "&c✪✪✪✪&6✪ Remove dungeon stars", 1, 0, "&7Remove a dungeon star to your item!", "", "&eRight click for master stars!"));
     }
 
 
 
     private void setRarity(Rarity r, ItemStack i, Player player) {
-        ItemStack i1 = NBTUtil.setString(i, r.toString(), "RARITY");
-        SBItemStack it = new SBItemStack(i1);
-        player.setItemInHand(it.refreshLore());
+        player.setItemInHand(new SBItemBuilder(i).rarity(r).build());
     }
 
     public static String starKey = "dungeon_upgrades";
     public static String masterStarKey = "master_dungeon_upgrades";
 
     private void addStar(ItemStack i, boolean masterStar) {
-        ItemStack finalI = new ItemStack(getOwner().getItemInHand());
-        if(NBTUtil.getInteger(i,"dungeon_item")!=1) {
-            finalI = NBTUtil.setInteger(finalI,1,"dungeon_item");
+        SBItemBuilder builder = new SBItemBuilder(i);
+        if(masterStar) {
+            builder.masterStar(builder.masterstar + 1);
         }
-        getOwner().playSound(getOwner().getLocation(), Sound.ZOMBIE_REMEDY, 2, 1);
-        int starAmt = NBTUtil.getInteger(i, starKey);
-        int masterStarAmt = NBTUtil.getInteger(i, masterStarKey);
-
-        if (masterStar) {
-            finalI = NBTUtil.setInteger(finalI, masterStarAmt + 1, masterStarKey);
-        } else {
-            finalI = NBTUtil.setInteger(finalI, starAmt + 1, starKey);
+        else {
+            builder.normalStar(builder.normalstar + 1);
         }
-        SBItemStack it = new SBItemStack(finalI);
-        getOwner().setItemInHand(it.refreshLore());
+        getOwner().setItemInHand(builder.build());
+    }
+    private void removeStar(ItemStack i, boolean masterStar) {
+        SBItemBuilder builder = new SBItemBuilder(i);
+        if(masterStar) {
+            builder.masterStar(builder.masterstar - 1);
+        }
+        else {
+            builder.normalStar(builder.normalstar - 1);
+        }
+        getOwner().setItemInHand(builder.build());
     }
 
     private void recomb(Rarity r, ItemStack i, Player player) {
-        ItemStack i1 = new ItemStack(i);
+        SBItemBuilder builder = new SBItemBuilder(i);
         getOwner().playSound(getOwner().getLocation(), Sound.ANVIL_USE, 2, 1);
         switch (r) {
             case COMMON:
-                i1 = NBTUtil.setString(i, UNCOMMON.toString(), "RARITY");
+                builder.rarity(UNCOMMON);
                 break;
             case UNCOMMON:
-                i1 = NBTUtil.setString(i, RARE.toString(), "RARITY");
+                builder.rarity(RARE);
                 break;
             case RARE:
-                i1 = NBTUtil.setString(i, EPIC.toString(), "RARITY");
+                builder.rarity(EPIC);
                 break;
             case EPIC:
-                i1 = NBTUtil.setString(i, LEGENDARY.toString(), "RARITY");
+                builder.rarity(LEGENDARY);
                 break;
             case LEGENDARY:
-                i1 = NBTUtil.setString(i, MYTHIC.toString(), "RARITY");
+                builder.rarity(MYTHIC);
                 break;
             case MYTHIC:
-                i1 = NBTUtil.setString(i, SUPREME.toString(), "RARITY");
+                builder.rarity(SUPREME);
                 break;
             case SUPREME:
-                i1 = NBTUtil.setString(i, SPECIAL.toString(), "RARITY");
+                builder.rarity(SPECIAL);
                 break;
             case SPECIAL:
-                i1 = NBTUtil.setString(i, SUPER_SPECIAL.toString(), "RARITY");
+                builder.rarity(SUPER_SPECIAL);
                 break;
             case SUPER_SPECIAL:
-                i1 = NBTUtil.setString(i, UNOBTAINABLE.toString(), "RARITY");
+                builder.rarity(UNOBTAINABLE);
                 break;
         }
-
-        SBItemStack it = new SBItemStack(i1);
-        it = new SBItemStack(it.setInteger(it.asBukkitItem(), it.getInteger(it.asBukkitItem(), "rarity_upgrades") + 1, "rarity_upgrades"));
-        player.setItemInHand(it.refreshLore());
+        builder.recomb(true);
+        player.setItemInHand(builder.build());
+    }
+    private void unRecomb(Rarity r, ItemStack i, Player player) {
+        SBItemBuilder builder = new SBItemBuilder(i);
+        getOwner().playSound(getOwner().getLocation(), Sound.ANVIL_USE, 2, 1);
+        switch (r) {
+            case UNCOMMON:
+                builder.rarity(COMMON);
+                break;
+            case RARE:
+                builder.rarity(UNCOMMON);
+                break;
+            case EPIC:
+                builder.rarity(RARE);
+                break;
+            case LEGENDARY:
+                builder.rarity(EPIC);
+                break;
+            case MYTHIC:
+                builder.rarity(LEGENDARY);
+                break;
+            case SUPREME:
+                builder.rarity(MYTHIC);
+                break;
+            case SPECIAL:
+                builder.rarity(SUPREME);
+                break;
+            case SUPER_SPECIAL:
+                builder.rarity(SPECIAL);
+                break;
+            case UNOBTAINABLE:
+                builder.rarity(SUPER_SPECIAL);
+                break;
+        }
+        builder.recomb(false);
+        player.setItemInHand(builder.build());
     }
 
 }

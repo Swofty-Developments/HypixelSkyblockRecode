@@ -6,6 +6,7 @@ import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemTypeGUI;
 import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.AbilitySelectorGUI;
 import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.petbuilder.PetBuilderGUI;
+import net.atlas.SkyblockSandbox.item.SBItemBuilder;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.SUtil;
@@ -55,9 +56,8 @@ public class ItemCreatorGUIMain extends NormalGUI {
 
 
                     meta.setDisplayName(SUtil.colorize(event1.getName()));
-                    player.getItemInHand().setItemMeta(meta);
-                    ItemStack i = NBTUtil.setString(player.getItemInHand(),SUtil.colorize(event1.getName()),"item-name");
-                    player.setItemInHand(i);
+                    SBItemBuilder item = new SBItemBuilder(player.getItemInHand());
+                    player.setItemInHand(item.name(event1.getName()).build());
 
                     new BukkitRunnable() {
                         @Override

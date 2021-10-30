@@ -3,6 +3,7 @@ package net.atlas.SkyblockSandbox;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.google.common.base.Enums;
+import com.google.gson.JsonObject;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import net.atlas.SkyblockSandbox.AuctionHouse.AuctionItemHandler;
@@ -24,7 +25,9 @@ import net.atlas.SkyblockSandbox.files.CfgFile;
 import net.atlas.SkyblockSandbox.files.DatabaseInformationFile;
 import net.atlas.SkyblockSandbox.files.IslandInfoFile;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.LootListener;
+import net.atlas.SkyblockSandbox.item.ItemType;
 import net.atlas.SkyblockSandbox.item.Rarity;
+import net.atlas.SkyblockSandbox.item.SBItemBuilder;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.item.ability.AbiltyListener;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.HellShatter;
@@ -39,6 +42,7 @@ import net.atlas.SkyblockSandbox.playerIsland.MongoIslands;
 import net.atlas.SkyblockSandbox.slayer.SlayerTier;
 import net.atlas.SkyblockSandbox.slayer.Slayers;
 import net.atlas.SkyblockSandbox.storage.MongoStorage;
+import net.atlas.SkyblockSandbox.util.HypixelColorCodes;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.NumberTruncation.NumberSuffix;
 import net.atlas.SkyblockSandbox.util.SUtil;
@@ -66,8 +70,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.davidmoten.text.utils.WordWrap;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
@@ -157,8 +163,6 @@ public class SBX extends JavaPlugin {
         coins = new Coins();
 
         Data.initialize();
-        sql = new MySQL();
-        SQLBpCache.init();
         signManager = new SignManager(this);
         signManager.init();
         registerListeners();
@@ -259,6 +263,7 @@ public class SBX extends JavaPlugin {
                 }
             }
         }.runTaskTimerAsynchronously(this, 0, 100);
+        updateAH.cancel();
 
         BukkitTask runnable = new BukkitRunnable() {
             @Override
@@ -402,140 +407,42 @@ public class SBX extends JavaPlugin {
 
     private void githubItems() {
         try {
-            System.err.println("Starting to download neu-repo");
-            File repoLocation = new File(getDataFolder(), File.separator + "github");
-            repoLocation.mkdirs();
-            File itemsZip = new File(repoLocation, "neu-items-master.zip");
-            try {
-                itemsZip.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return;
-            }
-
-
-            URL url = new URL("https://github.com/Moulberry/NotEnoughUpdates-REPO/archive/refs/heads/master.zip");
-            URLConnection urlConnection = url.openConnection();
-            urlConnection.setConnectTimeout(15000);
-            urlConnection.setReadTimeout(30000);
-
-            try (InputStream is = urlConnection.getInputStream()) {
-                FileUtils.copyInputStreamToFile(is, itemsZip);
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.err.println("Failed to download NEU Repo! Please report this issue to the mod creator");
-                return;
-            }
-            System.out.println("Successfully downloaded NEU Repo!");
-            System.out.println("Starting to unzip NEU Repo!");
-
-            SUtil.unzipIgnoreFirstFolder(itemsZip.getAbsolutePath(), repoLocation.getAbsolutePath());
-            File items = new File(repoLocation, "items");
-            if (items.exists()) {
-                File[] itemFiles = new File(repoLocation, "items").listFiles();
-                if (itemFiles != null) {
-                    for (File f : itemFiles) {
-                        JSONParser parser = new JSONParser();
-                        JSONObject json;
-                        try {
-                            try (Reader reader = Files.newBufferedReader(f.toPath().toAbsolutePath(), StandardCharsets.UTF_8)) {
-                                json = (JSONObject) parser.parse(reader);
-                            }
-                            try {
-                                MinecraftKey mk = new MinecraftKey(json.get("itemid").toString());
-                                ItemStack item = CraftItemStack.asNewCraftStack(net.minecraft.server.v1_8_R3.Item.REGISTRY.get(mk));
-                                Material mat = item.getType();
-                                switch (mat) {
-                                    case BARRIER:
-                                    case COMMAND:
-                                    case COMMAND_MINECART:
-                                    case BURNING_FURNACE:
-                                    case SOIL:
-                                        continue;
-                                }
-                                String displayname = String.valueOf(json.get("displayname"));
-                                ArrayList<String> lore = new ArrayList<>();
-                                for (Object list : (JSONArray) json.get("lore")) {
-                                    lore.add(list.toString());
-                                }
-                                String parsedRarity = ChatColor.stripColor(lore.get(lore.size() - 1)).split(" ")[0];
-                                Rarity r = Enums.getIfPresent(Rarity.class, parsedRarity).orNull();
-                                net.minecraft.server.v1_8_R3.ItemStack itemStack = CraftItemStack.asNMSCopy(StackUtils.makeColorfulItem(mat, displayname, 1, Integer.parseInt(json.get("damage").toString()), lore));
-                                if (json.get("nbttag") != null) {
-                                    NBTTagCompound nbt = MojangsonParser.parse(json.get("nbttag").toString());
-                                    itemStack.setTag(nbt);
-                                }
-                                ItemStack bukkitStack = CraftItemStack.asBukkitCopy(itemStack);
-                                for (String s : lore) {
-                                    String parsedStat = ChatColor.stripColor(s).replace(' ', '_').toUpperCase().split(":")[0];
-                                    List<String> statsFormat = new ArrayList<>(Arrays.asList(SBItemStack.statsformat));
-                                    if (statsFormat.stream().anyMatch(parsedStat::equalsIgnoreCase)) {
-                                        SBPlayer.PlayerStat stat = Enums.getIfPresent(SBPlayer.PlayerStat.class, parsedStat).orNull();
-                                        if (stat != null) {
-                                            try {
-                                                String split1 = ChatColor.stripColor(s).replace(' ', '_').toUpperCase();
-                                                if (split1.contains("{")) {
-                                                    split1 = "0";
-                                                } else {
-                                                    if (split1.contains(":")) {
-                                                        split1 = split1.split(":")[1];
-                                                    }
-                                                    if (split1.contains("_HP")) {
-                                                        split1 = split1.replace("_HP", "");
-                                                    }
-                                                    if (split1.contains("%")) {
-                                                        split1 = split1.replace("%", "");
-                                                    }
-                                                    if (split1.contains("+")) {
-                                                        split1 = split1.replace("+", "");
-                                                    }
-                                                    if (split1.contains(".")) {
-                                                        split1 = split1.split("\\.")[0];
-                                                    }
-                                                    if (split1.contains("-")) {
-                                                        split1 = "0";
-                                                    }
-                                                    if (split1.contains(",")) {
-                                                        split1 = split1.replace(",", "");
-                                                    }
-                                                    if (split1.contains("_")) {
-                                                        split1 = split1.replace("_", "");
-                                                    }
-                                                    if (split1.contains("?")) {
-                                                        split1 = split1.replace("?", "");
-                                                    }
-                                                    if (split1.contains("HEALTH") || split1.contains("PERSECOND") || split1.contains("SPEED") || split1.contains("INTELLIGENCE") || split1.contains("DAMAGE") || split1.contains("STRENGTH")) {
-                                                        split1 = "0";
-                                                    }
-                                                    int amt = Integer.parseInt(split1);
-                                                    if (amt != 0) {
-                                                        bukkitStack = NBTUtil.setInteger(bukkitStack, amt, stat.name());
-                                                    }
-                                                }
-                                            } catch (NumberFormatException ex) {
-                                                ex.printStackTrace();
-                                            }
-                                        }
-                                    } else {
-                                        SBItemStack stack = new SBItemStack(bukkitStack);
-                                        bukkitStack = stack.addDescriptionLine(s, lore.indexOf(s));
-                                    }
-
-                                }
-                                if (r != null) {
-                                    bukkitStack = NBTUtil.setString(bukkitStack, r.toString(), "RARITY");
-                                }
-                                bukkitStack = NBTUtil.setString(bukkitStack, "true", "is-hypixel");
-
-                                hypixelItemMap.put(String.valueOf(json.get("internalname")), bukkitStack);
-                            } catch (MojangsonParseException e) {
-                                e.printStackTrace();
-                            }
-                        } catch (NullPointerException | IllegalArgumentException ignored) {
-                        } catch (ParseException e) {
-                            e.printStackTrace();
+            JSONObject hypixelJSON = SUtil.readJsonObjFromUrl("https://api.hypixel.net/resources/skyblock/items");
+            if (!hypixelJSON.getBoolean("success")) return;
+            JSONArray jsonItems = hypixelJSON.getJSONArray("items");
+            int count = -1;
+            for (Object doc : jsonItems) {
+                JSONObject json = (JSONObject) doc;
+                SBItemBuilder item = new SBItemBuilder();
+                try {
+                    item.name(json.has("name") ? json.getString("name") : "Null")
+                            .rarity(Rarity.valueOf(json.has("tier") ? json.getString("tier") : Rarity.COMMON.name()))
+                            .material(Material.valueOf(json.getString("material")))
+                            .type(ItemType.typeFromString(json.has("category") ? json.getString("category") : null))
+                            .id(json.getString("id"))
+                            .stackable(!json.has("unstackable"));
+                    if (json.has("stats")) {
+                        JSONObject statsJSON = json.getJSONObject("stats");
+                        statsJSON.toMap().forEach((key, value) -> {
+                            item.stat(SBPlayer.PlayerStat.getStat(key), Double.parseDouble(String.valueOf(value)));
+                        });
+                    }
+                    if(json.has("skin")) {
+                        item.texture(json.getString("skin"));
+                    }
+                    if (json.has("description")) {
+                        for (String line : WordWrap.from(json.getString("description")).maxWidth(50).wrap().split("\n")) {
+                            item.addDescriptionLine(HypixelColorCodes.translateHypixelColorCodes(line));
                         }
                     }
+                    hypixelItemMap.put(json.getString("id"), item.build());
+                } catch (JSONException | NullPointerException e) {
+                    count++;
+                    if(count >= 20) {
+                        return;
+                    }
+                    e.printStackTrace();
+                    System.out.println(json);
                 }
             }
         } catch (IOException e) {

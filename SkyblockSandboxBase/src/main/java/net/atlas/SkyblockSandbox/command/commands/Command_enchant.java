@@ -4,6 +4,7 @@ import com.google.common.base.Enums;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCommand;
 import net.atlas.SkyblockSandbox.command.abstraction.SBCommandArgs;
 import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
+import net.atlas.SkyblockSandbox.item.SBItemBuilder;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.item.enchant.Enchantment;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
@@ -36,9 +37,9 @@ public class Command_enchant extends SkyblockCommandFramework
                 if(enchant!=null) {
                     if(NumUtils.isInt(args[1])) {
                         SBPlayer player = new SBPlayer(((Player) sender));
-                        SBItemStack stack = new SBItemStack(player.getItemInHand());
-                        ItemStack newItem = stack.addEnchantment(enchant,Integer.parseInt(args[1]));
-                        player.setItemInHand(newItem);
+                        SBItemBuilder builder = new SBItemBuilder(player.getItemInHand());
+                        builder.addEnchantment(enchant, Integer.parseInt(args[1]));
+                        player.setItemInHand(builder.build());
                         player.playSound(player.getLocation(), Sound.ITEM_PICKUP,1,1);
                         player.sendMessage(SUtil.colorize("&aEnchanting succeeded!"));
                     } else {

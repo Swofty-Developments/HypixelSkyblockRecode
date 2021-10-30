@@ -112,8 +112,8 @@ public class SBMenu extends NormalGUI {
                         "&aDefense&r: " + format.format(owner.getMaxStat(SBPlayer.PlayerStat.DEFENSE)),
                         "&cStrength&r: " + format.format(owner.getMaxStat(SBPlayer.PlayerStat.STRENGTH)),
                         "&rSpeed&r: " + format.format(owner.getMaxStat(SBPlayer.PlayerStat.SPEED)),
-                        "&9Crit Chance&r: " + format.format(owner.getMaxStat(SBPlayer.PlayerStat.CRIT_CHANCE)) + "%",
-                        "&9Crit Damage&r: " + format.format(owner.getMaxStat(SBPlayer.PlayerStat.CRIT_DAMAGE)) + "%",
+                        "&9Crit Chance&r: " + format.format(owner.getMaxStat(SBPlayer.PlayerStat.CRITICAL_CHANCE)) + "%",
+                        "&9Crit Damage&r: " + format.format(owner.getMaxStat(SBPlayer.PlayerStat.CRITICAL_DAMAGE)) + "%",
                         "&bIntelligence&r: " + format.format(owner.getMaxStat(SBPlayer.PlayerStat.INTELLIGENCE)),
                         "&eBonus Attack Speed&r: " + format.format(owner.getMaxStat(SBPlayer.PlayerStat.ATTACK_SPEED)) + "%",
                         "&cFerocity&r: " + format.format(owner.getMaxStat(SBPlayer.PlayerStat.FEROCITY)))));

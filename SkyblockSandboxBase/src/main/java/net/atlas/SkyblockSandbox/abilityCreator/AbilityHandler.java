@@ -26,16 +26,19 @@ import static net.atlas.SkyblockSandbox.abilityCreator.AbilityUtil.*;
 public class AbilityHandler {
     public void callEvent(PlayerInteractEvent event) {
         SBPlayer p = new SBPlayer(event.getPlayer());
-        ItemStack craftItem = event.getItem();
+        ItemStack craftItem = p.getItemInHand();
         SBItemStack sbItem = new SBItemStack(craftItem);
         if (getGenericAbilityString(craftItem, "has-ability").equalsIgnoreCase("true")) {
             for (int i = 0; i < getAbilityAmount(craftItem); i++) {
                 String abilName = getAbilityString(craftItem, i, AbilityValue.NAME.name());
-                String manaCost = getAbilityData(craftItem,i,AbilityValue.MANA_COST);
-                Integer manaCostInt = Integer.parseInt(manaCost);
+                String manaCost = getAbilityString(craftItem, i, AbilityValue.MANA_COST.name());
+                int manaCostInt = 0;
+                if (!manaCost.equals("")) {
+                    manaCostInt = Integer.parseInt(manaCost);
+                }
 
                 String clickTypeString = getAbilityData(craftItem, i, AbilityValue.CLICK_TYPE);
-                clickTypeString = clickTypeString.split("_")[0];
+                clickTypeString = clickTypeString.replace("_CLICK", "");
                 ClickType type = Enums.getIfPresent(ClickType.class, clickTypeString).orNull();
                 if (type != null) {
                     if (event.getAction().name().contains(type.name())) {

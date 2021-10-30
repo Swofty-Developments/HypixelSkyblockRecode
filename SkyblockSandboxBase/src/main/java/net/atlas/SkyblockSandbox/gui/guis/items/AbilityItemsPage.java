@@ -6,6 +6,7 @@ import net.atlas.SkyblockSandbox.gui.AnvilGUI;
 import net.atlas.SkyblockSandbox.gui.PaginatedGUI;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.item.SkyblockItem;
+import net.atlas.SkyblockSandbox.item.SkyblockItems;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import net.kyori.adventure.text.Component;
@@ -150,10 +151,7 @@ public class AbilityItemsPage extends PaginatedGUI {
     }
 
     private Collection<ItemStack> items(SBPlayer player) {
-        Collection<ItemStack> items = new ArrayList<>();
-        for (SBItemStack item : SkyblockItem.getAllPublicItems()) {
-            items.add(item.refreshLore());
-        }
+        Collection<ItemStack> items = new ArrayList<>(SkyblockItems.getAllPublicItems());
         if (search.containsKey(player.getUniqueId())) {
             ArrayList<ItemStack> searchItems = new ArrayList<>();
             for (ItemStack item : items) {

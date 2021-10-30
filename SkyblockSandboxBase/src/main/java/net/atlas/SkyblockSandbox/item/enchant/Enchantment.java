@@ -37,28 +37,28 @@ public enum Enchantment {
         sbPlayer.setMaxStat(SBPlayer.PlayerStat.INTELLIGENCE, sbPlayer.getMaxStat(SBPlayer.PlayerStat.INTELLIGENCE) + (5 * lvl));
         return 1;
     }),
-    BLAST_PROTECTION("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    BLAST_PROTECTION("Blast Protection", 3, ItemType.ARMOR, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    BLESSING("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    BLESSING("Blessing", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    CASTER("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    CASTER("Caster", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    CHANCE("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    CHANCE("Chance", 3, ItemType.SWORD, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    CLEAVE("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    CLEAVE("Cleave", 3, ItemType.SWORD, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    COMPACT("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    COMPACT("Compact", 3, ItemType.PICKAXE, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    COUNTER_STRIKE("Counter-Strike", 3, ItemType.CHESPLATE,false, (event, dmg, lvl) ->{
+    COUNTER_STRIKE("Counter-Strike", 3, ItemType.CHESTPLATE,false, (event, dmg, lvl) ->{
         return 1;
     }),
-    CRITICAL("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    CRITICAL("Critical", 3, ItemType.SWORD, false, (sbPlayer, lvl) -> {
         return 1;
     }),
     CUBISM("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
@@ -79,28 +79,28 @@ public enum Enchantment {
     DRAGON_TRACER("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Efficiency("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    EFFICIENCY("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Ender_Slayer("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    ENDER_SLAYER("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Execute("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    EXECUTE("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Experience("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    EXPERIENCE("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Expertise("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    EXPERTISE("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Feather_Falling("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    FEATHER_FALLING("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Fire_Aspect("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    FIRE_ASPECT("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Fire_Protection("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    FIRE_PROTECTION("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
     FIRST_STRIKE("First Strike", 5, ItemType.SWORD, false, (event,dmg,lvl) -> {
@@ -118,22 +118,22 @@ public enum Enchantment {
         }
         return dmg;
     }),
-    Flame("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    FLAME("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Fortune("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    FORTUNE("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Frail("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    FRAIL("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Frost_Walker("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    FROST_WALKER("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Giant_Killer("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    GIANT_KILLER("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Growth("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    GROWTH("Aqua Affinity", 7, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
     HARVESTING("Harvesting",6,ItemType.HOE,false,(sbPlayer, lvl) -> {
@@ -143,13 +143,13 @@ public enum Enchantment {
     PRISTINE("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Impaling("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    IMPALING("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Infinite_Quiver("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    INFINITE_QUIVER("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
-    Knockback("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
+    KNOCKBACK("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {
         return 1;
     }),
     Lethality("Aqua Affinity", 3, ItemType.HELMET, false, (sbPlayer, lvl) -> {

@@ -110,27 +110,31 @@ public class AbilityCreatorGUI extends NormalGUI {
             updateItems();
         });
         setAction(22, event -> {
-            AnvilGUI gui = new AnvilGUI(player, event13 -> {
-                if (!NumUtils.isInt(event13.getName())) {
-                    invalidNumberError(event13, getOwner().getPlayer());
+            AnvilGUI gui = new AnvilGUI(player, event1 -> {
+                try {
+                    Integer p = Integer.parseInt(event1.getName());
+                } catch (NumberFormatException ignored) {
+                    player.sendMessage("§cThat's not a valid number!");
+                    new AbilityCreatorGUI(getOwner(), index).open();
                     return;
                 }
-                if (Integer.parseInt(event13.getName()) > 10000) {
-                    player.sendMessage("§cThe mana cost cannot be more than 10,000!");
+                if (Integer.parseInt(event1.getName()) > 100000) {
+                    player.sendMessage("§cThe Mana Cost cannot be more than 100,000!");
                     player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 0);
+                    player.closeInventory();
                     return;
                 }
-                if (Integer.parseInt(event13.getName()) < 0) {
-                    player.sendMessage("§cThe mana cost cannot be less than 0!");
+                if (Integer.parseInt(event1.getName()) < 0) {
+                    player.sendMessage("§cThe Mana Cost cannot be less than 0!");
                     player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 0);
+                    player.closeInventory();
                     return;
                 }
-                if (NumUtils.isInt(event13.getName()) && event13.getName() != null) {
-                    SBItemStack bb = new SBItemStack(player.getItemInHand());
-                    bb.setAbilityData(index, AbilityValue.MANA_COST, event13.getName());
-                    player.setItemInHand(bb.asBukkitItem());
+                if (event1.getName() != null) {
+                    SBItemStack i = new SBItemStack(player.getItemInHand());
+                    player.setItemInHand(i.setAbilityData(index, AbilityValue.MANA_COST, event1.getName()));
                 } else {
-                    invalidNumberError(event13, player);
+                    invalidNumberError(event1, player);
                 }
                 new BukkitRunnable() {
                     @Override
@@ -140,7 +144,7 @@ public class AbilityCreatorGUI extends NormalGUI {
                 }.runTaskLater(SBX.getInstance(), 2);
             });
 
-            gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, makeColorfulItem(Material.PAPER, "Enter your mana cost", 1, 0));
+            gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, makeColorfulItem(Material.PAPER, "Enter your Mana Cost", 1, 0));
             gui.open();
         });
         setAction(30, event -> {
