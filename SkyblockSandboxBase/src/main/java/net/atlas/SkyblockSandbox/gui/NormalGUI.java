@@ -119,10 +119,6 @@ public abstract class NormalGUI extends SBGUI {
 
     }
 
-    public void open(SBPlayer owner) {
-        gui.open(owner);
-    }
-
     public void setAction(int slot, GuiAction<InventoryClickEvent> e) {
         gui.addSlotAction(slot,e);
     }

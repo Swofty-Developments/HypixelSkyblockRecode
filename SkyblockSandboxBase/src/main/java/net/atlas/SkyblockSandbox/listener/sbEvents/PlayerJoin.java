@@ -31,6 +31,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -164,5 +165,19 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
             petsDoc = new Document();
         }
         cachedPets.put(p.getUniqueId(),petsDoc);
+
+        //settings cache
+        Document docs = (Document) playerDoc.get("Settings");
+        if (docs == null) {
+            HashMap<String, Object> emptyMap = new HashMap<>();
+            for (SBPlayer.Settings setting : SBPlayer.Settings.values()) {
+                emptyMap.put(setting.name(), false);
+            }
+            docs = new Document(emptyMap);
+            playerDoc.put("Settings", docs);
+        }
+        for (SBPlayer.Settings setting : SBPlayer.Settings.values()) {
+            setting.map.put(p.getUniqueId(), !docs.containsKey(setting.name()) ? Boolean.valueOf(false) : docs.getBoolean(setting.name()));
+        }
     }
 }

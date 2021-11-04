@@ -4,11 +4,13 @@ import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.abilityCreator.AbilityUtil;
 import net.atlas.SkyblockSandbox.abilityCreator.AbilityValue;
 import net.atlas.SkyblockSandbox.gui.AnvilGUI;
+import net.atlas.SkyblockSandbox.gui.Backable;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.functionCreator.FunctionsMainGUI;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.item.ability.EnumAbilityData;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
+import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.NumUtils;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
@@ -22,7 +24,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class AbilityCreatorGUI extends NormalGUI {
+public class AbilityCreatorGUI extends NormalGUI implements Backable {
     private final int index;
 
     public AbilityCreatorGUI(SBPlayer owner, int index) {
@@ -147,14 +149,13 @@ public class AbilityCreatorGUI extends NormalGUI {
             gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, makeColorfulItem(Material.PAPER, "Enter your Mana Cost", 1, 0));
             gui.open();
         });
-        setAction(30, event -> {
-            new SetAbilityDescriptionMenu(getOwner(), index).open();
-        });
+        if (NBTUtil.getString(getOwner().getItemInHand(), "non-legacy").equals("true")) {
+            setAction(30, event -> {
+                new SetAbilityDescriptionMenu(getOwner(), index).open();
+            });
+        }
         setAction(31, event -> {
             new FunctionsMainGUI(getOwner(), index).open();
-        });
-        setAction(49, event -> {
-            new AbilitySelectorGUI(getOwner()).open();
         });
         return true;
     }
@@ -172,8 +173,6 @@ public class AbilityCreatorGUI extends NormalGUI {
     @Override
     public void setItems() {
         setMenuGlass();
-        setItem(49, makeColorfulItem(Material.ARROW, "§aGo Back", 1, 0, "§7To Edit Item Ability"));
-
         setItem(13, makeColorfulItem(Material.NAME_TAG, "§aSet ability name", 1, 0,
                 SUtil.colorize("&7Set the name of your ability!", "", "&cNOTICE: Inappropriate ability names", "&cwill result in a warn/ban.", "", "&eClick to set name!")));
 
@@ -183,7 +182,9 @@ public class AbilityCreatorGUI extends NormalGUI {
         setItem(22, makeColorfulItem(Material.EYE_OF_ENDER, "§aSet item Mana cost", 1, 0, SUtil.colorize(
                 "&7Set the amount of&b intelligence", "&7your ability costs to use!", "", "&7Maximum: &a10000", "", "&eClick to set!"
         )));
-        setItem(30, makeColorfulItem(Material.BOOK_AND_QUILL, ChatColor.GREEN + "Add ability description", 1, 0, ChatColor.GRAY + "Set the ability description."));
+        if (NBTUtil.getString(getOwner().getItemInHand(), "non-legacy").equals("true")) {
+            setItem(30, makeColorfulItem(Material.BOOK_AND_QUILL, ChatColor.GREEN + "Add ability description", 1, 0, ChatColor.GRAY + "Set the ability description."));
+        }
         setItem(31, makeColorfulItem(Material.COMMAND, "§aAdvanced Functions", 1, 0, "§7You can add functions to", "§7your item to make it weirder!", "§7You can add up to §a5", "§7functions to your items.", "", "§eClick to view!"));
         SBItemStack item = new SBItemStack(getOwner().getItemInHand());
         getOwner().setItemInHand(AbilityUtil.setGenericAbilityString(item.asBukkitItem(), "has-ability", "true"));
@@ -200,4 +201,18 @@ public class AbilityCreatorGUI extends NormalGUI {
         player.closeInventory();
     }
 
+    @Override
+    public void openBack() {
+        new AbilitySelectorGUI(getOwner()).open();
+    }
+
+    @Override
+    public String backTitle() {
+        return "Ability Selector";
+    }
+
+    @Override
+    public int backItemSlot() {
+        return 48;
+    }
 }

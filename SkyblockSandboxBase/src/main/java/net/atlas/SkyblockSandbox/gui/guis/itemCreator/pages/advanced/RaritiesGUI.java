@@ -1,16 +1,10 @@
-package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages;
+package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.advanced;
 
-import com.google.common.base.Enums;
-import net.atlas.SkyblockSandbox.SBX;
-import net.atlas.SkyblockSandbox.gui.AnvilGUI;
+import net.atlas.SkyblockSandbox.gui.Backable;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.item.Rarity;
 import net.atlas.SkyblockSandbox.item.SBItemBuilder;
-import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
-import net.atlas.SkyblockSandbox.util.NBTUtil;
-import net.atlas.SkyblockSandbox.util.NumUtils;
-import net.atlas.SkyblockSandbox.util.SUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -18,14 +12,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
 
 import static net.atlas.SkyblockSandbox.item.Rarity.*;
+import static net.atlas.SkyblockSandbox.util.NBTUtil.getString;
+import static net.atlas.SkyblockSandbox.util.NBTUtil.setString;
 
-public class RaritiesGUI extends NormalGUI {
+public class RaritiesGUI extends NormalGUI implements Backable {
 
 
     public RaritiesGUI(SBPlayer owner) {
@@ -41,9 +35,6 @@ public class RaritiesGUI extends NormalGUI {
 
     @Override
     public boolean setClickActions() {
-        setAction(31, event -> {
-            new ItemCreatorGUIMain(getOwner()).open();
-        });
 
         setAction(10, event -> {
             SBPlayer player = new SBPlayer((Player) event.getWhoClicked());
@@ -95,12 +86,6 @@ public class RaritiesGUI extends NormalGUI {
                 recomb(builder.rarity, getOwner().getItemInHand(), getOwner());
             }
         });
-        setAction(21, event -> {
-            addStar(getOwner().getItemInHand(), event.getClick().isRightClick());
-        });
-        setAction(23, event -> {
-            removeStar(getOwner().getItemInHand(), event.getClick().isRightClick());
-        });
 
         return true;
     }
@@ -118,8 +103,6 @@ public class RaritiesGUI extends NormalGUI {
     @Override
     public void setItems() {
         setMenuGlass();
-        setItem(31, makeColorfulItem(Material.ARROW, "§aGo Back", 1, 0, "§7To Create an item"));
-
         setItem(10, makeColorfulItem(Material.STAINED_CLAY, "§fCommon", 1, 0, "§7Set your item's rarity", "§7to §fCommon§7!", "", "§eClick to set!"));
         setItem(11, makeColorfulItem(Material.STAINED_CLAY, "§aUncommon", 1, 5, "§7Set your item's rarity", "§7to §aUncommon§7!", "", "§eClick to set!"));
         setItem(12, makeColorfulItem(Material.STAINED_CLAY, "§9Rare", 1, 3, "§7Set your item's rarity", "§7to §9Rare§7!", "", "§eClick to set!"));
@@ -128,109 +111,106 @@ public class RaritiesGUI extends NormalGUI {
         setItem(15, makeColorfulItem(Material.STAINED_CLAY, "§dMythic", 1, 2, "§7Set your item's rarity", "§7to §dMythic§7!", "", "§eClick to set!"));
         setItem(16, makeColorfulItem(Material.STAINED_CLAY, "§cSpecial", 1, 14, "§7Set your item's rarity", "§7to §cSpecial§7!", "", "§eClick to set!"));
         setItem(22, makeColorfulSkullItem("&6Recombobulate", "http://textures.minecraft.net/texture/57ccd36dc8f72adcb1f8c8e61ee82cd96ead140cf2a16a1366be9b5a8e3cc3fc", 1, "&7Automatically recombobulate your item!", "", "&eLeft-Click to recombobulate!", "&bRight-Click to remove the recombobulator!"));
-        setItem(21, makeColorfulItem(Material.QUARTZ, "&c✪✪✪✪&6✪ Add dungeon stars", 1, 0, "&7Add a dungeon star to your item!", "", "&eRight click for master stars!"));
-        setItem(23, makeColorfulItem(Material.QUARTZ, "&c✪✪✪✪&6✪ Remove dungeon stars", 1, 0, "&7Remove a dungeon star to your item!", "", "&eRight click for master stars!"));
     }
 
 
 
     private void setRarity(Rarity r, ItemStack i, Player player) {
-        player.setItemInHand(new SBItemBuilder(i).rarity(r).build());
+        ItemMeta meta = i.getItemMeta();
+        meta.setDisplayName(r.getColor() + ChatColor.stripColor(meta.getDisplayName()));
+        List<String> lore = i.getItemMeta().getLore();
+        if (getString(i, "recombobulated").equals("true")) {
+            String recombsymbol = r.getColor() + "" + ChatColor.MAGIC + "L" + ChatColor.stripColor("") + r.getColor() + "" + ChatColor.BOLD;
+            lore.set(lore.size()-1, recombsymbol + " " + r.name() + " " + recombsymbol);
+        } else {
+            lore.set(lore.size()-1, r.getColor() + "" + ChatColor.BOLD + r.name());
+        }
+
+        player.setItemInHand(setString(i, r.name(), "rarity"));
     }
 
     public static String starKey = "dungeon_upgrades";
     public static String masterStarKey = "master_dungeon_upgrades";
 
-    private void addStar(ItemStack i, boolean masterStar) {
-        SBItemBuilder builder = new SBItemBuilder(i);
-        if(masterStar) {
-            builder.masterStar(builder.masterstar + 1);
-        }
-        else {
-            builder.normalStar(builder.normalstar + 1);
-        }
-        getOwner().setItemInHand(builder.build());
-    }
-    private void removeStar(ItemStack i, boolean masterStar) {
-        SBItemBuilder builder = new SBItemBuilder(i);
-        if(masterStar) {
-            builder.masterStar(builder.masterstar - 1);
-        }
-        else {
-            builder.normalStar(builder.normalstar - 1);
-        }
-        getOwner().setItemInHand(builder.build());
-    }
-
     private void recomb(Rarity r, ItemStack i, Player player) {
-        SBItemBuilder builder = new SBItemBuilder(i);
         getOwner().playSound(getOwner().getLocation(), Sound.ANVIL_USE, 2, 1);
+        i = setString(i, "true", "recombobulated");
         switch (r) {
             case COMMON:
-                builder.rarity(UNCOMMON);
+                setRarity(UNCOMMON, i, player);
                 break;
             case UNCOMMON:
-                builder.rarity(RARE);
+                setRarity(RARE, i, player);
                 break;
             case RARE:
-                builder.rarity(EPIC);
+                setRarity(EPIC, i, player);
                 break;
             case EPIC:
-                builder.rarity(LEGENDARY);
+                setRarity(LEGENDARY, i, player);
                 break;
             case LEGENDARY:
-                builder.rarity(MYTHIC);
+                setRarity(MYTHIC, i, player);
                 break;
             case MYTHIC:
-                builder.rarity(SUPREME);
+                setRarity(SUPREME, i, player);
                 break;
             case SUPREME:
-                builder.rarity(SPECIAL);
+                setRarity(SPECIAL, i, player);
                 break;
             case SPECIAL:
-                builder.rarity(SUPER_SPECIAL);
+                setRarity(SUPER_SPECIAL, i, player);
                 break;
             case SUPER_SPECIAL:
-                builder.rarity(UNOBTAINABLE);
+                setRarity(UNOBTAINABLE, i, player);
                 break;
         }
-        builder.recomb(true);
-        player.setItemInHand(builder.build());
     }
     private void unRecomb(Rarity r, ItemStack i, Player player) {
-        SBItemBuilder builder = new SBItemBuilder(i);
         getOwner().playSound(getOwner().getLocation(), Sound.ANVIL_USE, 2, 1);
+        i = setString(i, "false", "recombobulated");
         switch (r) {
             case UNCOMMON:
-                builder.rarity(COMMON);
+                setRarity(COMMON, i, player);
                 break;
             case RARE:
-                builder.rarity(UNCOMMON);
+                setRarity(UNCOMMON, i, player);
                 break;
             case EPIC:
-                builder.rarity(RARE);
+                setRarity(RARE, i, player);
                 break;
             case LEGENDARY:
-                builder.rarity(EPIC);
+                setRarity(EPIC, i, player);
                 break;
             case MYTHIC:
-                builder.rarity(LEGENDARY);
+                setRarity(LEGENDARY, i, player);
                 break;
             case SUPREME:
-                builder.rarity(MYTHIC);
+                setRarity(MYTHIC, i, player);
                 break;
             case SPECIAL:
-                builder.rarity(SUPREME);
+                setRarity(SUPREME, i, player);
                 break;
             case SUPER_SPECIAL:
-                builder.rarity(SPECIAL);
+                setRarity(SPECIAL, i, player);
                 break;
             case UNOBTAINABLE:
-                builder.rarity(SUPER_SPECIAL);
+                setRarity(SUPER_SPECIAL, i, player);
                 break;
         }
-        builder.recomb(false);
-        player.setItemInHand(builder.build());
     }
 
+    @Override
+    public void openBack() {
+        new ItemCreatorGUIMain(getOwner()).open();
+    }
+
+    @Override
+    public String backTitle() {
+        return "Normal Item Creator";
+    }
+
+    @Override
+    public int backItemSlot() {
+        return 30;
+    }
 }

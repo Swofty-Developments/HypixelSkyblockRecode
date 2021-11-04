@@ -4,6 +4,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.google.common.base.Enums;
 import com.google.gson.JsonObject;
+import com.mongodb.client.MongoClients;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import net.atlas.SkyblockSandbox.AuctionHouse.AuctionItemHandler;
@@ -137,7 +138,7 @@ public class SBX extends JavaPlugin {
         mongoStats = new MongoCoins();
         mongoStats.connect();
         protocolManager = ProtocolLibrary.getProtocolManager();
-        MongoAH mongoAH = new MongoAH();
+        /*MongoAH mongoAH = new MongoAH();
         mongoAH.connect();
         long time = System.currentTimeMillis();
         System.out.println("Starting to cache all ah data....");
@@ -158,6 +159,8 @@ public class SBX extends JavaPlugin {
             System.err.println("Failed to cache all ah data! (" + (System.currentTimeMillis() - time) + " ms)");
             e.printStackTrace();
         }
+
+         */
         mongoStorage.connect();
         mongoIslands.connect();
         coins = new Coins();
@@ -350,13 +353,16 @@ public class SBX extends JavaPlugin {
     public static String getStatMessage(SBPlayer p) {
         DecimalFormat f = new DecimalFormat("#");
         String middlemsg = "";
+        if (p.getMaxStat(SBPlayer.PlayerStat.DEFENSE) != 0) {
+            middlemsg = "    &a" + f.format(p.getMaxStat(SBPlayer.PlayerStat.DEFENSE)) + "❈ Defense§b    ";
+        }
         if (queuedBarMessages.containsKey(p.getUniqueId())) {
             String s = queuedBarMessages.get(p.getUniqueId()).keySet().stream().findFirst().orElse("");
             if (!s.equals("")) {
                 middlemsg = s;
             }
         }
-        return SUtil.colorize("&c" + f.format(p.getStat(SBPlayer.PlayerStat.HEALTH)) + "/" + f.format(p.getMaxStat(SBPlayer.PlayerStat.HEALTH)) + "❤ Health " + middlemsg + " &b" + f.format(p.getStat(SBPlayer.PlayerStat.INTELLIGENCE)) + "/" + f.format(p.getMaxStat(SBPlayer.PlayerStat.INTELLIGENCE)) + "✎ Mana");
+        return SUtil.colorize("&c" + f.format(p.getStat(SBPlayer.PlayerStat.HEALTH)) + "/" + f.format(p.getMaxStat(SBPlayer.PlayerStat.HEALTH)) + "❤ " + middlemsg + " &b" + f.format(p.getStat(SBPlayer.PlayerStat.INTELLIGENCE)) + "/" + f.format(p.getMaxStat(SBPlayer.PlayerStat.INTELLIGENCE)) + "✎ Mana");
     }
 
     public static String getStatMessage(SBPlayer p, ManaEvent e) {

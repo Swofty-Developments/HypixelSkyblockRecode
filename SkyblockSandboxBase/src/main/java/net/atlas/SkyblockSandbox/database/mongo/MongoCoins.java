@@ -40,7 +40,7 @@ public class MongoCoins implements MongoDB {
         if (dbinfo.getConfiguration().getBoolean("use"))
             client = MongoClients.create(dbinfo.getConfiguration().getString("uri"));
         else
-            client = MongoClients.create("mongodb+srv://admin:anyg0nSdrBvN0ltL@atlasdb.rpbqq.mongodb.net/test");
+            client = MongoClients.create("mongodb+srv://atlasDevelopment:qvm347n89fugyq89@cluster0.ha64p.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
 
         MongoDatabase database = client.getDatabase("AtlasSandbox");
         col = database.getCollection("playerdata");
@@ -63,6 +63,22 @@ public class MongoCoins implements MongoDB {
         }
 
         col.updateOne(Filters.eq("uuid", uuid.toString()), Updates.set(key, value));
+    }
+
+    public void putIfAbsent(UUID uuid, String key, Object value) {
+        Document query = new Document("uuid", uuid.toString());
+        Document found = col.find(query).first();
+
+        if (found == null) {
+            Document update = new Document("uuid", uuid.toString());
+            update.append(key, value);
+
+            col.insertOne(update);
+            return;
+        }
+        if(found.get(key) == null) {
+            col.updateOne(Filters.eq("uuid", uuid.toString()), Updates.set(key, value));
+        }
     }
 
     @Override

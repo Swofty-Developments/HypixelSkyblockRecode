@@ -1,21 +1,8 @@
 package net.atlas.SkyblockSandbox.gui.guis.itemCreator;
 
-import net.atlas.SkyblockSandbox.gui.NormalGUI;
-import net.atlas.SkyblockSandbox.gui.PaginatedGUI;
-import net.atlas.SkyblockSandbox.gui.SBGUI;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.*;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.ItemCreatorGUIMain;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.ItemLoreGUI;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.RaritiesGUI;
-import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.StatsEditorGUI;
-import net.atlas.SkyblockSandbox.player.SBPlayer;
-import org.apache.commons.lang.reflect.ConstructorUtils;
-
-import java.lang.reflect.InvocationTargetException;
-
 public enum ItemCreatorPage {
     /*MAIN(ItemCreatorGUIMain.class),
-    SET_LORE(ItemLoreGUI.class),
+    SET_LORE(ItemDescriptionGUI.class),
     SET_RARITY(RaritiesGUI.class),
     STATS_EDITOR(StatsEditorGUI.class),
     ABILITY_EDITOR(AbilityEditorGUI.class),

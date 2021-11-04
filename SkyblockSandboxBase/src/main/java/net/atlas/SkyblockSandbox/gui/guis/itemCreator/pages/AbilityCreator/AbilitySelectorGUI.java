@@ -2,11 +2,10 @@ package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator;
 
 import net.atlas.SkyblockSandbox.abilityCreator.Ability;
 import net.atlas.SkyblockSandbox.abilityCreator.AbilityUtil;
-import net.atlas.SkyblockSandbox.abilityCreator.AbilityValue;
+import net.atlas.SkyblockSandbox.gui.Backable;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
-import net.atlas.SkyblockSandbox.gui.SBGUI;
+import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.auto.ItemCreatorGUIMain;
 import net.atlas.SkyblockSandbox.item.SBItemBuilder;
-import net.atlas.SkyblockSandbox.item.ability.AbilityData;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -14,7 +13,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class AbilitySelectorGUI extends NormalGUI {
+public class AbilitySelectorGUI extends NormalGUI implements Backable {
     public AbilitySelectorGUI(SBPlayer owner) {
         super(owner);
     }
@@ -74,5 +73,28 @@ public class AbilitySelectorGUI extends NormalGUI {
     @Override
     public boolean setClickActions() {
         return true;
+    }
+
+    @Override
+    public void openBack() {
+        if (getOwner().getStringFromItemInHand("non-legacy").equals("true") && SBPlayer.Settings.LORE_GEN.map.get(getOwner().getUniqueId())) {
+            new ItemCreatorGUIMain(getOwner()).open();
+        } else {
+            new net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.advanced.ItemCreatorGUIMain(getOwner()).open();
+        }
+    }
+
+    @Override
+    public String backTitle() {
+        if (getOwner().getStringFromItemInHand("non-legacy").equals("true") && SBPlayer.Settings.LORE_GEN.map.get(getOwner().getUniqueId())) {
+            return "Auto Item Creator";
+        } else {
+            return "Normal Item Creator";
+        }
+    }
+
+    @Override
+    public int backItemSlot() {
+        return 39;
     }
 }

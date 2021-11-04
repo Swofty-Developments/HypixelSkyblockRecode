@@ -8,6 +8,7 @@ import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
 import net.atlas.SkyblockSandbox.gui.guis.TestPage;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.signGUI.SignGUI;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -34,12 +35,18 @@ public class Command_dev extends SkyblockCommandFramework {
                 new AuctionHouseGUI(p).open();
                 break;
             }
+            case "nbt": {
+                net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(p.getItemInHand());
+                p.sendMessage(nmsItem.getTag().toString());
+                break;
+            }
             case "sign": {
                 new SignGUI(SBX.getInstance().signManager, (e -> {
                     p.sendMessage("&eYour output was: " + e.getLines()[0]);
                 }))
                 .withLines("","^^^^^^^^^^^^^^^","Auction starting", "bid price")
                 .open(p.getPlayer());
+                break;
             }
         }
     }

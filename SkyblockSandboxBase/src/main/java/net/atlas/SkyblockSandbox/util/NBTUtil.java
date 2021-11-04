@@ -32,7 +32,7 @@ public class NBTUtil {
                     }
                 }
             }
-            if (!(p.getItemInHand().getType().equals(Material.AIR) || p.getItemInHand() == null)) {
+            if (p.getItemInHand() != null && p.getItemInHand().hasItemMeta()) {
                 SBItemBuilder item = new SBItemBuilder(p.getItemInHand());
                 if (getString(p.getItemInHand(), "non-legacy").equals("true")) {
                     if (item.stats.get(s) != null) {
@@ -41,10 +41,10 @@ public class NBTUtil {
                 } else {
                     tempStat += new SBItemStack(p.getItemInHand()).getStat(s);
                 }
-                HashMap<SBPlayer.PlayerStat, Double> fairyMap = FairySouls.getPlayerRewards(p);
-                if (fairyMap.containsKey(s)) {
-                    tempStat += fairyMap.get(s);
-                }
+            }
+            HashMap<SBPlayer.PlayerStat, Double> fairyMap = FairySouls.getPlayerRewards(p);
+            if (fairyMap.containsKey(s)) {
+                tempStat += fairyMap.get(s);
             }
             statMap.put(s, tempStat);
         }
@@ -241,6 +241,22 @@ public class NBTUtil {
                 }
 
                 stats.setString(String.valueOf(index), line);
+                data.set("Description",stats);
+                tag.set("ExtraAttributes", data);
+                nmsItem.setTag(tag);
+                return CraftItemStack.asBukkitCopy(nmsItem);
+            }
+        }
+        return stack;
+    }
+
+    public static ItemStack resetDescription(ItemStack stack) {
+        if (stack != null) {
+            if (stack.hasItemMeta()) {
+                net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
+                NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+                NBTTagCompound data = tag.getCompound("ExtraAttributes") != null ? tag.getCompound("ExtraAttributes") : new NBTTagCompound();
+                NBTTagCompound stats = new NBTTagCompound();
                 data.set("Description",stats);
                 tag.set("ExtraAttributes", data);
                 nmsItem.setTag(tag);

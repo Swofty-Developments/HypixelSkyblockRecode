@@ -1,33 +1,38 @@
-package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages;
+package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.advanced;
 
 import com.google.common.base.Enums;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
-import dev.triumphteam.gui.guis.GuiItem;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.gui.AnvilGUI;
+import net.atlas.SkyblockSandbox.gui.Backable;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
-import net.atlas.SkyblockSandbox.item.SBItemBuilder;
-import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.NumUtils;
 import net.atlas.SkyblockSandbox.util.SUtil;
+import net.atlas.SkyblockSandbox.util.signGUI.SignCompleteEvent;
+import net.atlas.SkyblockSandbox.util.signGUI.SignGUI;
 import net.kyori.adventure.text.Component;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.Sign;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.davidmoten.text.utils.WordWrap;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 
-public class StatsEditorGUI extends NormalGUI {
+import static net.atlas.SkyblockSandbox.util.SUtil.colorize;
+
+public class StatsEditorGUI extends NormalGUI implements Backable {
 
     public StatsEditorGUI(SBPlayer owner) {
         super(owner);
@@ -41,10 +46,6 @@ public class StatsEditorGUI extends NormalGUI {
 
     @Override
     public boolean setClickActions() {
-
-        setAction(49, event -> {
-            new ItemCreatorGUIMain(getOwner()).open();
-        });
         return true;
     }
 
@@ -60,17 +61,17 @@ public class StatsEditorGUI extends NormalGUI {
 
     @Override
     public void setItems() {
-        getGui().getFiller().fillBottom(ItemBuilder.from(FILLER_GLASS).name(Component.text(SUtil.colorize("&7"))).asGuiItem());
-        getGui().getFiller().fillBetweenPoints(1, 1, 5, 1, ItemBuilder.from(FILLER_GLASS).name(Component.text(SUtil.colorize("&7"))).asGuiItem());
-        getGui().getFiller().fillBetweenPoints(1, 9, 5, 9, ItemBuilder.from(FILLER_GLASS).name(Component.text(SUtil.colorize("&7"))).asGuiItem());
-        getGui().getFiller().fillBetweenPoints(1, 3, 5, 3, ItemBuilder.from(FILLER_GLASS).name(Component.text(SUtil.colorize("&7"))).asGuiItem());
-        getGui().getFiller().fillBetweenPoints(1, 5, 5, 5, ItemBuilder.from(FILLER_GLASS).name(Component.text(SUtil.colorize("&7"))).asGuiItem());
-        getGui().getFiller().fillBetweenPoints(1, 7, 5, 7, ItemBuilder.from(FILLER_GLASS).name(Component.text(SUtil.colorize("&7"))).asGuiItem());
+        getGui().getFiller().fillBottom(ItemBuilder.from(FILLER_GLASS).name(Component.text(colorize("&7"))).asGuiItem());
+        getGui().getFiller().fillBetweenPoints(1, 1, 5, 1, ItemBuilder.from(FILLER_GLASS).name(Component.text(colorize("&7"))).asGuiItem());
+        getGui().getFiller().fillBetweenPoints(1, 9, 5, 9, ItemBuilder.from(FILLER_GLASS).name(Component.text(colorize("&7"))).asGuiItem());
+        getGui().getFiller().fillBetweenPoints(1, 3, 5, 3, ItemBuilder.from(FILLER_GLASS).name(Component.text(colorize("&7"))).asGuiItem());
+        getGui().getFiller().fillBetweenPoints(1, 5, 5, 5, ItemBuilder.from(FILLER_GLASS).name(Component.text(colorize("&7"))).asGuiItem());
+        getGui().getFiller().fillBetweenPoints(1, 7, 5, 7, ItemBuilder.from(FILLER_GLASS).name(Component.text(colorize("&7"))).asGuiItem());
         for (SBPlayer.PlayerStat s : SBPlayer.PlayerStat.values()) {
             if(s == SBPlayer.PlayerStat.BREAKING_POWER) {
-                getGui().setItem(4, ItemBuilder.from(s.getStack()).lore(Component.text(""), Component.text(SUtil.colorize("&bClick to set the " + s.getStack().getItemMeta().getDisplayName() + " &bamount!"))).setNbt("Stat", s.name()).asGuiItem());
+                getGui().setItem(4, ItemBuilder.from(s.getStack()).lore(Component.text(""), Component.text(colorize("&bClick to set the " + s.getStack().getItemMeta().getDisplayName() + " &bamount!"))).setNbt("Stat", s.name()).asGuiItem());
             } else {
-                getGui().addItem(ItemBuilder.from(s.getStack()).lore(Component.text(""), Component.text(SUtil.colorize("&bClick to set the " + s.getStack().getItemMeta().getDisplayName() + " &bamount!"))).setNbt("Stat", s.name()).asGuiItem());
+                getGui().addItem(ItemBuilder.from(s.getStack()).lore(Component.text(""), Component.text(colorize("&bClick to set the " + s.getStack().getItemMeta().getDisplayName() + " &bamount!"))).setNbt("Stat", s.name()).asGuiItem());
             }
         }
         for (int in = 0; in < getGui().getInventory().getSize(); in++) {
@@ -79,7 +80,7 @@ public class StatsEditorGUI extends NormalGUI {
                     String stat = NBTUtil.getGenericString(getGui().getGuiItem(in).getItemStack(), "Stat");
                     int finalIn = in;
                     setAction(in, event -> {
-                        AnvilGUI gui = setstatGUI(Objects.requireNonNull(Enums.getIfPresent(SBPlayer.PlayerStat.class, stat).orNull()), getOwner().getPlayer());
+                        SignGUI gui = setstatGUI(Objects.requireNonNull(Enums.getIfPresent(SBPlayer.PlayerStat.class, stat).orNull()), getOwner().getPlayer());
                     });
 
                 }
@@ -88,8 +89,6 @@ public class StatsEditorGUI extends NormalGUI {
 
         }
         //setMenuGlass();
-        setItem(49, makeColorfulItem(Material.ARROW, "§aGo Back", 1, 0, "§7To Create an Item"));
-
 
         /*getGui().setItem(10, ItemBuilder.from(makeColorfulItem(Material.GOLDEN_APPLE, "§aSet Health", 1, 0, "&7Edit the amount of &c❤ Health", "&7your item has!", "", "&eClick to set!")).setNbt("Stat", SBPlayer.PlayerStat.HEALTH.name()).asGuiItem());
         getGui().setItem(11, ItemBuilder.from(makeColorfulItem(Material.EYE_OF_ENDER, "§aSet Intelligence", 1, 0, "&7Edit the amount of &b✎ Intelligence", "&7your item has!", "", "&eClick to set!")).setNbt("Stat", SBPlayer.PlayerStat.INTELLIGENCE.name()).asGuiItem());
@@ -101,43 +100,48 @@ public class StatsEditorGUI extends NormalGUI {
 
     }
 
-    private void invalidNumberError(AnvilGUI.AnvilClickEvent event, Player player) {
-        IChatBaseComponent comp = IChatBaseComponent.ChatSerializer.a("{\"text\":\"§cThat's not a valid number!\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"§fYour input: §e" + event.getName() + "\"}}");
+    private void invalidNumberError(SignCompleteEvent event, Player player) {
+        IChatBaseComponent comp = IChatBaseComponent.ChatSerializer.a("{\"text\":\"§cThat's not a valid number!\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"§fYour input: §e" + event.getLines()[0] + "\"}}");
         PacketPlayOutChat c = new PacketPlayOutChat(comp);
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(c);
 
         player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1f, 0f);
         player.closeInventory();
+        new StatsEditorGUI(getOwner()).open();
+
     }
 
-    public AnvilGUI setstatGUI(SBPlayer.PlayerStat stat, Player player) {
+    public SignGUI setstatGUI(SBPlayer.PlayerStat stat, Player player) {
         String formattedname = SUtil.firstLetterUpper(stat.toString());
-        AnvilGUI gui = new AnvilGUI(player, event1 -> {
-            if (!NumUtils.isInt(event1.getName())) {
+        SignGUI gui = new SignGUI(SBX.getInstance().signManager, event1 -> {
+            if (!NumUtils.isInt(event1.getLines()[0])) {
                 invalidNumberError(event1, player);
                 return;
             }
-            if (Integer.parseInt(event1.getName()) > 100000) {
-                player.sendMessage("§cThe " + formattedname + " amount can't be more than 100,000!");
+            if (Integer.parseInt(event1.getLines()[0]) > stat.getMax()) {
+                player.sendMessage("§cThe " + formattedname + " amount can't be more than " + NumUtils.format(stat.getMax(), "###,#") + "!");
                 player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 0);
                 player.closeInventory();
                 return;
             }
-            if (Integer.parseInt(event1.getName()) <= 0) {
+            if (Integer.parseInt(event1.getLines()[0]) <= 0) {
                 player.sendMessage("§cThe " + formattedname + " amount can't be less than 1!");
                 player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 0);
                 player.closeInventory();
                 return;
             }
-            if (NumUtils.isInt(event1.getName()) && event1.getName() != null) {
-                String s = event1.getName();
+            if (NumUtils.isInt(event1.getLines()[0]) && event1.getLines()[0] != null) {
+                String s = event1.getLines()[0];
                 int strength = Integer.parseInt(s);
 
                 ItemStack is = player.getItemInHand();
-                SBItemBuilder item = new SBItemBuilder(is);
-                item.stat(stat, strength);
-                player.setItemInHand(item.build());
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aAdded " + event1.getName() + " " + stat.name().toLowerCase() + " to the item in your hand!"));
+                ItemMeta meta = is.getItemMeta();
+                List<String> lore = meta.getLore();
+                lore.add("&7" + stat.getDisplayName().replace("_", " ") + ": " + stat.getColor() + (!stat.equals(SBPlayer.PlayerStat.GEAR_SCORE) ? "+" : "") + event1.getLines()[0]);
+                meta.setLore(colorize(lore));
+                is.setItemMeta(meta);
+                player.setItemInHand(NBTUtil.setInteger(is, strength, stat.name()));
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aAdded " + event1.getLines()[0] + " " + stat.getDisplayName().replace("_", " ") + " to the item in your hand!"));
             } else {
                 invalidNumberError(event1, player);
             }
@@ -148,9 +152,24 @@ public class StatsEditorGUI extends NormalGUI {
                 }
             }.runTaskLater(SBX.getInstance(), 1);
         });
-
-        gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, makeColorfulItem(Material.PAPER, "Enter value", 1, 0));
-        gui.open();
+        gui.withLines("", "^^^^^^^^^^^^^^^", WordWrap.from(stat.getDisplayName()).maxWidth(15).insertHyphens(false).newLine("\n").wrap().replace("_", " "), "Stat");
+        player.closeInventory();
+        gui.open(player);
         return gui;
+    }
+
+    @Override
+    public void openBack() {
+        new ItemCreatorGUIMain(getOwner()).open();
+    }
+
+    @Override
+    public String backTitle() {
+        return "Normal Item Creator";
+    }
+
+    @Override
+    public int backItemSlot() {
+        return 48;
     }
 }

@@ -18,7 +18,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -29,8 +28,8 @@ import java.text.Collator;
 import java.text.DecimalFormat;
 import java.util.*;
 
-import static net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.RaritiesGUI.masterStarKey;
-import static net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.RaritiesGUI.starKey;
+import static net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.auto.RaritiesGUI.masterStarKey;
+import static net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.auto.RaritiesGUI.starKey;
 import static net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat.GEAR_SCORE;
 import static net.atlas.SkyblockSandbox.player.pets.PetBuilder.petXP;
 

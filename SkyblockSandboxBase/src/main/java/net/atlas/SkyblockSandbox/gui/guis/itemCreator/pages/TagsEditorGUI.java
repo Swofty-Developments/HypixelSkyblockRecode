@@ -1,7 +1,9 @@
 package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages;
 
 import dev.triumphteam.gui.guis.Gui;
+import net.atlas.SkyblockSandbox.gui.Backable;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
+import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.auto.ItemCreatorGUIMain;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.SUtil;
@@ -14,7 +16,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public class TagsEditorGUI extends NormalGUI {
+public class TagsEditorGUI extends NormalGUI implements Backable {
 
     private Gui gui;
 
@@ -47,9 +49,6 @@ public class TagsEditorGUI extends NormalGUI {
                 item.setItemMeta(itemMeta);
                 ((Player) event.getWhoClicked()).playSound(event.getWhoClicked().getLocation(), Sound.ITEM_PICKUP, 2, 1);
             }
-        });
-        setAction(49, event -> {
-            new ItemCreatorGUIMain(getOwner()).open();
         });
         setAction(15, event -> {
             ItemStack item = event.getWhoClicked().getItemInHand();
@@ -127,12 +126,29 @@ public class TagsEditorGUI extends NormalGUI {
     @Override
     public void setItems() {
         setMenuGlass();
-        setItem(49, makeColorfulItem(Material.ARROW, "§aGo Back", 1, 0, "§7To Create an Item"));
-
         setItem(13, makeColorfulItem(Material.IRON_BLOCK, "§aToggle Unbreakable", 1, 0, SUtil.colorize("&7Toggle the unbreakable tag", "", "&eLeft click to Enable", "&eRight click to Disable!")));
         setItem(15, makeColorfulItem(Material.ENCHANTED_BOOK, "§aToggle Enchant Tag", 1, 0, SUtil.colorize("&7Toggle the enchant tag", "", "&eLeft click to Enable", "&eRight click to Disable!")));
         setItem(31, makeColorfulItem(Material.GLOWSTONE_DUST, "§aToggle Glowing", 1, 0, SUtil.colorize("&7Toggle Item Glow", "", "&eLeft click to Enable", "&eRight click to Disable!")));
         setItem(11, makeColorfulItem(Material.GOLDEN_APPLE, "§aToggle Damage Tag", 1, 0, SUtil.colorize("&7Toggle the damage tag", "", "&eLeft click to Enable", "&eRight click to Disable!")));
         setItem(33, makeColorfulItem(Material.STAINED_GLASS, "&aToggle wearable", 1, 15, "&7Toggle being able to wear", "&7blocks on your head!", "", "&eLeft click to Enable", "&eRight click to Disable!"));
+    }
+
+    @Override
+    public void openBack() {
+        new ItemCreatorGUIMain(getOwner()).open();
+    }
+
+    @Override
+    public String backTitle() {
+        if (getOwner().getStringFromItemInHand("non-legacy").equals("true") && SBPlayer.Settings.LORE_GEN.map.get(getOwner().getUniqueId())) {
+            return "Auto Item Creator";
+        } else {
+            return "Normal Item Creator";
+        }
+    }
+
+    @Override
+    public int backItemSlot() {
+        return 48;
     }
 }

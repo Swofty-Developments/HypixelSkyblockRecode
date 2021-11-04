@@ -13,6 +13,7 @@ import net.atlas.SkyblockSandbox.util.SUtil;
 import net.atlas.SkyblockSandbox.util.StackUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -56,7 +57,7 @@ public class SBItemBuilder {
         legacy = false;
         stack = item;
         id = getString(item, "ID");
-        rarity = Rarity.valueOf(getString(item, "RARITY"));
+        rarity = Enums.getIfPresent(Rarity.class, getString(item, "RARITY")).orNull();
         mat = item.getType();
         name = getString(item, "name");
         masterstar = getInteger(item, "masterStars");
@@ -66,8 +67,10 @@ public class SBItemBuilder {
         reforgeable = getInteger(item, "reforgeable") == 1;
         recombobulated = getInteger(item, "recombobulated") == 1;
         hexColor = getString(item, "color");
-        type = ItemType.valueOf(getString(item, "type"));
-        enchants.putAll(getEnchants(item));
+        type = Enums.getIfPresent(ItemType.class, getString(item, "type")).orNull();
+        if (getEnchants(item) != null) {
+            enchants.putAll(getEnchants(item));
+        }
         for(SBPlayer.PlayerStat stat : SBPlayer.PlayerStat.values()) {
             int extraStats = 0;
             if (!enchants.isEmpty()) {
@@ -80,7 +83,9 @@ public class SBItemBuilder {
                 stats.put(stat, getStat(item, stat) + extraStats);
             }
         }
-        description.addAll(getDescription(item));
+        if (getDescription(item) != null) {
+            description.addAll(getDescription(item));
+        }
         IntStream.range(0, 5).filter(i -> !getAbilityString(item, i, AbilityValue.NAME.name()).equals("")).forEach(i -> abilities.put(i, new Ability(this, i)));
     }
 
@@ -162,6 +167,10 @@ public class SBItemBuilder {
         description.set(index, line);
         return this;
     }
+    public SBItemBuilder removeDescriptionLine(int index) {
+        description.remove(index);
+        return this;
+    }
 
     public SBItemBuilder addDescriptionLine(String line) {
         description.add(line);
@@ -224,7 +233,7 @@ public class SBItemBuilder {
             }
         }
 
-        String name = petLvl + rarity.getColor().toString() + this.name + (stars.toString().equals("") ? "" : " " + stars);
+        String name = petLvl + (rarity != null ? rarity.getColor().toString() : "") + this.name + (stars.toString().equals("") ? "" : " " + stars);
         meta.setDisplayName(name);
         ArrayList<String> lore = new ArrayList<>();
         int i = 0;
@@ -316,11 +325,13 @@ public class SBItemBuilder {
         if (reforgeable) {
             lore.add("&8This item can be reforged!");
         }
-        if (recombobulated) {
-            String recombsymbol = rarity.getColor() + "" + ChatColor.MAGIC + "L" + ChatColor.stripColor("") + rarity.getColor() + "" + ChatColor.BOLD;
-            lore.add(recombsymbol + " " + rarity.name() + " " + type.getValue() + " " + recombsymbol);
-        } else {
-            lore.add(rarity.getColor() + "" + ChatColor.BOLD + rarity.name() + " " + type.getValue());
+        if (rarity != null && type != null) {
+            if (recombobulated) {
+                String recombsymbol = rarity.getColor() + "" + ChatColor.MAGIC + "L" + ChatColor.stripColor("") + rarity.getColor() + "" + ChatColor.BOLD;
+                lore.add(recombsymbol + " " + rarity.name() + " " + type.getValue() + " " + recombsymbol);
+            } else {
+                lore.add(rarity.getColor() + "" + ChatColor.BOLD + rarity.name() + " " + type.getValue());
+            }
         }
         meta.setLore(SUtil.colorize(lore));
         item.setItemMeta(meta);
@@ -332,9 +343,9 @@ public class SBItemBuilder {
     public ItemStack setNBT(ItemStack item) {
         item = setString(item, "true", "non-legacy");
         item = setString(item, id, "ID");
-        item = setString(item, rarity.name(), "RARITY");
+        item = setString(item, (rarity != null ? rarity.name() : ""), "RARITY");
         item = setString(item, name, "name");
-        item = setString(item, type.name(), "type");
+        item = setString(item, (type != null ? type.name() : ""), "type");
         item = setInteger(item, masterstar, "masterStars");
         item = setInteger(item, normalstar, "normalStars");
         item = setInteger(item, stackable ? 1 : 0, "stackable");
@@ -355,10 +366,9 @@ public class SBItemBuilder {
             }
         }
 
-        if(!description.isEmpty()) {
-            for (int i = 0; i < description.size(); i++) {
-                item = setDescription(item, i, description.get(i));
-            }
+        item = resetDescription(item);
+        for (int i = 0; i < description.size(); i++) {
+            item = setDescription(item, i, description.get(i));
         }
 
         if(!enchants.isEmpty()) {

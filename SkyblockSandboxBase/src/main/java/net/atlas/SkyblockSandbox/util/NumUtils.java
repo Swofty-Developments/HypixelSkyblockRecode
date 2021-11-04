@@ -1,5 +1,7 @@
 package net.atlas.SkyblockSandbox.util;
 
+import java.text.DecimalFormat;
+
 public class NumUtils {
 
     public static boolean isInt(String o) {
@@ -27,5 +29,10 @@ public class NumUtils {
         }catch (Exception e) {
             return false;
         }
+    }
+
+    public static String format(double num, String pattern) {
+        DecimalFormat decimalFormat = new DecimalFormat(pattern);
+        return(decimalFormat.format(num));
     }
 }

@@ -4,20 +4,17 @@ import dev.triumphteam.gui.builder.item.ItemBuilder;
 import me.nemo_64.spigotutilities.playerinputs.chatinput.PlayerChatInput;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.gui.AnvilGUI;
+import net.atlas.SkyblockSandbox.gui.Backable;
 import net.atlas.SkyblockSandbox.gui.PaginatedGUI;
 import net.atlas.SkyblockSandbox.item.SBItemBuilder;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
-import net.atlas.SkyblockSandbox.util.SUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.conversations.Conversation;
-import org.bukkit.conversations.ConversationFactory;
-import org.bukkit.conversations.Prompt;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -27,10 +24,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
+import static net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.auto.ItemDescriptionGUI.PROFANITIES;
 import static net.atlas.SkyblockSandbox.util.NBTUtil.getInteger;
 import static net.atlas.SkyblockSandbox.util.SUtil.colorize;
 
-public class SetAbilityDescriptionMenu extends PaginatedGUI {
+public class SetAbilityDescriptionMenu extends PaginatedGUI implements Backable {
     private final int indexx;
 
     public SetAbilityDescriptionMenu(SBPlayer owner, int indexx) {
@@ -171,11 +169,22 @@ public class SetAbilityDescriptionMenu extends PaginatedGUI {
         p.closeInventory();
         int line = getInteger(stack, "Line");
         PlayerChatInput.PlayerChatInputBuilder<String> builder = new PlayerChatInput.PlayerChatInputBuilder<>(SBX.getInstance(), p);
-        builder.onExpireMessage(colorize("&cYou failed to set the lore after 1 minute.")).sendValueMessage(colorize("&7Please input your description for line " + line + "!\n&eSay &ccancel &eto stop."));
-        builder.setValue((player, str) -> {
-            return str;
-        });
-        builder.isValidInput((player, str) -> !(str.equals("") || str.isEmpty())).onFinish((player, str) -> {
+        builder.onExpireMessage(colorize("&cYou failed to set the lore after 3 minute.")).sendValueMessage(colorize("&7Please input your description for line " + line + "!\n&eSay &ccancel &eto stop."));
+        builder.setValue((player, str) -> str);
+        builder.isValidInput((player, str) -> {
+            if (str.isEmpty()) {
+                getOwner().sendMessage("&cThat is not a valid input!");
+                return false;
+            }
+            for (String s : PROFANITIES) {
+                if (ChatColor.stripColor(str).toLowerCase().contains(s)) {
+                    player.sendMessage("§cYou cannot use that word in your lore!");
+                    open(getOwner());
+                    return false;
+                }
+            }
+            return true;
+        }).onFinish((player, str) -> {
             SBItemBuilder item = new SBItemBuilder(player.getItemInHand());
             if(add) {
                 player.setItemInHand(item.abilities.get(indexx).addDescription(str).build().build());
@@ -183,15 +192,25 @@ public class SetAbilityDescriptionMenu extends PaginatedGUI {
                 player.setItemInHand(item.abilities.get(indexx).setDescription(line, str).build().build());
             }
             new SetAbilityDescriptionMenu(getOwner(),indexx).open();
-        }).onInvalidInput(((player, s) -> {
-            getOwner().sendMessage("&cThat is not a valid input!");
-            return true;
-        })).expiresAfter(3600).onExpire((player -> {
-            new SetAbilityDescriptionMenu(getOwner(),indexx).open();
-        })).toCancel("cancel").onCancel((player -> {
+        }).onInvalidInput(((player, s) -> true)).expiresAfter(3600).onExpire((player -> new SetAbilityDescriptionMenu(getOwner(),indexx).open())).toCancel("cancel").onCancel((player -> {
             getOwner().sendMessage("&cCanceled!");
             new SetAbilityDescriptionMenu(getOwner(),indexx).open();
         }));
         builder.build().start();
+    }
+
+    @Override
+    public void openBack() {
+        new AbilityCreatorGUI(getOwner(), indexx).open();
+    }
+
+    @Override
+    public String backTitle() {
+        return "Ability Editor";
+    }
+
+    @Override
+    public int backItemSlot() {
+        return 48;
     }
 }

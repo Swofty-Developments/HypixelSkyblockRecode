@@ -3,6 +3,7 @@ package net.atlas.SkyblockSandbox.listener.sbEvents;
 import net.atlas.SkyblockSandbox.AuctionHouse.guis.AuctionCreatorGUI;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.database.mongo.MongoCoins;
+import net.atlas.SkyblockSandbox.gui.guis.skyblockmenu.SettingsMenu;
 import net.atlas.SkyblockSandbox.island.islands.FairySouls;
 import net.atlas.SkyblockSandbox.economy.Coins;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
@@ -23,6 +24,7 @@ public class PlayerLeave extends SkyblockListener<PlayerQuitEvent> {
         if (AuctionCreatorGUI.PlayerItems.containsKey(event.getPlayer().getUniqueId())) {
             playerData.setData(event.getPlayer().getUniqueId(), "AuctionItem", AuctionCreatorGUI.PlayerItems.get(event.getPlayer().getUniqueId()));
         }
+        AuctionCreatorGUI.PlayerItems.remove(event.getPlayer().getUniqueId());
         SBX.getInstance().coins.cacheCoins(event.getPlayer());
         Document doc = new Document();
         SBPlayer p = new SBPlayer(event.getPlayer());
@@ -46,5 +48,12 @@ public class PlayerLeave extends SkyblockListener<PlayerQuitEvent> {
         for (int i = 1; i <= 9; i++) {
             storage.toMongoFromCache(i);
         }
+
+        //Unloading settings cache
+        Document docs = (Document) playerData.getPlayerDocument(p.getUniqueId()).get("Settings");
+        for(SBPlayer.Settings setting : SBPlayer.Settings.values()) {
+            docs.put(setting.name(), setting.map.get(p.getUniqueId()));
+        }
+        playerData.setData(p.getUniqueId(), "Settings", docs);
     }
 }
