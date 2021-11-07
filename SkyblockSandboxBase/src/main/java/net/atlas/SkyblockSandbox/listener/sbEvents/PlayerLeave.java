@@ -50,7 +50,7 @@ public class PlayerLeave extends SkyblockListener<PlayerQuitEvent> {
         }
 
         //Unloading settings cache
-        Document docs = (Document) playerData.getPlayerDocument(p.getUniqueId()).get("Settings");
+        Document docs = new Document();
         for(SBPlayer.Settings setting : SBPlayer.Settings.values()) {
             docs.put(setting.name(), setting.map.get(p.getUniqueId()));
         }

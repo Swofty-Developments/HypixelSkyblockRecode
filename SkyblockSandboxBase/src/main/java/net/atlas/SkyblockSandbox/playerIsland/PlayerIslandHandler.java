@@ -42,14 +42,16 @@ public class PlayerIslandHandler implements PlayerIsland {
 				}
 				if(getOwner().isOnline()) {
 					Player pl = getOwner().getPlayer();
-					if(pl.getLocation().getWorld()==getCenter().getWorld()) {
-						if (pl.getLocation().distance(getCenter()) > dist()) {
-							Location teleLoc = getCenter();
-							while (teleLoc.getBlock().getType()!= Material.AIR) {
-								teleLoc.add(0,1,0);
+					if (!pl.hasPermission("sbx.admin")) {
+						if (pl.getLocation().getWorld() == getCenter().getWorld()) {
+							if (pl.getLocation().distance(getCenter()) > dist()) {
+								Location teleLoc = getCenter();
+								while (teleLoc.getBlock().getType() != Material.AIR) {
+									teleLoc.add(0, 1, 0);
+								}
+								pl.teleport(teleLoc);
+								pl.sendMessage(SUtil.colorize("&cYou cannot travel more than " + dist() + " blocks in that direction!"));
 							}
-							pl.teleport(teleLoc);
-							pl.sendMessage(SUtil.colorize("&cYou cannot travel more than " + dist() + " blocks in that direction!"));
 						}
 					}
 				}

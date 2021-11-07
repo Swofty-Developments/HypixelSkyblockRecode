@@ -1,5 +1,6 @@
 package net.atlas.SkyblockSandbox.listener.sbEvents.damageEvents;
 
+import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.event.customEvents.PlayerCustomDeathEvent;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
@@ -18,19 +19,25 @@ public class PlayerDamageListener extends SkyblockListener<EntityDamageEvent> {
             switch (event.getCause()) {
                 case PROJECTILE:
                     event.setCancelled(true);
+                    player.damage(0.1);
+                    player.setCause(event.getCause());
+                    event.setCancelled(true);
                 case FALL:
                     player.setStat(HEALTH, player.getStat(HEALTH) - event.getDamage());
+                    player.damage(0.1);
+                    player.setCause(event.getCause());
+                    event.setCancelled(true);
                 case FIRE_TICK:
                 case LAVA:
                 case SUFFOCATION:
                 case DROWNING:
                 case FIRE:
                     player.setStat(HEALTH, player.getStat(HEALTH) - 5);
-                default:
+                    player.damage(0.1);
+                    player.setCause(event.getCause());
                     event.setCancelled(true);
             }
-            player.damage(0.1);
-            player.setCause(event.getCause());
+
         }
     }
 }

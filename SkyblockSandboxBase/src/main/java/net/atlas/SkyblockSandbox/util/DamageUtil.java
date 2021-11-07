@@ -14,10 +14,7 @@ import net.atlas.SkyblockSandbox.slayer.Slayers;
 import net.minecraft.server.v1_8_R3.EntityArmorStand;
 import net.minecraft.server.v1_8_R3.PacketPlayOutEntityDestroy;
 import net.minecraft.server.v1_8_R3.PacketPlayOutSpawnEntityLiving;
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEnderDragon;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
@@ -424,13 +421,17 @@ public class DamageUtil {
     }
 
     public static double calculateEnchants(SBPlayer p, LivingEntity en, double curDmg) {
-        for (Enchantment ench : Enchantment.values()) {
-            if (ench.getItemType().equals(ItemType.SWORD) || ench.getItemType().equals(ItemType.ITEM)) {
-                int enchLvl = new SBItemStack(p.getItemInHand()).getEnchantment(ench);
-                if (enchLvl != 0) {
-                    EntityDamageByEntityEvent event1 = new EntityDamageByEntityEvent(p.getPlayer(), en, EntityDamageEvent.DamageCause.CUSTOM, curDmg);
-                    if(ench.getDamageAction()!=null) {
-                        curDmg = ench.getDamageAction().apply(event1, (int) curDmg, enchLvl);
+        if (!(p.getItemInHand().getType().equals(Material.AIR) || p.getItemInHand() == null)) {
+            for (Enchantment ench : Enchantment.values()) {
+                if (ench.getItemType() != null) {
+                    if (ench.getItemType().equals(ItemType.SWORD) || ench.getItemType().equals(ItemType.ITEM)) {
+                        int enchLvl = new SBItemStack(p.getItemInHand()).getEnchantment(ench);
+                        if (enchLvl != 0) {
+                            EntityDamageByEntityEvent event1 = new EntityDamageByEntityEvent(p.getPlayer(), en, EntityDamageEvent.DamageCause.CUSTOM, curDmg);
+                            if (ench.getDamageAction() != null) {
+                                curDmg = ench.getDamageAction().apply(event1, (int) curDmg, enchLvl);
+                            }
+                        }
                     }
                 }
             }

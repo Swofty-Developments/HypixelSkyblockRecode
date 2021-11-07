@@ -3,6 +3,7 @@ package net.atlas.SkyblockSandbox.item;
 import com.google.common.base.Enums;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.abilityCreator.Ability;
 import net.atlas.SkyblockSandbox.abilityCreator.AbilityValue;
 import net.atlas.SkyblockSandbox.item.enchant.Enchantment;
@@ -10,23 +11,23 @@ import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.NumberTruncation.RomanNumber;
 import net.atlas.SkyblockSandbox.util.SUtil;
-import net.atlas.SkyblockSandbox.util.StackUtils;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Material;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.awt.image.ColorConvertOp;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
-import static net.atlas.SkyblockSandbox.abilityCreator.AbilityUtil.getAbilityData;
 import static net.atlas.SkyblockSandbox.abilityCreator.AbilityUtil.getAbilityString;
 import static net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat.GEAR_SCORE;
-import static net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat.PET_LUCK;
 import static net.atlas.SkyblockSandbox.util.NBTUtil.*;
 
 public class SBItemBuilder {
@@ -47,8 +48,9 @@ public class SBItemBuilder {
     public boolean recombobulated;
     public ArrayList<String> description = new ArrayList<>();
     public ArrayList<ItemFlag> flags = new ArrayList<>();
-    public String hexColor = "";
+    public String color = "";
     public HashMap<SBPlayer.PlayerStat, Double> stats = new HashMap<>();
+    public HashMap<SBPlayer.PlayerStat, Double> hiddenStats = new HashMap<>();
     public HashMap<Integer, Ability> abilities = new HashMap<>();
     public HashMap<Enchantment, Integer> enchants = new HashMap<>();
     public static String[] statsformat = {"Gear_Score", "Damage", "Strength", "Crit_Chance", "Crit_Damage", "Attack_Speed", "Sea_Creature_Chance", "Ability_Damage", "Health", "Defense", "Intelligence", "Speed", "Magic_Find", "True_Defense", "Ferocity", "Mining_Speed", "Mining_Fortune", "Pristine"};
@@ -66,21 +68,17 @@ public class SBItemBuilder {
         glowing = getInteger(item, "glowing") == 1;
         reforgeable = getInteger(item, "reforgeable") == 1;
         recombobulated = getInteger(item, "recombobulated") == 1;
-        hexColor = getString(item, "color");
+        color = getString(item, "color");
         type = Enums.getIfPresent(ItemType.class, getString(item, "type")).orNull();
         if (getEnchants(item) != null) {
             enchants.putAll(getEnchants(item));
         }
         for(SBPlayer.PlayerStat stat : SBPlayer.PlayerStat.values()) {
-            int extraStats = 0;
-            if (!enchants.isEmpty()) {
-                for (Map.Entry<Enchantment, Integer> entry : enchants.entrySet()) {
-                    Enchantment enchant = entry.getKey();
-                    Integer lvl = entry.getValue();
-                }
-            }
             if (getStat(item, stat) != null) {
-                stats.put(stat, getStat(item, stat) + extraStats);
+                stats.put(stat, getStat(item, stat));
+            }
+            if (NBTUtil.getHiddenStat(item, stat) != null) {
+                hiddenStats.put(stat, NBTUtil.getHiddenStat(item, stat));
             }
         }
         if (getDescription(item) != null) {
@@ -95,6 +93,21 @@ public class SBItemBuilder {
 
     public SBItemBuilder material(Material var) {
         this.mat = var;
+        return this;
+    }
+
+    public SBItemBuilder color(int red, int green, int blue) {
+        color = red + "," + green + "," + blue;
+        return this;
+    }
+
+    public SBItemBuilder color(String red, String green, String blue) {
+        color = red + "," + green + "," + blue;
+        return this;
+    }
+
+    public SBItemBuilder color(String rgb) {
+        color = rgb;
         return this;
     }
 
@@ -158,6 +171,15 @@ public class SBItemBuilder {
         return this;
     }
 
+    public SBItemBuilder hiddenStat(SBPlayer.PlayerStat stat, double amount) {
+        hiddenStats.put(stat, amount);
+        return this;
+    }
+
+    public Double getHiddenStat(SBPlayer.PlayerStat stat) {
+        return hiddenStats.get(stat) != null ? hiddenStats.get(stat) : 0;
+    }
+
     public SBItemBuilder ability(int index, Ability ability) {
         abilities.put(index, ability);
         return this;
@@ -177,7 +199,7 @@ public class SBItemBuilder {
         return this;
     }
 
-    public SBItemBuilder addEnchantment(Enchantment enchant, int lvl) {
+    public SBItemBuilder putEnchantment(Enchantment enchant, int lvl) {
         enchants.put(enchant, lvl);
         return this;
     }
@@ -197,17 +219,38 @@ public class SBItemBuilder {
         return this;
     }
 
+    public SBItemBuilder applyEnchants() {
+        hiddenStats = new HashMap<>();
+        for (Map.Entry<Enchantment, Integer> entry : enchants.entrySet()) {
+            Enchantment enchant = entry.getKey();
+            int lvl = entry.getValue();
+            try {
+                enchant.getHeldAction().apply(this, lvl);
+            } catch (NullPointerException ignored) {
+            }
+        }
+        return this;
+    }
+
     public ItemStack build() {
         ItemStack item = new ItemStack(mat, 1, (short) 0);
         if (stack != null) {
             item = stack;
         }
         if(item.getType().equals(Material.SKULL_ITEM)) {
+            item.setDurability((short) 3);
             if (texture != null) {
                 item = applyTexture(item, texture);
             } else if(url != null) {
                 item = applyUrl(item, url);
             }
+        }
+        ItemStack finalItem = item;
+        if (Stream.of(Material.LEATHER_LEGGINGS, Material.LEATHER_HELMET, Material.LEATHER_BOOTS, Material.LEATHER_CHESTPLATE).anyMatch(material -> finalItem.getType().equals(material)) && !color.isEmpty()) {
+            LeatherArmorMeta leatherMeta = (LeatherArmorMeta) item.getItemMeta();
+            String[] colors = color.split(",");
+            leatherMeta.setColor(Color.fromRGB(Integer.parseInt(colors[0]), Integer.parseInt(colors[1]), Integer.parseInt(colors[2])));
+            item.setItemMeta(leatherMeta);
         }
         ItemMeta meta = item.getItemMeta();
         if (!flags.isEmpty()) {
@@ -277,26 +320,44 @@ public class SBItemBuilder {
             }
         }
         if(!enchants.isEmpty()) {
-            for (Map<Enchantment, Integer> enchantmap : split(enchants)) {
-                StringBuilder builder = new StringBuilder();
-                for (Map.Entry<Enchantment, Integer> entry : enchantmap.entrySet()) {
+            HashMap<Enchantment, Integer> tempEnchants = new HashMap<>();
+            for (Enchantment enchant : Enchantment.values()) {
+                if (enchants.containsKey(enchant)) {
+                    tempEnchants.put(enchant, enchants.get(enchant));
+                }
+            }
+            if (enchants.size() < 6) {
+                for (Map.Entry<Enchantment, Integer> entry : tempEnchants.entrySet()) {
                     Enchantment enchant = entry.getKey();
                     Integer value = entry.getValue();
                     if (enchant.isUltimate()) {
-                        builder.append("&b&l").append(enchant.getName()).append(" ").append(RomanNumber.toRoman(value));
-                        if (!(enchantmap.keySet().toArray()[enchantmap.size() - 1] == enchant)) {
-                            builder.append(",");
-                        }
-                    builder.append(" ");
+                        lore.add("&d&l" + enchant.getName() + " " + RomanNumber.toRoman(value));
                     } else {
-                        builder.append("&9").append(enchant.getName()).append(" ").append(RomanNumber.toRoman(value));
-                        if (!(enchantmap.keySet().toArray()[enchantmap.size() - 1] == enchant)) {
-                            builder.append(",");
-                        }
-                        builder.append(" ");
+                        lore.add("&9" + enchant.getName() + " " + RomanNumber.toRoman(value));
                     }
                 }
-                lore.add(builder.toString());
+            } else {
+                for (Map<Enchantment, Integer> enchantmap : split(tempEnchants)) {
+                    StringBuilder builder = new StringBuilder();
+                    for (Map.Entry<Enchantment, Integer> entry : enchantmap.entrySet()) {
+                        Enchantment enchant = entry.getKey();
+                        Integer value = entry.getValue();
+                        if (enchant.isUltimate()) {
+                            builder.append("&d&l").append(enchant.getName()).append(" ").append(RomanNumber.toRoman(value));
+                            if (!(enchantmap.keySet().toArray()[enchantmap.size() - 1] == enchant)) {
+                                builder.append(",");
+                            }
+                            builder.append(" ");
+                        } else {
+                            builder.append("&9").append(enchant.getName()).append(" ").append(RomanNumber.toRoman(value));
+                            if (!(enchantmap.keySet().toArray()[enchantmap.size() - 1] == enchant)) {
+                                builder.append(",");
+                            }
+                            builder.append(" ");
+                        }
+                    }
+                    lore.add(builder.toString());
+                }
             }
             lore.add("");
         }
@@ -352,7 +413,7 @@ public class SBItemBuilder {
         item = setInteger(item, glowing ? 1 : 0, "glowing");
         item = setInteger(item, reforgeable ? 1 : 0, "reforgeable");
         item = setInteger(item, recombobulated ? 1 : 0, "recombobulated");
-        item = setString(item, hexColor, "color");
+        item = setString(item, color, "color");
 
         if(!stackable) {
             item = setString(item, UUID.randomUUID().toString(), "uuid");
@@ -363,6 +424,15 @@ public class SBItemBuilder {
                 SBPlayer.PlayerStat stat = entry.getKey();
                 Double value = entry.getValue();
                 item = setStat(item, value, stat);
+            }
+        }
+        if(!hiddenStats.isEmpty()) {
+            for (Map.Entry<SBPlayer.PlayerStat, Double> entry : hiddenStats.entrySet()) {
+                SBPlayer.PlayerStat stat = entry.getKey();
+                Double value = entry.getValue();
+                if (value != 0) {
+                    item = setInteger(item, Math.toIntExact(Math.round(value)), stat.name());
+                }
             }
         }
 
@@ -408,8 +478,7 @@ public class SBItemBuilder {
         if (item == null) return item;
         SkullMeta itemMeta = (SkullMeta) item.getItemMeta();
         GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-        byte[] encodedData = texture.getBytes();
-        profile.getProperties().put("textures", new Property("textures", new String(encodedData)));
+        profile.getProperties().put("textures", new Property("textures", texture));
         Field profileField;
         try {
             profileField = itemMeta.getClass().getDeclaredField("profile");

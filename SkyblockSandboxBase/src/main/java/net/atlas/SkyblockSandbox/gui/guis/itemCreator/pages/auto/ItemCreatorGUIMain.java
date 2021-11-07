@@ -88,6 +88,9 @@ public class ItemCreatorGUIMain extends NormalGUI {
         setAction(40,event -> {
             getOwner().closeInventory();
         });
+        setAction(23, event -> {
+            new EnchantGUI(getOwner()).open();
+        });
         return true;
     }
 
@@ -114,7 +117,8 @@ public class ItemCreatorGUIMain extends NormalGUI {
         setItem(12, makeColorfulItem(Material.PAINTING, "§aSet item Rarity", 1, 0, SUtil.colorize("&7Set the rarity of your item", "&7you can choose anything", "&7between: &fCommon&7, &aUncommon", "&9Rare&7, &5Epic&7, &6Legendary&7,", "&dMythic&7, &cSpecial&7.", "", "§cNote: The last line of", "§clore in your item will", "§cturn into the rarity name.", "", "&eClick to set!")));
         setItem(15, makeColorfulItem(Material.GLOWSTONE_DUST, "§aSet item ability", 1, 0, SUtil.colorize("&7Create your own custom ability!", "&7Using the Base Abilites or", "&7the Advanced functions!", "", "&eClick to create!")));
         setItem(21,makeColorfulItem(Material.BARRIER,"&aPet Builder",1,0,SUtil.colorize("&7Create your own custom pet!","","&eClick to create!")));
-        setItem(22, makeColorfulItem(Material.ENCHANTED_BOOK, "§aEdit Item Tags", 1, 0, SUtil.colorize("&7Edit the tags the item has!", "&7Including Unbreakable, Enchant tag,", "&7Glowing tag, and the Damage Tag!", "", "&eClick to edit!")));
+        setItem(23, makeColorfulItem(Material.ENCHANTED_BOOK, "§aEdit Item Enchants", 1, 0, SUtil.colorize("&7Edit the enchants the item has!", "", "&eClick to edit!")));
+        setItem(22, makeColorfulItem(Material.BOOK_AND_QUILL, "§aEdit Item Tags", 1, 0, SUtil.colorize("&7Edit the tags the item has!", "&7Including Unbreakable, Enchant tag,", "&7Glowing tag, and the Damage Tag!", "", "&eClick to edit!")));
         setItem(11, makeColorfulItem(Material.INK_SACK, "§aSet item color", 1, 5, SUtil.colorize("&7Edit the color of the item!", "&7you can change any item", "&7from: &aWool &7, &aStained_Clay &7, ", "&aStained_Glass_Panes &7, &aStained_Glass  ", "&7or &aINK_SACK(DYES)")));
         setItem(20,makeColorfulItem(Material.GOLD_AXE,"&aSet item type",1,0,"&7Set the item type!","","&eClick to set the item type!"));
 

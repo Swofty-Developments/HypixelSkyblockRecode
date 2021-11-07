@@ -63,13 +63,20 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
                 p.teleport(teleLoc);
             } else {
                 try {
-                    Data.createIsland(p.getPlayer(), IslandId.randomIslandId());
+                    Data.createIsland(p.getPlayer(), IslandId.randomIslandId(), new ArrayList<>());
                 } catch (Exception ex) {
                     p.sendMessage(SUtil.colorize("&cFailed to create island. Please contact a server administrator if this issue persists."));
                 }
             }
+            //remove clientside mining fatigue
+            p.removePotionEffect(PotionEffectType.SLOW_DIGGING);
         } else {
             p.teleport(new Location(Bukkit.getWorld("Hypixel"), -2.5, 70, -70.5));
+
+            //clientside mining fatigue
+            p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, Integer.MAX_VALUE, 255, true, false));
+            PacketPlayOutEntityEffect entityEffect = new PacketPlayOutEntityEffect(p.getEntityId(), new MobEffect(MobEffectList.SLOWER_DIG.getId(), Integer.MAX_VALUE, -1, true, false));
+            ((CraftPlayer) p.getPlayer()).getHandle().playerConnection.sendPacket(entityEffect);
         }
 
         //loading fairy souls
@@ -124,11 +131,6 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
         } else {
             p.setMaxHealth(20);
         }
-
-        //clientside mining fatigue
-        p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, Integer.MAX_VALUE, 255, true, false));
-        PacketPlayOutEntityEffect entityEffect = new PacketPlayOutEntityEffect(p.getEntityId(), new MobEffect(MobEffectList.SLOWER_DIG.getId(), Integer.MAX_VALUE, -1, true, false));
-        ((CraftPlayer) p.getPlayer()).getHandle().playerConnection.sendPacket(entityEffect);
 
         //loading skill cache
         Bukkit.getScheduler().runTaskAsynchronously(SBX.getInstance(), () -> {

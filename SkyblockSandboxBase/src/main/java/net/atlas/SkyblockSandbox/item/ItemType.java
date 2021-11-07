@@ -11,8 +11,8 @@ public enum ItemType {
     LEGGINGS("LEGGINGS"),
     CHESTPLATE("CHESTPLATE"),
     HELMET("HELMET"),
-    ARMOR("BOOTS", "CHESTPLATE", "LEGGINGS", "HELMET"),
-    ITEM(""),
+    ARMOR("ARMOR", "BOOTS", "CHESTPLATE", "LEGGINGS", "HELMET"),
+    ITEM("ITEM"),
     WAND("WAND"),
     ACCESSORY("ACCESSORY"),
     DUNGEON_ITEM("DUNGEON ITEM"),
@@ -24,7 +24,8 @@ public enum ItemType {
     DRILL("DRILL"),
     HOE("HOE"),
     SUMMONING("SUMMONING ITEM"),
-    PET_ITEM("PET ITEM");
+    PET_ITEM("PET ITEM"),
+    CUSTOM("NONE");
 
     private String s;
     private final ArrayList<String> alias = new ArrayList<>();
@@ -32,7 +33,8 @@ public enum ItemType {
     ItemType(String s) {
         this.s = s;
     }
-    ItemType(String... s) {
+    ItemType(String s1, String... s) {
+        this.s = s1;
         Collections.addAll(alias, s);
     }
 

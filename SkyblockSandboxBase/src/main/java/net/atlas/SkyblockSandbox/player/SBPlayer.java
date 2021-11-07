@@ -421,9 +421,9 @@ public class SBPlayer extends PluginPlayer {
         HEALTH("&a", "Health", 100, true, makeColorfulItem(Material.GOLDEN_APPLE, "&cHealth", 1, 0, "")),
         DEFENSE("&a", "Defense", 0, false, makeColorfulItem(Material.IRON_CHESTPLATE, "&aDefense", 1, 0, "")),
         STRENGTH("Strength", 0, false, makeColorfulItem(Material.BLAZE_POWDER, "&cStrength", 1, 0, "")),
-        SPEED("&a", "Speed", 100, false, makeColorfulItem(Material.SUGAR, "&rSpeed", 1, 0, ""), new String[]{"Walk_Speed"}),
-        CRIT_CHANCE("Crit_Chance", 30, false, 100, makeColorfulSkullItem("&9Crit Chance", "http://textures.minecraft.net/texture/3e4f49535a276aacc4dc84133bfe81be5f2a4799a4c04d9a4ddb72d819ec2b2b", 1, "")),
-        CRIT_DAMAGE("Crit_Damage", 50, false, makeColorfulSkullItem("&9Crit Damage", "http://textures.minecraft.net/texture/ddafb23efc57f251878e5328d11cb0eef87b79c87b254a7ec72296f9363ef7c", 1, "")),
+        SPEED("&a", "Speed", 100, false, makeColorfulItem(Material.SUGAR, "&rSpeed", 1, 0, ""), new String[]{"WALK_SPEED"}),
+        CRIT_CHANCE("Crit_Chance", 30, false, 100, makeColorfulSkullItem("&9Crit Chance", "http://textures.minecraft.net/texture/3e4f49535a276aacc4dc84133bfe81be5f2a4799a4c04d9a4ddb72d819ec2b2b", 1, ""), new String[]{"CRITICAL_CHANCE"}),
+        CRIT_DAMAGE("Crit_Damage", 50, false, makeColorfulSkullItem("&9Crit Damage", "http://textures.minecraft.net/texture/ddafb23efc57f251878e5328d11cb0eef87b79c87b254a7ec72296f9363ef7c", 1, ""), new String[]{"CRITICAL_DAMAGE"}),
         INTELLIGENCE("&a", "Intelligence", 100, true, makeColorfulItem(Material.ENCHANTED_BOOK, "&bIntelligence", 1, 0, "")),
         MINING_SPEED("&a", "Mining_Speed", 0, false, makeColorfulItem(Material.DIAMOND_PICKAXE, "&6Mining Speed", 1, 0, "")),
         ATTACK_SPEED("Attack_Speed", 0, false, 100, makeColorfulItem(Material.GOLD_AXE, "&eAttack Speed", 1, 0, "")),
@@ -477,6 +477,16 @@ public class SBPlayer extends PluginPlayer {
             this.color = "&c";
             this.max = max;
 
+        }
+
+        PlayerStat(String name, double base, boolean isRegen, int max, ItemStack stack, String[] alias) {
+            this.name = name;
+            this.base = base;
+            this.isRegen = isRegen;
+            this.stack = stack;
+            this.color = "&c";
+            this.max = max;
+            this.alias = alias;
         }
         PlayerStat(String color, String name, double base, boolean isRegen, ItemStack stack) {
             this.name = name;

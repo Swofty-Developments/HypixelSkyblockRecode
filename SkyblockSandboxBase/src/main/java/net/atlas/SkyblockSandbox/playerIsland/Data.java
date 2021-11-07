@@ -1,8 +1,5 @@
 package net.atlas.SkyblockSandbox.playerIsland;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import lombok.experimental.UtilityClass;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.files.IslandInfoFile;
@@ -10,7 +7,6 @@ import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.BungeeUtil;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import net.atlas.SkyblockSandbox.util.WorldEditUtil;
-import net.citizensnpcs.npc.ai.speech.Chat;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -48,7 +44,7 @@ public class Data {
 		}
 	}
 
-	public PlayerIsland createIsland(Player owner, IslandId islandId, Player... members) throws IOException {
+	public PlayerIsland createIsland(Player owner, IslandId islandId, List<UUID> members) throws IOException {
 		File islandsData = new File(SBX.getInstance().getDataFolder(), File.separator + "IslandDatabase");
 		File f = new File(islandsData, File.separator + islandId.toString() + ".yml");
 		FileConfiguration islandData = YamlConfiguration.loadConfiguration(f);
@@ -59,7 +55,7 @@ public class Data {
 
 				MongoIslands mongo = new MongoIslands();
 				mongo.setData(islandId.toUUID(), "owner", owner.getUniqueId().toString());
-				mongo.setList(islandId.toUUID(), "members", ImmutableList.of(members));
+				mongo.setList(islandId.toUUID(), "members", members);
 
 				IslandInfoFile info = new IslandInfoFile();
 				double x = info.getConfiguration().getDouble("latest.location.x");
@@ -72,16 +68,14 @@ public class Data {
 
 				// Paste schematic at loc;
 				File schematicPath = new File(SBX.getInstance().getDataFolder(), File.separator + "Schematics");
-				File schematic = new File(schematicPath, File.separator + info.getConfiguration().getString("island-schematic-file"));
+				File schematic = new File(schematicPath, File.separator + "private_island.schematic");
 
 				WorldEditUtil.loadSchemFromFile(schematic, loc);
 
 				islandData.set("id", islandId.toString());
 				islandData.set("owner", owner.getUniqueId().toString());
 
-				List<String> uuids = new ArrayList<>();
-				for (Player player : members)
-					uuids.add(player.getUniqueId().toString());
+				List<UUID> uuids = new ArrayList<>(members);
 
 				islandData.set("members", uuids);
 
@@ -115,8 +109,9 @@ public class Data {
 						} else {
 							BungeeUtil.sendPlayer(new SBPlayer(owner),"islands");
 						}
-						if (members.length != 0)
-							for (Player player : members) {
+						if (members.size() != 0)
+							for (UUID uuid : members) {
+								Player player = Bukkit.getPlayer(uuid);
 								player.teleport(loc);
 								player.playSound(player.getLocation(), Sound.NOTE_PLING,2,1);
 								player.sendMessage(SUtil.colorize("&e&lWelcome To Skyblock Sandbox!"));
@@ -158,8 +153,10 @@ public class Data {
 		FileConfiguration islandData = YamlConfiguration.loadConfiguration(f);
 
 		List<OfflinePlayer> members = new ArrayList<>();
-
-		List<String> list = new ArrayList<>(islandData.getStringList("members"));
+		List<String> list = new ArrayList<>();
+		if (!islandData.getStringList("members").isEmpty()) {
+			list = new ArrayList<>(islandData.getStringList("members"));
+		}
 		List<UUID> uuids = new ArrayList<>();
 
 		for (String item : list)

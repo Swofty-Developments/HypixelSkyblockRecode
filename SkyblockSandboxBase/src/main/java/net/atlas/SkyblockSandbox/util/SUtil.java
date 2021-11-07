@@ -89,4 +89,8 @@ public class SUtil {
 
     }
 
+    public static String rgbToHex(Color color) {
+        return String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
+    }
+
 }

@@ -27,6 +27,9 @@ public class NBTUtil {
                         if(item.stats.get(s) != null) {
                             tempStat += item.stats.get(s);
                         }
+                        if (item.hiddenStats.get(s) != null) {
+                            tempStat += item.hiddenStats.get(s);
+                        }
                     } else {
                         tempStat += new SBItemStack(i).getStat(s);
                     }
@@ -37,6 +40,9 @@ public class NBTUtil {
                 if (getString(p.getItemInHand(), "non-legacy").equals("true")) {
                     if (item.stats.get(s) != null) {
                         tempStat += item.stats.get(s);
+                    }
+                    if (item.hiddenStats.get(s) != null) {
+                        tempStat += item.hiddenStats.get(s);
                     }
                 } else {
                     tempStat += new SBItemStack(p.getItemInHand()).getStat(s);
@@ -224,6 +230,19 @@ public class NBTUtil {
                 }
 
                 return stats.get(key.name()) != null ? stats.getDouble(key.name()) : null;
+            }
+        }
+        return null;
+    }
+
+    public static Double getHiddenStat(ItemStack stack, SBPlayer.PlayerStat key) {
+        if (stack != null) {
+            if (stack.hasItemMeta()) {
+                net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
+                NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+                NBTTagCompound data = tag.getCompound("ExtraAttributes");
+
+                return data.get(key.name()) != null ? data.getDouble(key.name()) : null;
             }
         }
         return null;

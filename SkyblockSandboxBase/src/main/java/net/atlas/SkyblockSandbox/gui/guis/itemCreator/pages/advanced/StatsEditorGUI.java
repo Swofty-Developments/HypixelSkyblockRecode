@@ -119,7 +119,7 @@ public class StatsEditorGUI extends NormalGUI implements Backable {
                 return;
             }
             if (Integer.parseInt(event1.getLines()[0]) > stat.getMax()) {
-                player.sendMessage("§cThe " + formattedname + " amount can't be more than " + NumUtils.format(stat.getMax(), "###,#") + "!");
+                player.sendMessage("§cThe " + formattedname + " amount can't be more than " + NumUtils.format(stat.getMax(), "#,###") + "!");
                 player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 0);
                 player.closeInventory();
                 return;

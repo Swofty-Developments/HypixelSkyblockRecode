@@ -120,7 +120,7 @@ public class MongoIslands implements MongoDB {
         return found;
     }
 
-    public void setList(UUID id, String key, ImmutableList<Object> list) {
+    public void setList(UUID id, String key, List<UUID> list) {
         Document query = new Document("id", id.toString());
         Document found = col.find(query).first();
 

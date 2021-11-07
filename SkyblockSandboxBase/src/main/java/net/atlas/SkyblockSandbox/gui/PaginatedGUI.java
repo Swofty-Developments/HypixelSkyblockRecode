@@ -72,18 +72,20 @@ public abstract class PaginatedGUI extends SBGUI{
                     if (this instanceof Backable) {
                         Backable backable = (Backable) this;
                         setItem(backable.backItemSlot(), makeColorfulItem(Material.ARROW, "&aGo Back", 1, 0, "&7To " + backable.backTitle()));
+                        gui.addSlotAction(backable.backItemSlot(), e -> {
+                            backable.openBack();
+                        });
+
+                        setItem(backable.backItemSlot()+1,makeColorfulItem(Material.BARRIER,"&cClose",1,0));
+                        gui.addSlotAction(backable.backItemSlot()+1,event -> {
+                            gui.close(getOwner());
+                        });
                     }
                     if (!setClickActions()) {
                         gui.setDefaultClickAction(this::handleMenu);
                     } else {
                         gui.setDefaultClickAction(event -> {
                             event.setCancelled(true);
-                        });
-                    }
-                    if (this instanceof Backable) {
-                        Backable backable = (Backable) this;
-                        gui.addSlotAction(backable.backItemSlot(), e -> {
-                            backable.openBack();
                         });
                     }
                     gui.open(owner);

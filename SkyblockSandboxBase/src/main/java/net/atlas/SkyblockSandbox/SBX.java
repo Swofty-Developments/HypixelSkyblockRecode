@@ -2,22 +2,15 @@ package net.atlas.SkyblockSandbox;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
-import com.google.common.base.Enums;
-import com.google.gson.JsonObject;
-import com.mongodb.client.MongoClients;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import net.atlas.SkyblockSandbox.AuctionHouse.AuctionItemHandler;
-import net.atlas.SkyblockSandbox.command.abstraction.SBCommandArgs;
-import net.atlas.SkyblockSandbox.command.abstraction.SBCompleter;
 import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
-import net.atlas.SkyblockSandbox.command.commands.*;
 import net.atlas.SkyblockSandbox.customMining.BreakListener;
 import net.atlas.SkyblockSandbox.customMining.MineUtil;
 import net.atlas.SkyblockSandbox.database.mongo.MongoAH;
 import net.atlas.SkyblockSandbox.database.mongo.MongoCoins;
 import net.atlas.SkyblockSandbox.database.sql.MySQL;
-import net.atlas.SkyblockSandbox.database.sql.SQLBpCache;
 import net.atlas.SkyblockSandbox.economy.Coins;
 import net.atlas.SkyblockSandbox.entity.SkyblockEntity;
 import net.atlas.SkyblockSandbox.event.customEvents.ManaEvent;
@@ -29,7 +22,6 @@ import net.atlas.SkyblockSandbox.island.islands.end.dragFight.LootListener;
 import net.atlas.SkyblockSandbox.item.ItemType;
 import net.atlas.SkyblockSandbox.item.Rarity;
 import net.atlas.SkyblockSandbox.item.SBItemBuilder;
-import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.item.ability.AbiltyListener;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.HellShatter;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.ShortBowTerm;
@@ -44,13 +36,11 @@ import net.atlas.SkyblockSandbox.slayer.SlayerTier;
 import net.atlas.SkyblockSandbox.slayer.Slayers;
 import net.atlas.SkyblockSandbox.storage.MongoStorage;
 import net.atlas.SkyblockSandbox.util.HypixelColorCodes;
-import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.NumberTruncation.NumberSuffix;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import net.atlas.SkyblockSandbox.util.StackUtils;
 import net.atlas.SkyblockSandbox.util.signGUI.SignManager;
 import net.minecraft.server.v1_8_R3.*;
-import org.apache.commons.io.FileUtils;
 import org.bson.Document;
 import org.bukkit.Material;
 import org.bukkit.WorldType;
@@ -58,41 +48,28 @@ import org.bukkit.*;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.craftbukkit.libs.jline.internal.Log;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
-import org.davidmoten.text.utils.WordWrap;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.util.*;
 
 import static net.atlas.SkyblockSandbox.command.commands.Command_forward.MESSAGE_CHANNEL;
 import static net.atlas.SkyblockSandbox.listener.sbEvents.entityEvents.EntitySpawnEvent.holoMap;
 import static net.atlas.SkyblockSandbox.listener.sbEvents.entityEvents.EntitySpawnEvent.holoMap2;
-import static net.atlas.SkyblockSandbox.command.commands.Command_forward.MESSAGE_CHANNEL;
 
 public class SBX extends JavaPlugin {
     public static HashMap<UUID, Boolean> isSoulCryActive = new HashMap<>();
@@ -433,11 +410,14 @@ public class SBX extends JavaPlugin {
                             item.stat(SBPlayer.PlayerStat.getStat(key), Double.parseDouble(String.valueOf(value)));
                         });
                     }
+                    if (json.has("color")) {
+                        item.color(json.getString("color"));
+                    }
                     if(json.has("skin")) {
                         item.texture(json.getString("skin"));
                     }
                     if (json.has("description")) {
-                        for (String line : WordWrap.from(json.getString("description")).maxWidth(50).wrap().split("\n")) {
+                        for (String line : StackUtils.stringToLore(json.getString("description"), 43, ChatColor.GRAY)) {
                             item.addDescriptionLine(HypixelColorCodes.translateHypixelColorCodes(line));
                         }
                     }

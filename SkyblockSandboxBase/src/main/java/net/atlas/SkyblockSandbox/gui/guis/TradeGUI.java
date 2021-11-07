@@ -25,7 +25,7 @@ public class TradeGUI extends TwoPlayerGUI {
     List<ItemStack> p1Items = new ArrayList<>();
     List<ItemStack> p2Items = new ArrayList<>();
     List<Integer> baseLeftSide = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 9, 10, 11, 12, 18, 19, 20, 21, 27, 28, 29, 30));
-    List<Integer> baseRightSide = new ArrayList<>(Arrays.asList(5, 6, 7, 8, 14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34, 35, 41, 42, 43, 44));
+    List<Integer> baseRightSide = new ArrayList<>(Arrays.asList(5, 6, 7, 8, 14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34));
     List<Integer> p2rightside = new ArrayList<>(baseRightSide);
     List<Integer> p1rightside = new ArrayList<>(baseRightSide);
     List<Integer> p2leftside = new ArrayList<>(baseLeftSide);
@@ -121,12 +121,17 @@ public class TradeGUI extends TwoPlayerGUI {
 
             if (event1.getRawSlot() >= 45) {
                 if(event1.getCurrentItem().getType()!=Material.AIR) {
-                    p1Items.add(event1.getCurrentItem());
-                    player1.playSound(player1.getLocation(), Sound.VILLAGER_HAGGLE, 2, 1);
-                    player2.playSound(player1.getLocation(), Sound.VILLAGER_HAGGLE, 2, 1);
-                    player1.getInventory().setItem(event1.getSlot(), new ItemStack(Material.AIR));
-                    setItems();
-                    startTradeCountdown(player1, p1Items, player2, p2Items);
+                    if (p1Items.size() <= baseLeftSide.size()) {
+                        p1Items.add(event1.getCurrentItem());
+                        player1.playSound(player1.getLocation(), Sound.VILLAGER_HAGGLE, 2, 1);
+                        player2.playSound(player1.getLocation(), Sound.VILLAGER_HAGGLE, 2, 1);
+                        player1.getInventory().setItem(event1.getSlot(), new ItemStack(Material.AIR));
+                        setItems();
+                        startTradeCountdown(player1, p1Items, player2, p2Items);
+                    } else {
+                        player1.sendMessage("&c&lIT'S FULL! &7Your trade window is full!");
+                        player1.playSound(player1.getLocation(), Sound.VILLAGER_HAGGLE, 2, 1);
+                    }
                 }
             } else {
                 event1.setCancelled(true);
@@ -159,12 +164,17 @@ public class TradeGUI extends TwoPlayerGUI {
             event2.setCancelled(true);
             if (event2.getRawSlot() >= 45) {
                 if(event2.getCurrentItem().getType()!=Material.AIR) {
-                    p2Items.add(event2.getCurrentItem());
-                    player1.playSound(player1.getLocation(), Sound.VILLAGER_HAGGLE, 2, 1);
-                    player2.playSound(player1.getLocation(), Sound.VILLAGER_HAGGLE, 2, 1);
-                    setItems();
-                    player2.getInventory().setItem(event2.getSlot(), new ItemStack(Material.AIR));
-                    startTradeCountdown(player1, p1Items, player2, p2Items);
+                    if (p2Items.size() <= baseLeftSide.size()) {
+                        p2Items.add(event2.getCurrentItem());
+                        player1.playSound(player1.getLocation(), Sound.VILLAGER_HAGGLE, 2, 1);
+                        player2.playSound(player1.getLocation(), Sound.VILLAGER_HAGGLE, 2, 1);
+                        setItems();
+                        player2.getInventory().setItem(event2.getSlot(), new ItemStack(Material.AIR));
+                        startTradeCountdown(player1, p1Items, player2, p2Items);
+                    } else {
+                        player2.sendMessage("&c&lIT'S FULL! &7Your trade window is full!");
+                        player2.playSound(player2.getLocation(), Sound.VILLAGER_HAGGLE, 2, 1);
+                    }
                 }
             } else {
                 if (event2.getCurrentItem() != null && event2.getCurrentItem().hasItemMeta()) {
