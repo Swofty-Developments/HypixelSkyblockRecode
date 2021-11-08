@@ -14,6 +14,10 @@ import org.bson.Document;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.concurrent.TimeUnit;
+
 import static net.atlas.SkyblockSandbox.SBX.*;
 
 public class PlayerLeave extends SkyblockListener<PlayerQuitEvent> {
@@ -55,5 +59,12 @@ public class PlayerLeave extends SkyblockListener<PlayerQuitEvent> {
             docs.put(setting.name(), setting.map.get(p.getUniqueId()));
         }
         playerData.setData(p.getUniqueId(), "Settings", docs);
+
+        //PlayTime
+        int minutes = 0;
+        minutes = Math.toIntExact(TimeUnit.MILLISECONDS.toMinutes(ZonedDateTime.now(ZoneId.of("-05:00")).toInstant().toEpochMilli() - PlayerJoin.time.get(p.getUniqueId()).toInstant().toEpochMilli()));
+        playerData.setData(p.getUniqueId(), "PlayTime", PlayerJoin.playTimeMinutes.get(p.getUniqueId()) + minutes);
+        PlayerJoin.playTimeMinutes.remove(p.getUniqueId());
+        PlayerJoin.time.remove(p.getUniqueId());
     }
 }

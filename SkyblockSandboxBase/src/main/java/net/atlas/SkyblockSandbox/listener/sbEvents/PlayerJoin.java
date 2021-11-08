@@ -31,6 +31,8 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
@@ -44,6 +46,8 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
     //public static HashMap<UUID,HashMap<SBPlayer.PlayerStat, Double>> currStats = new HashMap<>();
     public static HashMap<UUID, HashMap<SBPlayer.PlayerStat, Double>> maxStats = new HashMap<>();
     public static HashMap<UUID, HashMap<SBPlayer.PlayerStat, Double>> bonusStats = new HashMap<>();
+    public static HashMap<UUID, ZonedDateTime> time = new HashMap<>();
+    public static HashMap<UUID, Double> playTimeMinutes = new HashMap<>();
 
     @EventHandler
     public void callEvent(PlayerJoinEvent event) {
@@ -173,7 +177,7 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
         if (docs == null) {
             HashMap<String, Object> emptyMap = new HashMap<>();
             for (SBPlayer.Settings setting : SBPlayer.Settings.values()) {
-                emptyMap.put(setting.name(), false);
+                emptyMap.put(setting.name(), true);
             }
             docs = new Document(emptyMap);
             playerDoc.put("Settings", docs);
@@ -181,5 +185,14 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
         for (SBPlayer.Settings setting : SBPlayer.Settings.values()) {
             setting.map.put(p.getUniqueId(), !docs.containsKey(setting.name()) ? Boolean.valueOf(false) : docs.getBoolean(setting.name()));
         }
+
+        //PlayTime
+        time.put(p.getUniqueId(), ZonedDateTime.now(ZoneId.of("-05:00")));
+        Object time = playerDoc.get("PlayTime");
+        if (time == null) {
+            time = 0D;
+        }
+
+        playTimeMinutes.put(p.getUniqueId(), (Double) time);
     }
 }
