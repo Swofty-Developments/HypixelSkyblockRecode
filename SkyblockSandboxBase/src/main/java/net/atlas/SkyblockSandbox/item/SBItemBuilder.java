@@ -177,7 +177,7 @@ public class SBItemBuilder {
     }
 
     public Double getHiddenStat(SBPlayer.PlayerStat stat) {
-        return hiddenStats.get(stat) != null ? hiddenStats.get(stat) : 0;
+        return hiddenStats.get(stat) != null ? hiddenStats.get(stat) : 0.0d;
     }
 
     public SBItemBuilder ability(int index, Ability ability) {

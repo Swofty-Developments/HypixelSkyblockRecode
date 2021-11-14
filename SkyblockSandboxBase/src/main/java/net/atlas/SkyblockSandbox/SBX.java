@@ -2,6 +2,7 @@ package net.atlas.SkyblockSandbox;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
+import com.google.common.base.Enums;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import net.atlas.SkyblockSandbox.AuctionHouse.AuctionItemHandler;
@@ -13,11 +14,14 @@ import net.atlas.SkyblockSandbox.database.mongo.MongoCoins;
 import net.atlas.SkyblockSandbox.database.sql.MySQL;
 import net.atlas.SkyblockSandbox.economy.Coins;
 import net.atlas.SkyblockSandbox.entity.SkyblockEntity;
+import net.atlas.SkyblockSandbox.entitySpawner.DefaultSpawnerObject;
+import net.atlas.SkyblockSandbox.entitySpawner.Spawner;
 import net.atlas.SkyblockSandbox.event.customEvents.ManaEvent;
 import net.atlas.SkyblockSandbox.event.customEvents.SkillEXPGainEvent;
 import net.atlas.SkyblockSandbox.files.CfgFile;
 import net.atlas.SkyblockSandbox.files.DatabaseInformationFile;
 import net.atlas.SkyblockSandbox.files.IslandInfoFile;
+import net.atlas.SkyblockSandbox.files.SpawnersFile;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.LootListener;
 import net.atlas.SkyblockSandbox.item.ItemType;
 import net.atlas.SkyblockSandbox.item.Rarity;
@@ -48,10 +52,8 @@ import org.bukkit.*;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.*;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -92,6 +94,7 @@ public class SBX extends JavaPlugin {
     public static boolean pvpEnabled;
     public MySQL sql;
     public SignManager signManager;
+    public List<Spawner> spawners;
 
     private static SBX instance;
     SkyblockCommandFramework framework;
@@ -159,12 +162,16 @@ public class SBX extends JavaPlugin {
         //registerEntity("Enderman", 58, EntityZombie.class, NoTeleportEnderman.class);
         SkyblockEntity.registerEntities();
         getServer().getMessenger().registerOutgoingPluginChannel(this, MESSAGE_CHANNEL);
+        loadSpawners();
     }
 
     @Override
     public void onDisable() {
         cacheSkills();
         cachePets();
+        for (Spawner spawner : spawners) {
+            spawner.stop();
+        }
     }
 
     public static void cacheSkills() {
@@ -219,6 +226,7 @@ public class SBX extends JavaPlugin {
         new DatabaseInformationFile().create();
         new IslandInfoFile().create();
         new CfgFile().create();
+        new SpawnersFile().create();
     }
 
     public static ProtocolManager getProtcolManager() {
@@ -386,6 +394,29 @@ public class SBX extends JavaPlugin {
             }
         }
         return blacklisted;
+    }
+
+    private void loadSpawners() {
+        spawners = new ArrayList<>();
+
+        SpawnersFile file = new SpawnersFile();
+
+        for (String s : file.a().getConfigurationSection("spawners").getKeys(false)) {
+            Spawner spawner = new DefaultSpawnerObject().setSpawnerLocation(
+                    new Location(Bukkit.getWorld(file.a().getString("spawners." + s + ".location.world")), file.a().getDouble("spawners." + s + ".location.x"), file.a().getDouble("spawners." + s + ".location.y"), file.a().getDouble("spawners." + s + ".location.z"))
+            ).setSpawnerType(Enums.getIfPresent(EntityType.class, file.a().getString("spawners." + s + ".entity.type")).get()
+            ).setDisplayname(file.a().getString("spawners." + s + ".entity.name")
+            ).setHealth(file.a().getInt("spawners." + s + ".entity.health")
+            ).setSpawnDelay(file.a().getInt("spawners." + s + ".properties.delay")
+            ).setSpawnCount(file.a().getInt("spawners." + s + ".properties.count")
+            ).setSpawnRange(file.a().getInt("spawners." + s + ".properties.range"));
+
+            spawners.add(spawner);
+        }
+
+        for (Spawner s : spawners) {
+            s.start();
+        }
     }
 
     private void githubItems() {

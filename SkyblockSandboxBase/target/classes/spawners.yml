@@ -1,0 +1,18 @@
+spawners:
+  graveYard1:
+    location:
+      world: 'world'
+      x: -126.579
+      y: 73
+      z: -125.529
+    entity:
+      type: 'ZOMBIE'
+      name: 'Zombie'
+      health: 300
+    properties:
+      delay: 300
+      count: 3
+      range: 5
+      keywords:
+        - 'probConfig'
+        - 'particle:smoke:large'
