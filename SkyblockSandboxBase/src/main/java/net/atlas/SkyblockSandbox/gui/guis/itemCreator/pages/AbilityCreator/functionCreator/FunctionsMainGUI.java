@@ -52,8 +52,8 @@ public class FunctionsMainGUI extends NormalGUI {
         });
         setAction(8,event -> {
             int count = FunctionUtil.getFunctionAmount(player.getItemInHand(), index);
-            if (count >= 3) {
-                player.sendMessage(SUtil.colorize("&cYou have already added 3 functions."));
+            if (count >= 5) {
+                player.sendMessage(SUtil.colorize("&cYou have already added 5 functions."));
                 player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 0);
                 return;
             }

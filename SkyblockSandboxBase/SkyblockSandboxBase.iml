@@ -71,8 +71,6 @@
     <orderEntry type="library" name="Maven: net.kyori:adventure-text-serializer-legacy:4.9.2" level="project" />
     <orderEntry type="library" name="Maven: com.github.koca2000:NoteBlockAPI:1.6.1" level="project" />
     <orderEntry type="library" name="Maven: org.json:json:20210307" level="project" />
-    <orderEntry type="library" name="Maven: com.github.davidmoten:word-wrap:0.1.1" level="project" />
-    <orderEntry type="library" name="Maven: com.github.davidmoten:guava-mini:0.1.1" level="project" />
     <orderEntry type="library" name="Maven: com.github.MrNemo64:player-inputs:1.2.1" level="project" />
   </component>
 </module>

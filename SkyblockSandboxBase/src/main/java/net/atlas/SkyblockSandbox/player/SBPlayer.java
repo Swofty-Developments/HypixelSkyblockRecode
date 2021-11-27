@@ -588,11 +588,10 @@ public class SBPlayer extends PluginPlayer {
         public void putDefault(SBPlayer player, boolean def) {
             map.putIfAbsent(player.getUniqueId(), def);
         }
+    }
 
-        public void loadMongo(SBPlayer player) {
-
-        }
-
+    public boolean getSetting(Settings setting) {
+        return setting.map.get(getUniqueId());
     }
 
     public PlayerIsland getPlayerIsland() {

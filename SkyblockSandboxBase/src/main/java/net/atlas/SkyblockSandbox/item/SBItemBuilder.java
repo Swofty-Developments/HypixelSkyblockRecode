@@ -3,7 +3,6 @@ package net.atlas.SkyblockSandbox.item;
 import com.google.common.base.Enums;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.abilityCreator.Ability;
 import net.atlas.SkyblockSandbox.abilityCreator.AbilityValue;
 import net.atlas.SkyblockSandbox.item.enchant.Enchantment;
@@ -20,7 +19,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.awt.image.ColorConvertOp;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.IntStream;
@@ -189,6 +187,10 @@ public class SBItemBuilder {
         description.set(index, line);
         return this;
     }
+    public SBItemBuilder setDescription(ArrayList<String> description) {
+        this.description = description;
+        return this;
+    }
     public SBItemBuilder removeDescriptionLine(int index) {
         description.remove(index);
         return this;
@@ -237,14 +239,16 @@ public class SBItemBuilder {
         if (stack != null) {
             item = stack;
         }
+
         if(item.getType().equals(Material.SKULL_ITEM)) {
             item.setDurability((short) 3);
             if (texture != null) {
                 item = applyTexture(item, texture);
-            } else if(url != null) {
+            } else if (url != null) {
                 item = applyUrl(item, url);
             }
         }
+
         ItemStack finalItem = item;
         if (Stream.of(Material.LEATHER_LEGGINGS, Material.LEATHER_HELMET, Material.LEATHER_BOOTS, Material.LEATHER_CHESTPLATE).anyMatch(material -> finalItem.getType().equals(material)) && !color.isEmpty()) {
             LeatherArmorMeta leatherMeta = (LeatherArmorMeta) item.getItemMeta();
@@ -320,37 +324,35 @@ public class SBItemBuilder {
             }
         }
         if(!enchants.isEmpty()) {
-            HashMap<Enchantment, Integer> tempEnchants = new HashMap<>();
-            for (Enchantment enchant : Enchantment.values()) {
+            ArrayList<Enchantment> list = new ArrayList<>();
+            for (Enchantment enchant : Enchantment.sortedEnchants) {
                 if (enchants.containsKey(enchant)) {
-                    tempEnchants.put(enchant, enchants.get(enchant));
+                    list.add(enchant);
                 }
             }
             if (enchants.size() < 6) {
-                for (Map.Entry<Enchantment, Integer> entry : tempEnchants.entrySet()) {
-                    Enchantment enchant = entry.getKey();
-                    Integer value = entry.getValue();
-                    if (enchant.isUltimate()) {
-                        lore.add("&d&l" + enchant.getName() + " " + RomanNumber.toRoman(value));
+                for (Enchantment entry : list) {
+                    Integer value = enchants.get(entry);
+                    if (entry.isUltimate()) {
+                        lore.add("&d&l" + entry.getName() + " " + RomanNumber.toRoman(value));
                     } else {
-                        lore.add("&9" + enchant.getName() + " " + RomanNumber.toRoman(value));
+                        lore.add("&9" + entry.getName() + " " + RomanNumber.toRoman(value));
                     }
                 }
             } else {
-                for (Map<Enchantment, Integer> enchantmap : split(tempEnchants)) {
+                for (List<Enchantment> enchantmap : split(list)) {
                     StringBuilder builder = new StringBuilder();
-                    for (Map.Entry<Enchantment, Integer> entry : enchantmap.entrySet()) {
-                        Enchantment enchant = entry.getKey();
-                        Integer value = entry.getValue();
-                        if (enchant.isUltimate()) {
-                            builder.append("&d&l").append(enchant.getName()).append(" ").append(RomanNumber.toRoman(value));
-                            if (!(enchantmap.keySet().toArray()[enchantmap.size() - 1] == enchant)) {
+                    for (Enchantment entry : enchantmap) {
+                        Integer value = enchants.get(entry);
+                        if (entry.isUltimate()) {
+                            builder.append("&d&l").append(entry.getName()).append(" ").append(RomanNumber.toRoman(value));
+                            if (!(enchantmap.toArray()[enchantmap.size() - 1] == entry)) {
                                 builder.append(",");
                             }
                             builder.append(" ");
                         } else {
-                            builder.append("&9").append(enchant.getName()).append(" ").append(RomanNumber.toRoman(value));
-                            if (!(enchantmap.keySet().toArray()[enchantmap.size() - 1] == enchant)) {
+                            builder.append("&9").append(entry.getName()).append(" ").append(RomanNumber.toRoman(value));
+                            if (!(enchantmap.toArray()[enchantmap.size() - 1] == entry)) {
                                 builder.append(",");
                             }
                             builder.append(" ");
@@ -379,8 +381,11 @@ public class SBItemBuilder {
                 if(ability.manaCost != 0) {
                     lore.add("&7Mana Cost: &3" + ability.manaCost);
                 }
+                if(ability.cooldown != 0) {
+                    lore.add("&7Cooldown: &a" + ability.cooldown + "s");
+                }
+                lore.add("");
             }
-            lore.add("");
         }
 
         if (reforgeable) {
@@ -438,10 +443,11 @@ public class SBItemBuilder {
 
         item = resetDescription(item);
         for (int i = 0; i < description.size(); i++) {
-            item = setDescription(item, i, description.get(i));
+            item = NBTUtil.setDescription(item, i, description.get(i));
         }
 
         if(!enchants.isEmpty()) {
+            item = resetDescription(item);
             for (Map.Entry<Enchantment, Integer> entry : enchants.entrySet()) {
                 Enchantment enchant = entry.getKey();
                 Integer value = entry.getValue();
@@ -492,24 +498,24 @@ public class SBItemBuilder {
         return item;
     }
 
-    private List<Map<Enchantment, Integer>> split(Map<Enchantment, Integer> original) {
+    private List<List<Enchantment>> split(List<Enchantment> original) {
 
         int max = 3;
         int counter = 0;
         int lcounter = 0;
-        List<Map<Enchantment, Integer>> listOfSplitMaps = new ArrayList<Map<Enchantment, Integer>> ();
-        Map<Enchantment, Integer> splitMap = new HashMap<> ();
+        List<List<Enchantment>> listOfSplitMaps = new ArrayList<>();
+        List<Enchantment> splitMap = new ArrayList<> ();
 
-        for (Map.Entry<Enchantment, Integer> m : original.entrySet()) {
+        for (Enchantment m : original) {
             if (counter < max) {
-                splitMap.put(m.getKey(), m.getValue());
+                splitMap.add(m);
                 counter++;
                 lcounter++;
 
                 if (counter == max || lcounter == original.size()) {
                     counter = 0;
                     listOfSplitMaps.add(splitMap);
-                    splitMap = new HashMap<> ();
+                    splitMap = new ArrayList<> ();
                 }
             }
         }

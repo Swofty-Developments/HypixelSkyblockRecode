@@ -17,11 +17,6 @@ public class PlayerDamageListener extends SkyblockListener<EntityDamageEvent> {
         if (event.getEntity() instanceof Player) {
             SBPlayer player = new SBPlayer((Player) event.getEntity());
             switch (event.getCause()) {
-                case PROJECTILE:
-                    event.setCancelled(true);
-                    player.damage(0.1);
-                    player.setCause(event.getCause());
-                    event.setCancelled(true);
                 case FALL:
                     player.setStat(HEALTH, player.getStat(HEALTH) - event.getDamage());
                     player.damage(0.1);

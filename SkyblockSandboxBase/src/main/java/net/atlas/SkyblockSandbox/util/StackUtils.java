@@ -5,7 +5,9 @@ import com.mojang.authlib.properties.Property;
 import com.sk89q.worldedit.blocks.SkullBlock;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import dev.triumphteam.gui.builder.item.SkullBuilder;
+import net.atlas.SkyblockSandbox.item.SBItemBuilder;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
+import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -200,5 +202,112 @@ public class StackUtils {
         }
 
         return lines;
+    }
+
+    public static void setLoreLine(int lineNumber, SBPlayer player, String[] args) {
+        StringBuilder builder = new StringBuilder("");
+        ItemStack inHand = player.getItemInHand();
+        lineNumber = lineNumber - 1;
+        for (int i = 1; i < args.length; i++) {
+            if (i == args.length - 1) {
+                builder.append(args[i]);
+            } else {
+                builder.append(args[i]).append(" ");
+            }
+        }
+        String loreToBeSet = builder.toString().trim();
+        List<String> newLore = new ArrayList<String>();
+        loreToBeSet = SUtil.colorize(loreToBeSet);
+        if (player.getSetting(SBPlayer.Settings.LORE_GEN)) {
+            SBItemBuilder item = new SBItemBuilder(inHand);
+            if (!item.description.isEmpty()) {
+                List<String> oldLore = item.description;
+                try {
+                    oldLore.set(lineNumber, loreToBeSet); // ERROR WILL BE CAUSED IF BIGGER
+                    newLore = oldLore;
+                } catch (IndexOutOfBoundsException e) {
+                    // Fill new lore with old stuff
+                    newLore.addAll(oldLore);
+                    for (int i = oldLore.size() - 1; i < lineNumber; i++) { // Expand new lore to proper size
+                        newLore.add("");
+                    }
+                    newLore.set(lineNumber, loreToBeSet);
+                }
+                item.setDescription((ArrayList<String>) newLore);
+                player.setItemInHand(item.build());
+            } else { // Item has no lore
+                for (int i = 0; i <= lineNumber; i++) {
+                    newLore.add("");
+                }
+                newLore.set(lineNumber, loreToBeSet);
+                item.setDescription((ArrayList<String>) newLore);
+                player.setItemInHand(item.build());
+            }
+        } else {
+            ItemMeta im = inHand.getItemMeta();
+            if (im.hasLore()) {
+                List<String> oldLore = im.getLore();
+                try {
+                    oldLore.set(lineNumber, loreToBeSet); // ERROR WILL BE CAUSED IF BIGGER
+                    newLore = oldLore;
+                } catch (IndexOutOfBoundsException e) {
+                    // Fill new lore with old stuff
+                    newLore.addAll(oldLore);
+                    for (int i = oldLore.size() - 1; i < lineNumber; i++) { // Expand new lore to proper size
+                        newLore.add("");
+                    }
+                    newLore.set(lineNumber, loreToBeSet);
+                }
+                im.setLore(newLore);
+                inHand.setItemMeta(im);
+                player.setItemInHand(inHand);
+            } else { // Item has no lore
+                for (int i = 0; i <= lineNumber; i++) {
+                    newLore.add("");
+                }
+                newLore.set(lineNumber, loreToBeSet);
+                im.setLore(newLore);
+                inHand.setItemMeta(im);
+                player.setItemInHand(inHand);
+            }
+            player.sendMessage("&aSuccessfully set lore line to: &e" + builder.toString());
+        }
+    }
+
+    public static void setDescriptionLine(int index, int lineNumber, SBPlayer player, String[] args) {
+        StringBuilder builder = new StringBuilder("");
+        ItemStack inHand = player.getItemInHand();
+        lineNumber = lineNumber - 1;
+        for (int i = 3; i < args.length; i++) {
+            builder.append(args[i]).append(" ");
+        }
+        String loreToBeSet = builder.toString().trim();
+        List<String> newLore = new ArrayList<String>();
+        loreToBeSet = SUtil.colorize(loreToBeSet);
+        if (player.getSetting(SBPlayer.Settings.LORE_GEN)) {
+            SBItemBuilder item = new SBItemBuilder(inHand);
+            if (!item.abilities.get(index).description.isEmpty()) {
+                List<String> oldLore = item.abilities.get(index).description;
+                try {
+                    oldLore.set(lineNumber, loreToBeSet); // ERROR WILL BE CAUSED IF BIGGER
+                    newLore = oldLore;
+                } catch (IndexOutOfBoundsException e) {
+                    // Fill new lore with old stuff
+                    newLore.addAll(oldLore);
+                    for (int i = oldLore.size() - 1; i < lineNumber; i++) { // Expand new lore to proper size
+                        newLore.add("");
+                    }
+                    newLore.set(lineNumber, loreToBeSet);
+                }
+                player.setItemInHand(item.abilities.get(index).setWholeDescription((ArrayList<String>) newLore).build().build());
+            } else { // Item has no lore
+                for (int i = 0; i <= lineNumber; i++) {
+                    newLore.add("");
+                }
+                newLore.set(lineNumber, loreToBeSet);
+                player.setItemInHand(item.abilities.get(index).setWholeDescription((ArrayList<String>) newLore).build().build());
+            }
+        }
+        player.sendMessage("&aSuccessfully set lore line to: &e" + builder);
     }
 }

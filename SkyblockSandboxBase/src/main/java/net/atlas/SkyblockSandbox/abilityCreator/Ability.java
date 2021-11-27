@@ -64,6 +64,10 @@ public class Ability {
         this.description.set(index, line);
         return this;
     }
+    public Ability setWholeDescription(ArrayList<String> lines) {
+        this.description = lines;
+        return this;
+    }
     @Deprecated() //Don't use this yet!
     public Ability addFunction(int fIndex, FunctionType function) {
         functions.put(fIndex, function);
@@ -76,7 +80,6 @@ public class Ability {
         item = setAbilityData(item, index, COOLDOWN, cooldown);
         item = setAbilityData(item, index, MANA_COST, manaCost);
         item = setAbilityData(item, index, CLICK_TYPE, clickType);
-        System.out.println(description);
         if(!description.isEmpty()) {
             for (int i = 0; i < description.size(); i++) {
                 item = setAbilityDescription(item, index, i, description.get(i));

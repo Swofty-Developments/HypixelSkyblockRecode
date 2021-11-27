@@ -39,13 +39,17 @@ public class ItemCreatorGUIMain extends NormalGUI {
             startChat(getOwner());
         });
         setAction(13, event -> {
-            new ItemDescriptionGUI(getOwner()).open();
+            if (getOwner().getStringFromItemInHand("non-legacy").equals("true")) {
+                new ItemDescriptionGUI(getOwner()).open();
+            } else {
+                getOwner().sendMessage("&cNeed to set a name or rarity before doing this.");
+            }
         });
         setAction(15, event -> {
             if (getOwner().getStringFromItemInHand("non-legacy").equals("true")) {
                 new AbilitySelectorGUI(getOwner()).open();
             } else {
-                getOwner().sendMessage("&cNeed to set a name, rarity or type before doing this.");
+                getOwner().sendMessage("&cNeed to set a name or rarity before doing this.");
             }
         });
         setAction(22, event -> {
@@ -80,7 +84,11 @@ public class ItemCreatorGUIMain extends NormalGUI {
             }
         });
         setAction(20,event -> {
-            new ItemTypeGUI(getOwner()).open();
+            if (getOwner().getStringFromItemInHand("non-legacy").equals("true")) {
+                new ItemTypeGUI(getOwner()).open();
+            } else {
+                getOwner().sendMessage("&cNeed to set a name or rarity before doing this.");
+            }
         });
         setAction(21,event -> {
             new PetBuilderGUI(getOwner()).open();
@@ -89,7 +97,15 @@ public class ItemCreatorGUIMain extends NormalGUI {
             getOwner().closeInventory();
         });
         setAction(23, event -> {
-            new EnchantGUI(getOwner()).open();
+            if (getOwner().getStringFromItemInHand("non-legacy").equals("true")) {
+                if (getOwner().getStringFromItemInHand("type") != null) {
+                    new EnchantGUI(getOwner()).open();
+                } else {
+                    getOwner().sendMessage("&cYou need to set an item type before doing this!");
+                }
+            } else {
+                getOwner().sendMessage("&cNeed to set a name or rarity before doing this.");
+            }
         });
         return true;
     }

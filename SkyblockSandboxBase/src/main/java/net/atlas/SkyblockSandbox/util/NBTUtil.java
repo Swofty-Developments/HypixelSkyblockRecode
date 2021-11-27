@@ -285,6 +285,22 @@ public class NBTUtil {
         return stack;
     }
 
+    public static ItemStack resetEnchants(ItemStack stack) {
+        if (stack != null) {
+            if (stack.hasItemMeta()) {
+                net.minecraft.server.v1_8_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(stack);
+                NBTTagCompound tag = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
+                NBTTagCompound data = tag.getCompound("ExtraAttributes") != null ? tag.getCompound("ExtraAttributes") : new NBTTagCompound();
+                NBTTagCompound stats = new NBTTagCompound();
+                data.set("Enchants",stats);
+                tag.set("ExtraAttributes", data);
+                nmsItem.setTag(tag);
+                return CraftItemStack.asBukkitCopy(nmsItem);
+            }
+        }
+        return stack;
+    }
+
     public static String getDescription(ItemStack stack, int index) {
         if (stack != null) {
             if (stack.hasItemMeta()) {

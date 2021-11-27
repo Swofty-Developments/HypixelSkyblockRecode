@@ -11,6 +11,7 @@ import net.atlas.SkyblockSandbox.customMining.BreakListener;
 import net.atlas.SkyblockSandbox.customMining.MineUtil;
 import net.atlas.SkyblockSandbox.database.mongo.MongoAH;
 import net.atlas.SkyblockSandbox.database.mongo.MongoCoins;
+import net.atlas.SkyblockSandbox.database.mongo.MongoHypixelItems;
 import net.atlas.SkyblockSandbox.database.sql.MySQL;
 import net.atlas.SkyblockSandbox.economy.Coins;
 import net.atlas.SkyblockSandbox.entity.SkyblockEntity;
@@ -31,6 +32,7 @@ import net.atlas.SkyblockSandbox.item.ability.itemAbilities.HellShatter;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.ShortBowTerm;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.SoulCry;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.WitherImpact;
+import net.atlas.SkyblockSandbox.item.enchant.Enchantment;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
@@ -101,6 +103,7 @@ public class SBX extends JavaPlugin {
     private static MongoCoins mongoStats;
     private MongoIslands mongoIslands;
     public MongoStorage mongoStorage;
+    public MongoHypixelItems hypixelItems;
     public Coins coins;
     private static ProtocolManager protocolManager;
 
@@ -113,10 +116,12 @@ public class SBX extends JavaPlugin {
         instance = this;
         mongoStorage = new MongoStorage();
         mongoIslands = new MongoIslands();
+        hypixelItems = new MongoHypixelItems();
         framework = new SkyblockCommandFramework(this);
         createDataFiles();
         mongoStats = new MongoCoins();
         mongoStats.connect();
+        hypixelItems.connect();
         protocolManager = ProtocolLibrary.getProtocolManager();
         /*MongoAH mongoAH = new MongoAH();
         mongoAH.connect();
@@ -151,18 +156,26 @@ public class SBX extends JavaPlugin {
         registerListeners();
         registerCommands();
         createIslandWorld();
-        githubItems();
-
         startOnlineRunnables();
         createDataFiles();
 
         MineUtil.setupPacketListeners();
 
-
-        //registerEntity("Enderman", 58, EntityZombie.class, NoTeleportEnderman.class);
         SkyblockEntity.registerEntities();
         getServer().getMessenger().registerOutgoingPluginChannel(this, MESSAGE_CHANNEL);
         loadSpawners();
+
+        for (int i = 0; i < Enchantment.values().length; i++) {
+            for (Enchantment enchant : Enchantment.values()) {
+                if (i == enchant.getIndex()) {
+                    Enchantment.sortedEnchants.add(enchant);
+                }
+            }
+        }
+
+        for (Enchantment enchant : Enchantment.sortedEnchants) {
+            Bukkit.getLogger().info(enchant.getName());
+        }
     }
 
     @Override
@@ -402,9 +415,10 @@ public class SBX extends JavaPlugin {
         SpawnersFile file = new SpawnersFile();
 
         for (String s : file.a().getConfigurationSection("spawners").getKeys(false)) {
-            Spawner spawner = new DefaultSpawnerObject().setSpawnerLocation(
-                    new Location(Bukkit.getWorld(file.a().getString("spawners." + s + ".location.world")), file.a().getDouble("spawners." + s + ".location.x"), file.a().getDouble("spawners." + s + ".location.y"), file.a().getDouble("spawners." + s + ".location.z"))
-            ).setSpawnerType(Enums.getIfPresent(EntityType.class, file.a().getString("spawners." + s + ".entity.type")).get()
+            Location loc = new Location(Bukkit.getWorld(file.a().getString("spawners." + s + ".location.world")), file.a().getDouble("spawners." + s + ".location.x"), file.a().getDouble("spawners." + s + ".location.y"), file.a().getDouble("spawners." + s + ".location.z"));
+            System.out.println(loc.getWorld().getName());
+            loc.setWorld(getServer().getWorld(file.a().getString("spawners." + s + ".location.world")));
+            Spawner spawner = new DefaultSpawnerObject().setSpawnerLocation(loc).setSpawnerType(Enums.getIfPresent(EntityType.class, file.a().getString("spawners." + s + ".entity.type")).get()
             ).setDisplayname(file.a().getString("spawners." + s + ".entity.name")
             ).setHealth(file.a().getInt("spawners." + s + ".entity.health")
             ).setSpawnDelay(file.a().getInt("spawners." + s + ".properties.delay")
@@ -416,54 +430,6 @@ public class SBX extends JavaPlugin {
 
         for (Spawner s : spawners) {
             s.start();
-        }
-    }
-
-    private void githubItems() {
-        try {
-            JSONObject hypixelJSON = SUtil.readJsonObjFromUrl("https://api.hypixel.net/resources/skyblock/items");
-            if (!hypixelJSON.getBoolean("success")) return;
-            JSONArray jsonItems = hypixelJSON.getJSONArray("items");
-            int count = -1;
-            for (Object doc : jsonItems) {
-                JSONObject json = (JSONObject) doc;
-                SBItemBuilder item = new SBItemBuilder();
-                try {
-                    item.name(json.has("name") ? json.getString("name") : "Null")
-                            .rarity(Rarity.valueOf(json.has("tier") ? json.getString("tier") : Rarity.COMMON.name()))
-                            .material(Material.valueOf(json.getString("material")))
-                            .type(ItemType.typeFromString(json.has("category") ? json.getString("category") : null))
-                            .id(json.getString("id"))
-                            .stackable(!json.has("unstackable"));
-                    if (json.has("stats")) {
-                        JSONObject statsJSON = json.getJSONObject("stats");
-                        statsJSON.toMap().forEach((key, value) -> {
-                            item.stat(SBPlayer.PlayerStat.getStat(key), Double.parseDouble(String.valueOf(value)));
-                        });
-                    }
-                    if (json.has("color")) {
-                        item.color(json.getString("color"));
-                    }
-                    if(json.has("skin")) {
-                        item.texture(json.getString("skin"));
-                    }
-                    if (json.has("description")) {
-                        for (String line : StackUtils.stringToLore(json.getString("description"), 43, ChatColor.GRAY)) {
-                            item.addDescriptionLine(HypixelColorCodes.translateHypixelColorCodes(line));
-                        }
-                    }
-                    hypixelItemMap.put(json.getString("id"), item.build());
-                } catch (JSONException | NullPointerException e) {
-                    count++;
-                    if(count >= 20) {
-                        return;
-                    }
-                    e.printStackTrace();
-                    System.out.println(json);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }

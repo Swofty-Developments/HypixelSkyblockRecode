@@ -25,7 +25,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.davidmoten.text.utils.WordWrap;
 
 import java.util.List;
 import java.util.Objects;
@@ -152,7 +151,7 @@ public class StatsEditorGUI extends NormalGUI implements Backable {
                 }
             }.runTaskLater(SBX.getInstance(), 1);
         });
-        gui.withLines("", "^^^^^^^^^^^^^^^", WordWrap.from(stat.getDisplayName()).maxWidth(15).insertHyphens(false).newLine("\n").wrap().replace("_", " "), "Stat");
+        gui.withLines("", "^^^^^^^^^^^^^^^", stat.getDisplayName(), "Stat");
         player.closeInventory();
         gui.open(player);
         return gui;

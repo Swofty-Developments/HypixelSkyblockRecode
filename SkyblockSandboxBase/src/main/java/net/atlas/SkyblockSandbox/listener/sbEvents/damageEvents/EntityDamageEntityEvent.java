@@ -62,6 +62,16 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
             }
 
         }
+        if (damager instanceof Arrow) {
+            if (((Arrow) damager).getShooter() instanceof Player) {
+                if (damagee instanceof Player) {
+                    if (!SBX.pvpEnabled) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+            }
+        }
         if (damager instanceof Player) {
             event.setCancelled(true);
             SBPlayer p = new SBPlayer(((Player) damager));
@@ -129,6 +139,9 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                 SBPlayer p = new SBPlayer((Player) arrow.getShooter());
                 p.playSound(p.getLocation(), Sound.SUCCESSFUL_HIT, 1, 1);
                 if (damagee instanceof LivingEntity) {
+                    if (damagee instanceof Player) {
+                        return;
+                    }
                     LivingEntity en = (LivingEntity) damagee;
                     event.setCancelled(true);
                     en.setMaximumNoDamageTicks(0);

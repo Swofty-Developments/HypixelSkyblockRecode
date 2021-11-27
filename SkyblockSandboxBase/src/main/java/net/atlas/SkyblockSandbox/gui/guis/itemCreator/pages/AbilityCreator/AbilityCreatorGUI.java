@@ -151,6 +151,7 @@ public class AbilityCreatorGUI extends NormalGUI implements Backable {
         });
         if (NBTUtil.getString(getOwner().getItemInHand(), "non-legacy").equals("true")) {
             setAction(30, event -> {
+                if (!AbilityUtil.getAbilityData(player.getItemInHand(), index, AbilityValue.NAME).equals(""))
                 new SetAbilityDescriptionMenu(getOwner(), index).open();
             });
         }

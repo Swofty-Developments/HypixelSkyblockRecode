@@ -15,12 +15,16 @@ import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.NumUtils;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import net.atlas.SkyblockSandbox.util.StackUtils;
+import net.atlas.SkyblockSandbox.util.signGUI.SignCompleteEvent;
 import net.atlas.SkyblockSandbox.util.signGUI.SignGUI;
 import net.kyori.adventure.text.Component;
+import net.minecraft.server.v1_8_R3.IChatBaseComponent;
+import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -79,7 +83,6 @@ public class EnchantGUI extends PaginatedGUI implements Backable {
                     event.setCancelled(true);
                     return;
                 }
-
                 new SignGUI(SBX.getInstance().signManager, event1 -> {
                     String input = event1.getLines()[0];
                     if (!input.equals("")) {
@@ -120,56 +123,87 @@ public class EnchantGUI extends PaginatedGUI implements Backable {
             }
             default:
                 if (!(NBTUtil.getGenericString(event.getCurrentItem(), "type").equals("") || NBTUtil.getGenericString(event.getCurrentItem(), "type") == null)) {
+                    if (event.isRightClick()) {
+                        Enchantment enchant = Enchantment.valueOf(NBTUtil.getGenericString(event.getCurrentItem(), "type"));
+                        SBPlayer player = getOwner();
+                        SBItemBuilder item = new SBItemBuilder(player.getItemInHand());
+                        player.setItemInHand(item.removeEnchantment(enchant).build());
+                        break;
+                    }
                     Enchantment enchant = Enchantment.valueOf(NBTUtil.getGenericString(event.getCurrentItem(), "type"));
-                    new AnvilGUI(p.getPlayer(), event1 -> {
-                        if (event1.getSlot().equals(AnvilGUI.AnvilSlot.OUTPUT)) {
-                            String input = event1.getName();
-                            SBItemBuilder item = new SBItemBuilder(p.getItemInHand());
-                            if (NumUtils.isInt(input)) {
-                                int lvl = Integer.parseInt(input);
-                                if (lvl > enchant.getMaxLvl()) {
-                                    p.sendMessage("&cThe max level for the enchant &9" + enchant.getName() + "&c is " + enchant.getMaxLvl() + "&c!");
-                                } else {
-                                    boolean isType = false;
-                                    if (enchant.getItemType() == null) {
-                                        for (ItemType type : enchant.getItemTypes()) {
-                                            if (type.equals(item.type)) {
-                                                isType = true;
-                                                break;
-                                            }
-                                        }
-                                    } else {
-                                        if (enchant.getItemType().getList().isEmpty()) {
-                                            if (enchant.getItemType().equals(item.type)) isType = true;
-                                        } else {
-                                            for (String type : enchant.getItemType().getList()) {
-                                                if (ItemType.valueOf(type).equals(item.type)) {
-                                                    isType = true;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    if (isType) {
-                                        item.putEnchantment(enchant, Integer.parseInt(input));
-                                    } else {
-                                        p.sendMessage("&cThe enchant &9" + enchant.getName() + "&c doesn't support your item type &e" + item.type.getValue() + "&c!");
+                    SBPlayer player = getOwner();
+                    SBItemBuilder item = new SBItemBuilder(player.getItemInHand());
+                    SignGUI gui = new SignGUI(SBX.getInstance().signManager, event1 -> {
+                        if (!NumUtils.isInt(event1.getLines()[0])) {
+                            invalidNumberError(event1, player);
+                            return;
+                        }
+                        if (Integer.parseInt(event1.getLines()[0]) > enchant.getMaxLvl()) {
+                            p.sendMessage("&cThe max level for the enchant &9" + enchant.getName() + "&c is " + enchant.getMaxLvl() + "&c!");
+                            player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 0);
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    new EnchantGUI(getOwner()).open();
+                                }
+                            }.runTaskLater(SBX.getInstance(), 1);
+                            return;
+                        }
+                        if (NumUtils.isInt(event1.getLines()[0]) && event1.getLines()[0] != null) {
+                            boolean isType = false;
+                            if (enchant.getItemType() == null) {
+                                for (ItemType type : enchant.getItemTypes()) {
+                                    if (type.equals(item.type)) {
+                                        isType = true;
+                                        break;
                                     }
                                 }
-                                Bukkit.getScheduler().runTaskLaterAsynchronously(SBX.getInstance(), () -> {
-                                    p.setItemInHand(item.applyEnchants().build());
-                                    new EnchantGUI(p).open();
-                                }, 7);
                             } else {
-                                p.sendMessage("&cThat is not a valid input");
-                                new EnchantGUI(p).open();
+                                if (enchant.getItemType().getList().isEmpty()) {
+                                    if (enchant.getItemType().equals(item.type)) isType = true;
+                                } else {
+                                    for (String type : enchant.getItemType().getList()) {
+                                        if (ItemType.valueOf(type).equals(item.type)) {
+                                            isType = true;
+                                            break;
+                                        }
+                                    }
+                                }
                             }
+                            if (isType) {
+                                item.putEnchantment(enchant, Integer.parseInt(event1.getLines()[0]));
+                            } else {
+                                p.sendMessage("&cThe enchant &9" + enchant.getName() + "&c doesn't support your item type &e" + item.type.getValue() + "&c!");
+                            }
+                        } else {
+                            invalidNumberError(event1, player);
                         }
-                    }).setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, makeColorfulItem(Material.PAPER, "Enchant level", 1, 0)).open();
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                p.setItemInHand(item.applyEnchants().build());
+                                p.sendMessage("&aSuccessfully added the enchant: " + (enchant.isUltimate() ? "&b&l" : "&9") + enchant.getName() + " " + event1.getLines()[0]);
+                                new EnchantGUI(getOwner()).open();
+                            }
+                        }.runTaskLater(SBX.getInstance(), 1);
+                    });
+                    gui.withLines("", "^^^^^^^^^^^^^^^", "Enchant lvl", "");
+                    player.closeInventory();
+                    gui.open(player.getPlayer());
                     break;
                 }
                 break;
         }
+    }
+
+    private void invalidNumberError(SignCompleteEvent event, Player player) {
+        IChatBaseComponent comp = IChatBaseComponent.ChatSerializer.a("{\"text\":\"§cThat's not a valid number!\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"§fYour input: §e" + event.getLines()[0] + "\"}}");
+        PacketPlayOutChat c = new PacketPlayOutChat(comp);
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(c);
+
+        player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1f, 0f);
+        player.closeInventory();
+        new EnchantGUI(getOwner()).open();
     }
 
     @Override
