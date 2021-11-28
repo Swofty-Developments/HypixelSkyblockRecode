@@ -60,16 +60,10 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
     public void callEvent(PlayerJoinEvent event) {
         SBPlayer p = new SBPlayer(event.getPlayer());
 
-        BossHall hall = new BossHall();
-        DungeonBoss db = new DungeonBoss();
+
         ShowcaseArea area = new ShowcaseArea();
         area.spawnArea(p);
-        db.setPhase(0);
-        db.setName("Necron");
-        db.setEntityType(EntityType.WITHER);
-        db.setHealth(1000000000);
-        hall.addBoss(p.getLocation(),db);
-        hall.getBossPedestal(db).showPedestal();
+
 
         Document playerDoc = SBX.getMongoStats().getPlayerDocument(p.getUniqueId());
 
