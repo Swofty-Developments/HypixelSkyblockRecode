@@ -3,7 +3,11 @@ package net.atlas.SkyblockSandbox.listener.sbEvents;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.files.CfgFile;
 import net.atlas.SkyblockSandbox.island.islands.FairySouls;
+import net.atlas.SkyblockSandbox.island.islands.bossRush.BossHall;
+import net.atlas.SkyblockSandbox.island.islands.bossRush.DungeonBoss;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.StartFight;
+import net.atlas.SkyblockSandbox.island.islands.hub.ShowcaseArea;
+import net.atlas.SkyblockSandbox.island.islands.hub.ShowcaseHandler;
 import net.atlas.SkyblockSandbox.item.ItemType;
 import net.atlas.SkyblockSandbox.item.Rarity;
 import net.atlas.SkyblockSandbox.item.SBItemBuilder;
@@ -25,11 +29,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -52,6 +59,18 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
     @EventHandler
     public void callEvent(PlayerJoinEvent event) {
         SBPlayer p = new SBPlayer(event.getPlayer());
+
+        BossHall hall = new BossHall();
+        DungeonBoss db = new DungeonBoss();
+        ShowcaseArea area = new ShowcaseArea();
+        area.spawnArea(p);
+        db.setPhase(0);
+        db.setName("Necron");
+        db.setEntityType(EntityType.WITHER);
+        db.setHealth(1000000000);
+        hall.addBoss(p.getLocation(),db);
+        hall.getBossPedestal(db).showPedestal();
+
         Document playerDoc = SBX.getMongoStats().getPlayerDocument(p.getUniqueId());
 
         if (StartFight.fightActive) {
@@ -75,7 +94,9 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
             //remove clientside mining fatigue
             p.removePotionEffect(PotionEffectType.SLOW_DIGGING);
         } else {
-            p.teleport(new Location(Bukkit.getWorld("Hypixel"), -2.5, 70, -70.5));
+            if(Bukkit.getWorld("Hypixel")!=null) {
+                p.teleport(new Location(Bukkit.getWorld("Hypixel"), -2.5, 70, -70.5));
+            }
 
             //clientside mining fatigue
             p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, Integer.MAX_VALUE, 255, true, false));

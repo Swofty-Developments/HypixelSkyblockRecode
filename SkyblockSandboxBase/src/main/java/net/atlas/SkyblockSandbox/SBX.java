@@ -22,8 +22,13 @@ import net.atlas.SkyblockSandbox.event.customEvents.SkillEXPGainEvent;
 import net.atlas.SkyblockSandbox.files.CfgFile;
 import net.atlas.SkyblockSandbox.files.DatabaseInformationFile;
 import net.atlas.SkyblockSandbox.files.IslandInfoFile;
+import net.atlas.SkyblockSandbox.gui.guis.ShowcaseGUI;
+import net.atlas.SkyblockSandbox.island.islands.bossRush.BossHall;
+import net.atlas.SkyblockSandbox.island.islands.bossRush.DungeonBoss;
+import net.atlas.SkyblockSandbox.island.islands.bossRush.components.NecronBoss;
 import net.atlas.SkyblockSandbox.files.SpawnersFile;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.LootListener;
+import net.atlas.SkyblockSandbox.island.islands.hub.ShowcaseHandler;
 import net.atlas.SkyblockSandbox.item.ItemType;
 import net.atlas.SkyblockSandbox.item.Rarity;
 import net.atlas.SkyblockSandbox.item.SBItemBuilder;
@@ -41,6 +46,7 @@ import net.atlas.SkyblockSandbox.playerIsland.MongoIslands;
 import net.atlas.SkyblockSandbox.slayer.SlayerTier;
 import net.atlas.SkyblockSandbox.slayer.Slayers;
 import net.atlas.SkyblockSandbox.storage.MongoStorage;
+import net.atlas.SkyblockSandbox.util.Hologram;
 import net.atlas.SkyblockSandbox.util.HypixelColorCodes;
 import net.atlas.SkyblockSandbox.util.NumberTruncation.NumberSuffix;
 import net.atlas.SkyblockSandbox.util.SUtil;
@@ -54,6 +60,9 @@ import org.bukkit.*;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.*;
+import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
@@ -92,7 +101,7 @@ public class SBX extends JavaPlugin {
     public static HashMap<Player, Boolean> canfire = new HashMap<>();
     public static HashMap<Player, List<EntityArmorStand>> thrownAxes = new HashMap<>();
     public static final TreeMap<String, ItemStack> hypixelItemMap = new TreeMap<>();
-    public static HashMap<UUID,Document> cachedPets = new HashMap<>();
+    public static HashMap<UUID, Document> cachedPets = new HashMap<>();
     public static boolean pvpEnabled;
     public MySQL sql;
     public SignManager signManager;
@@ -123,6 +132,7 @@ public class SBX extends JavaPlugin {
         mongoStats.connect();
         hypixelItems.connect();
         protocolManager = ProtocolLibrary.getProtocolManager();
+        new ShowcaseHandler();
         /*MongoAH mongoAH = new MongoAH();
         mongoAH.connect();
         long time = System.currentTimeMillis();
@@ -162,6 +172,7 @@ public class SBX extends JavaPlugin {
         MineUtil.setupPacketListeners();
 
         SkyblockEntity.registerEntities();
+        DungeonBoss.registerEntity("Wither",64,EntityWither.class, NecronBoss.class);
         getServer().getMessenger().registerOutgoingPluginChannel(this, MESSAGE_CHANNEL);
         loadSpawners();
 
@@ -194,19 +205,19 @@ public class SBX extends JavaPlugin {
             Document skillDoc = (Document) playerDoc.get("Skills");
             for (SkillType type : cachedSkills.get(uid).keySet()) {
                 double amt = cachedSkills.get(uid).get(type);
-                skillDoc.put(type.getName() + "_xp",amt);
+                skillDoc.put(type.getName() + "_xp", amt);
             }
             for (SkillType type : cachedSkillLvls.get(uid).keySet()) {
                 int amt = cachedSkillLvls.get(uid).get(type);
-                skillDoc.put(type.getName() + "_lvl",amt);
+                skillDoc.put(type.getName() + "_lvl", amt);
             }
-            SBX.getMongoStats().setData(uid,"Skills",skillDoc);
+            SBX.getMongoStats().setData(uid, "Skills", skillDoc);
         }
     }
 
     public static void cachePets() {
         for (UUID uid : cachedPets.keySet()) {
-            getMongoStats().setData(uid,"pets",cachedPets.get(uid));
+            getMongoStats().setData(uid, "pets", cachedPets.get(uid));
         }
     }
 
@@ -219,7 +230,9 @@ public class SBX extends JavaPlugin {
         pm.registerEvents(new AbiltyListener(new WitherImpact()), this);
         pm.registerEvents(new AbiltyListener(new ShortBowTerm()), this);
         pm.registerEvents(new LootListener(), this);
-        pm.registerEvents(new BreakListener(),this);
+        pm.registerEvents(new BreakListener(), this);
+
+
     }
 
     void registerCommands() {
@@ -253,7 +266,7 @@ public class SBX extends JavaPlugin {
             public void run() {
                 for (Document doc : new MongoAH().getAllDocuments()) {
                     AuctionItemHandler item = AuctionItemHandler.mongoToCache(UUID.fromString(doc.getString("auctionID")));
-                    if(AuctionItemHandler.time(item.getEndTime(), item.getStartTime()).equals("")) {
+                    if (AuctionItemHandler.time(item.getEndTime(), item.getStartTime()).equals("")) {
                         item.setHasEnded(true);
                         mongo.setData(item.getAuctionID(), "isClaimed", false);
                         item.setClaimed(false);
@@ -266,9 +279,42 @@ public class SBX extends JavaPlugin {
         }.runTaskTimerAsynchronously(this, 0, 100);
         updateAH.cancel();
 
+        HashMap<BossHall.BossPedestal, Hologram> bossStandList = new HashMap<>();
         BukkitTask runnable = new BukkitRunnable() {
             @Override
             public void run() {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    for (BossHall.BossPedestal bp : new ArrayList<>(BossHall.bossList)) {
+                        Entity en = bp.getBoss().getSpawnedEn();
+                        if(en.isDead()) {
+                            BossHall.bossList.remove(bp);
+                        } else {
+                            Location eye = p.getEyeLocation();
+                            Vector toEntity = en.getLocation().add(0, 2, 0).toVector().subtract(eye.toVector());
+                            double dot = toEntity.normalize().dot(eye.getDirection());
+                            if (dot > 0.99D) {
+                                Location spawnLoc = en.getLocation().add(toEntity.multiply(-1).normalize());
+                                Hologram hg;
+                                if (!bossStandList.containsKey(bp)) {
+                                    hg = new Hologram(spawnLoc);
+                                    hg.addLine("&7Requires Boss Rush 6 Completion");
+                                    hg.addLine("");
+                                    hg.addLine("&eRight Click to fight!");
+                                    hg.addLine("&c&l" + en.getCustomName());
+                                    bossStandList.put(bp, hg);
+                                } else {
+                                    hg = bossStandList.get(bp);
+                                }
+                                hg.displayHolo(p);
+                            } else {
+                                if (bossStandList.containsKey(bp)) {
+                                    bossStandList.get(bp).removeHolo(p);
+                                }
+                            }
+                        }
+                    }
+
+                }
                 if (!holoMap2.isEmpty()) {
                     HashMap<Integer, HashMap<Entity, EntityArmorStand>> holoMapClone = new HashMap<>(holoMap2);
                     for (int x : holoMapClone.keySet()) {
@@ -409,6 +455,53 @@ public class SBX extends JavaPlugin {
         return blacklisted;
     }
 
+    private void githubItems() {
+        try {
+            JSONObject hypixelJSON = SUtil.readJsonObjFromUrl("https://api.hypixel.net/resources/skyblock/items");
+            if (!hypixelJSON.getBoolean("success")) return;
+            JSONArray jsonItems = hypixelJSON.getJSONArray("items");
+            int count = -1;
+            for (Object doc : jsonItems) {
+                JSONObject json = (JSONObject) doc;
+                SBItemBuilder item = new SBItemBuilder();
+                try {
+                    item.name(json.has("name") ? json.getString("name") : "Null")
+                            .rarity(Rarity.valueOf(json.has("tier") ? json.getString("tier") : Rarity.COMMON.name()))
+                            .material(Material.valueOf(json.getString("material")))
+                            .type(ItemType.typeFromString(json.has("category") ? json.getString("category") : null))
+                            .id(json.getString("id"))
+                            .stackable(!json.has("unstackable"));
+                    if (json.has("stats")) {
+                        JSONObject statsJSON = json.getJSONObject("stats");
+                        statsJSON.toMap().forEach((key, value) -> {
+                            item.stat(SBPlayer.PlayerStat.getStat(key), Double.parseDouble(String.valueOf(value)));
+                        });
+                    }
+                    if (json.has("color")) {
+                        item.color(json.getString("color"));
+                    }
+                    if (json.has("skin")) {
+                        item.texture(json.getString("skin"));
+                    }
+                    if (json.has("description")) {
+                        for (String line : StackUtils.stringToLore(json.getString("description"), 43, ChatColor.GRAY)) {
+                            item.addDescriptionLine(HypixelColorCodes.translateHypixelColorCodes(line));
+                        }
+                    }
+                    hypixelItemMap.put(json.getString("id"), item.build());
+                } catch (JSONException | NullPointerException e) {
+                    count++;
+                    if (count >= 20) {
+                        return;
+                    }
+                    e.printStackTrace();
+                    System.out.println(json);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     private void loadSpawners() {
         spawners = new ArrayList<>();
 
