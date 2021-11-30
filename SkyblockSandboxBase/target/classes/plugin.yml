@@ -1,7 +1,0 @@
-  name: SkyblockSandboxBase
-  main: net.atlas.SkyblockSandbox.SBX
-  version: 0.1
-  api-version: "1.8"
-  authors: [Vespertilo, Ender, Maploop]
-  softdepend:
-    - PlaceholderAPI
