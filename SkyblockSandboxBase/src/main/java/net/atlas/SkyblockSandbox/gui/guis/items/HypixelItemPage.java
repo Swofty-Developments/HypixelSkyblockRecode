@@ -6,6 +6,7 @@ import net.atlas.SkyblockSandbox.gui.AnvilGUI;
 import net.atlas.SkyblockSandbox.gui.PaginatedGUI;
 import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.auto.EnchantGUI;
 import net.atlas.SkyblockSandbox.item.ItemType;
+import net.atlas.SkyblockSandbox.item.Rarity;
 import net.atlas.SkyblockSandbox.item.SBItemBuilder;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
@@ -111,7 +112,7 @@ public class HypixelItemPage extends PaginatedGUI {
                         selectedType.put(getOwner().getUniqueId(), types.get(types.indexOf(selectedType.get(getOwner().getUniqueId())) + 1));
                     }
                 }
-                new EnchantGUI(getOwner()).open();
+                new HypixelItemPage(getOwner()).open();
                 break;
             }
             case 53:
@@ -124,7 +125,10 @@ public class HypixelItemPage extends PaginatedGUI {
             default:
                 if(event.getCurrentItem().getItemMeta().getDisplayName().equals(colorize("&7 "))) return;
                 if (p.hasSpace()) {
-                    p.getInventory().addItem(event.getCurrentItem());
+                    ItemStack item1 = event.getCurrentItem();
+                    SBItemBuilder item = new SBItemBuilder(item1.clone());
+                    item.sign(null);
+                    p.getInventory().addItem(item.build());
                     p.playSound(p.getLocation(), Sound.NOTE_PLING, 1f, 2f);
                 }
                 break;
@@ -165,7 +169,7 @@ public class HypixelItemPage extends PaginatedGUI {
         }
         setItem(45, prev);
         ArrayList<String> lore = new ArrayList<>();
-        lore.add("&7Filter through enchant categories");
+        lore.add("&7Filter through item categories");
         lore.add("");
         for (ItemType type : types) {
             if (selectedType.get(getOwner().getUniqueId()) == type) {
@@ -177,16 +181,26 @@ public class HypixelItemPage extends PaginatedGUI {
         lore.add("");
         lore.add("&bRight-Click to go backwards!");
         lore.add("&eClick to switch categories!");
-        setItem(51, makeColorfulItem(Material.GOLD_BLOCK, "&bEnchant Categories", 1, 0, lore));
+        setItem(51, makeColorfulItem(Material.GOLD_BLOCK, "&bItem Categories", 1, 0, lore));
         for(SBItemBuilder item : items(getOwner())) {
             getGui().addItem(ItemBuilder.from(item.build()).asGuiItem());
         }
     }
 
-    private Collection<SBItemBuilder> items(SBPlayer player) {
-        Collection<SBItemBuilder> items = HypixelItemsHelper.hypixelItems;
-        for (SBItemBuilder item : items) {
+    private ArrayList<SBItemBuilder> items(SBPlayer player) {
+        ArrayList<SBItemBuilder> items = new ArrayList<>();
+        for (SBItemBuilder item : HypixelItemsHelper.hypixelItems) {
             if (selectedType.get(player.getUniqueId()) == ItemType.CUSTOM) {
+                items.add(item);
+            }
+            if (selectedType.get(player.getUniqueId()) == ItemType.ARMOR) {
+                for (ItemType type : Arrays.asList(ItemType.BOOTS, ItemType.LEGGINGS, ItemType.CHESTPLATE, ItemType.HELMET)) {
+                    if (item.type == type) {
+                        items.add(item);
+                    }
+                }
+            }
+            if (selectedType.get(player.getUniqueId()) == item.type) {
                 items.add(item);
             }
         }

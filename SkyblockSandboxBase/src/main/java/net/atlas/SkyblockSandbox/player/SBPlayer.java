@@ -418,28 +418,28 @@ public class SBPlayer extends PluginPlayer {
     }
 
     public enum PlayerStat {
-        HEALTH("&a", "Health", 100, true, makeColorfulItem(Material.GOLDEN_APPLE, "&cHealth", 1, 0, "")),
-        DEFENSE("&a", "Defense", 0, false, makeColorfulItem(Material.IRON_CHESTPLATE, "&aDefense", 1, 0, "")),
-        STRENGTH("Strength", 0, false, makeColorfulItem(Material.BLAZE_POWDER, "&cStrength", 1, 0, "")),
-        SPEED("&a", "Speed", 100, false, makeColorfulItem(Material.SUGAR, "&rSpeed", 1, 0, ""), new String[]{"WALK_SPEED"}),
-        CRIT_CHANCE("Crit_Chance", 30, false, 100, makeColorfulSkullItem("&9Crit Chance", "http://textures.minecraft.net/texture/3e4f49535a276aacc4dc84133bfe81be5f2a4799a4c04d9a4ddb72d819ec2b2b", 1, ""), new String[]{"CRITICAL_CHANCE"}),
-        CRIT_DAMAGE("Crit_Damage", 50, false, makeColorfulSkullItem("&9Crit Damage", "http://textures.minecraft.net/texture/ddafb23efc57f251878e5328d11cb0eef87b79c87b254a7ec72296f9363ef7c", 1, ""), new String[]{"CRITICAL_DAMAGE"}),
-        INTELLIGENCE("&a", "Intelligence", 100, true, makeColorfulItem(Material.ENCHANTED_BOOK, "&bIntelligence", 1, 0, "")),
-        MINING_SPEED("&a", "Mining_Speed", 0, false, makeColorfulItem(Material.DIAMOND_PICKAXE, "&6Mining Speed", 1, 0, "")),
-        ATTACK_SPEED("Attack_Speed", 0, false, 100, makeColorfulItem(Material.GOLD_AXE, "&eAttack Speed", 1, 0, "")),
-        SEA_CREATURE_CHANCE("Sea_Creature_Chance", 0, false, makeColorfulItem(Material.PRISMARINE_CRYSTALS, "&3Sea Creature Chance", 1, 0, "")),
-        MAGIC_FIND("Magic_Find", 0, false, makeColorfulItem(Material.STICK, "&bMagic Find", 1, 0, "")),
-        PET_LUCK("Pet_Luck", 0, false, makeColorfulSkullItem("&dPet Luck", "http://textures.minecraft.net/texture/93c8aa3fde295fa9f9c27f734bdbab11d33a2e43e855accd7465352377413b", 1, "")),
-        TRUE_DEFENSE("True_Defense", 0, false, makeColorfulItem(Material.INK_SACK, "&rTrue Defense", 1, 15, "")),
-        FEROCITY("&a", "Ferocity", 0, false, makeColorfulItem(Material.INK_SACK, "&cFerocity", 1, 1, "")),
-        ABILITY_DAMAGE("Ability_Damage", 0, false, makeColorfulItem(Material.BEACON, "&cAbility Damage", 1, 0, ""), new String[]{"ABILITY_DAMAGE_PERCENT", "WEAPON_ABILITY_DAMAGE"}),
-        MINING_FORTUNE("&a", "Mining_Fortune", 0, false, makeColorfulSkullItem("&6Mining Fortune", "http://textures.minecraft.net/texture/f07dff657d61f302c7d2e725265d17b64aa73642391964fb48fc15be950831d8", 1, "")),
-        FARMING_FORTUNE("&a", "Farming_Fortune", 0, false, makeColorfulSkullItem("&6Farming Fortune", "http://textures.minecraft.net/texture/2ab879e1e590041146bc78c018af5877d39e5475eb7db368fcaf2acda373833d", 1, "")),
-        FORAGING_FORTUNE("&a", "Foraging_Fortune", 0, false, makeColorfulSkullItem("&6Foraging Fortune", "http://textures.minecraft.net/texture/4f960c639d4004d1882575aeba69f456fb3c744077935714947e19c1306d2733", 1, "")),
-        PRISTINE("Pristine", 0, false, makeColorfulSkullItem("&5Pristine", "http://textures.minecraft.net/texture/db6975af70724d6a44fd5946e60b2717737dfdb545b4dab1893351a9c9dd183c", 1, "")),
-        DAMAGE("Damage", 0, false, makeColorfulItem(Material.IRON_SWORD, "&cDamage", 1, 0, "")),
-        GEAR_SCORE("&d", "Gear_Score", 0, false, makeColorfulItem(Material.INK_SACK, "&dGear Score", 1, 0, "")),
-        BREAKING_POWER("Breaking_Power", 0, false, makeColorfulItem(Material.IRON_PICKAXE, "&7Breaking Power", 1, 0, ""));
+        HEALTH("&a", "Health", 100, true, "", makeColorfulItem(Material.GOLDEN_APPLE, "&cHealth", 1, 0, "")),
+        DEFENSE("&a", "Defense", 0, false, "", makeColorfulItem(Material.IRON_CHESTPLATE, "&aDefense", 1, 0, "")),
+        STRENGTH("Strength", 0, false, "", makeColorfulItem(Material.BLAZE_POWDER, "&cStrength", 1, 0, "")),
+        SPEED("&a", "Speed", 100, false, "", makeColorfulItem(Material.SUGAR, "&rSpeed", 1, 0, ""), new String[]{"WALK_SPEED"}),
+        CRIT_CHANCE("Crit_Chance", 30, false, "%", 100, makeColorfulSkullItem("&9Crit Chance", "http://textures.minecraft.net/texture/3e4f49535a276aacc4dc84133bfe81be5f2a4799a4c04d9a4ddb72d819ec2b2b", 1, ""), new String[]{"CRITICAL_CHANCE"}),
+        CRIT_DAMAGE("Crit_Damage", 50, false, "%", makeColorfulSkullItem("&9Crit Damage", "http://textures.minecraft.net/texture/ddafb23efc57f251878e5328d11cb0eef87b79c87b254a7ec72296f9363ef7c", 1, ""), new String[]{"CRITICAL_DAMAGE"}),
+        INTELLIGENCE("&a", "Intelligence", 100, true, "", makeColorfulItem(Material.ENCHANTED_BOOK, "&bIntelligence", 1, 0, "")),
+        MINING_SPEED("&a", "Mining_Speed", 0, false, "", makeColorfulItem(Material.DIAMOND_PICKAXE, "&6Mining Speed", 1, 0, "")),
+        ATTACK_SPEED("Attack_Speed", 0, false, "%", 100, makeColorfulItem(Material.GOLD_AXE, "&eAttack Speed", 1, 0, "")),
+        SEA_CREATURE_CHANCE("Sea_Creature_Chance", 0, false, "", makeColorfulItem(Material.PRISMARINE_CRYSTALS, "&3Sea Creature Chance", 1, 0, "")),
+        MAGIC_FIND("Magic_Find", 0, false, "", makeColorfulItem(Material.STICK, "&bMagic Find", 1, 0, "")),
+        PET_LUCK("Pet_Luck", 0, false, "", makeColorfulSkullItem("&dPet Luck", "http://textures.minecraft.net/texture/93c8aa3fde295fa9f9c27f734bdbab11d33a2e43e855accd7465352377413b", 1, "")),
+        TRUE_DEFENSE("True_Defense", 0, false, "", makeColorfulItem(Material.INK_SACK, "&rTrue Defense", 1, 15, "")),
+        FEROCITY("&a", "Ferocity", 0, false, "", makeColorfulItem(Material.INK_SACK, "&cFerocity", 1, 1, "")),
+        ABILITY_DAMAGE("Ability_Damage", 0, false, "", makeColorfulItem(Material.BEACON, "&cAbility Damage", 1, 0, ""), new String[]{"ABILITY_DAMAGE_PERCENT", "WEAPON_ABILITY_DAMAGE"}),
+        MINING_FORTUNE("&a", "Mining_Fortune", 0, false, "", makeColorfulSkullItem("&6Mining Fortune", "http://textures.minecraft.net/texture/f07dff657d61f302c7d2e725265d17b64aa73642391964fb48fc15be950831d8", 1, "")),
+        FARMING_FORTUNE("&a", "Farming_Fortune", 0, false, "", makeColorfulSkullItem("&6Farming Fortune", "http://textures.minecraft.net/texture/2ab879e1e590041146bc78c018af5877d39e5475eb7db368fcaf2acda373833d", 1, "")),
+        FORAGING_FORTUNE("&a", "Foraging_Fortune", 0, false, "", makeColorfulSkullItem("&6Foraging Fortune", "http://textures.minecraft.net/texture/4f960c639d4004d1882575aeba69f456fb3c744077935714947e19c1306d2733", 1, "")),
+        PRISTINE("Pristine", 0, false, "", makeColorfulSkullItem("&5Pristine", "http://textures.minecraft.net/texture/db6975af70724d6a44fd5946e60b2717737dfdb545b4dab1893351a9c9dd183c", 1, "")),
+        DAMAGE("Damage", 0, false, "", makeColorfulItem(Material.IRON_SWORD, "&cDamage", 1, 0, "")),
+        GEAR_SCORE("&d", "Gear_Score", 0, false, "", makeColorfulItem(Material.INK_SACK, "&dGear Score", 1, 0, "")),
+        BREAKING_POWER("Breaking_Power", 0, false, "", makeColorfulItem(Material.IRON_PICKAXE, "&7Breaking Power", 1, 0, ""));
 
 
         private String name;
@@ -449,77 +449,86 @@ public class SBPlayer extends PluginPlayer {
         private String color;
         private int max;
         private String[] alias;
+        private String suffix;
 
-        PlayerStat(String color, String name, double base, boolean isRegen, int max, ItemStack stack) {
+        PlayerStat(String color, String name, double base, boolean isRegen, String suffix, int max, ItemStack stack) {
             this.name = name;
             this.base = base;
             this.isRegen = isRegen;
             this.stack = stack;
             this.color = color;
             this.max = max;
+            this.suffix = suffix;
         }
-        PlayerStat(String color, String name, double base, boolean isRegen, int max, ItemStack stack, String[] alias) {
-            this.name = name;
-            this.base = base;
-            this.isRegen = isRegen;
-            this.stack = stack;
-            this.color = color;
-            this.alias = alias;
-            this.max = max;
-
-        }
-
-        PlayerStat(String name, double base, boolean isRegen, int max, ItemStack stack) {
-            this.name = name;
-            this.base = base;
-            this.isRegen = isRegen;
-            this.stack = stack;
-            this.color = "&c";
-            this.max = max;
-
-        }
-
-        PlayerStat(String name, double base, boolean isRegen, int max, ItemStack stack, String[] alias) {
-            this.name = name;
-            this.base = base;
-            this.isRegen = isRegen;
-            this.stack = stack;
-            this.color = "&c";
-            this.max = max;
-            this.alias = alias;
-        }
-        PlayerStat(String color, String name, double base, boolean isRegen, ItemStack stack) {
-            this.name = name;
-            this.base = base;
-            this.isRegen = isRegen;
-            this.stack = stack;
-            this.color = color;
-            this.max = 100000;
-        }
-        PlayerStat(String color, String name, double base, boolean isRegen, ItemStack stack, String[] alias) {
+        PlayerStat(String color, String name, double base, boolean isRegen, String suffix, int max, ItemStack stack, String[] alias) {
             this.name = name;
             this.base = base;
             this.isRegen = isRegen;
             this.stack = stack;
             this.color = color;
             this.alias = alias;
-            this.max = 100000;
+            this.suffix = suffix;
+            this.max = max;
+
         }
 
-        PlayerStat(String name, double base, boolean isRegen, ItemStack stack) {
+        PlayerStat(String name, double base, boolean isRegen, String suffix, int max, ItemStack stack) {
+            this.name = name;
+            this.base = base;
+            this.isRegen = isRegen;
+            this.stack = stack;
+            this.suffix = suffix;
+            this.color = "&c";
+            this.max = max;
+
+        }
+
+        PlayerStat(String name, double base, boolean isRegen, String suffix, int max, ItemStack stack, String[] alias) {
             this.name = name;
             this.base = base;
             this.isRegen = isRegen;
             this.stack = stack;
             this.color = "&c";
-            this.max = 100000;
+            this.suffix = suffix;
+            this.max = max;
+            this.alias = alias;
         }
-
-        PlayerStat(String name, double base, boolean isRegen, ItemStack stack, String[] alias) {
+        PlayerStat(String color, String name, double base, boolean isRegen, String suffix, ItemStack stack) {
             this.name = name;
             this.base = base;
             this.isRegen = isRegen;
             this.stack = stack;
+            this.suffix = suffix;
+            this.color = color;
+            this.max = 100000;
+        }
+        PlayerStat(String color, String name, double base, boolean isRegen, String suffix, ItemStack stack, String[] alias) {
+            this.name = name;
+            this.base = base;
+            this.isRegen = isRegen;
+            this.stack = stack;
+            this.color = color;
+            this.suffix = suffix;
+            this.alias = alias;
+            this.max = 100000;
+        }
+
+        PlayerStat(String name, double base, boolean isRegen, String suffix, ItemStack stack) {
+            this.name = name;
+            this.base = base;
+            this.isRegen = isRegen;
+            this.stack = stack;
+            this.suffix = suffix;
+            this.color = "&c";
+            this.max = 100000;
+        }
+
+        PlayerStat(String name, double base, boolean isRegen, String suffix, ItemStack stack, String[] alias) {
+            this.name = name;
+            this.base = base;
+            this.isRegen = isRegen;
+            this.stack = stack;
+            this.suffix = suffix;
             this.color = "&c";
             this.alias = alias;
             this.max = 100000;
@@ -547,6 +556,10 @@ public class SBPlayer extends PluginPlayer {
 
         public int getMax() {
             return max;
+        }
+
+        public String getSuffix() {
+            return suffix;
         }
 
         public static PlayerStat getStat(String stat) {

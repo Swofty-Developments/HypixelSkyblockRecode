@@ -27,6 +27,7 @@ import net.atlas.SkyblockSandbox.island.islands.bossRush.BossHall;
 import net.atlas.SkyblockSandbox.island.islands.bossRush.DungeonBoss;
 import net.atlas.SkyblockSandbox.island.islands.bossRush.components.NecronBoss;
 import net.atlas.SkyblockSandbox.files.SpawnersFile;
+import net.atlas.SkyblockSandbox.gui.guis.items.HypixelItemsHelper;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.LootListener;
 import net.atlas.SkyblockSandbox.island.islands.hub.ShowcaseHandler;
 import net.atlas.SkyblockSandbox.item.ItemType;
@@ -46,11 +47,8 @@ import net.atlas.SkyblockSandbox.playerIsland.MongoIslands;
 import net.atlas.SkyblockSandbox.slayer.SlayerTier;
 import net.atlas.SkyblockSandbox.slayer.Slayers;
 import net.atlas.SkyblockSandbox.storage.MongoStorage;
-import net.atlas.SkyblockSandbox.util.Hologram;
-import net.atlas.SkyblockSandbox.util.HypixelColorCodes;
+import net.atlas.SkyblockSandbox.util.*;
 import net.atlas.SkyblockSandbox.util.NumberTruncation.NumberSuffix;
-import net.atlas.SkyblockSandbox.util.SUtil;
-import net.atlas.SkyblockSandbox.util.StackUtils;
 import net.atlas.SkyblockSandbox.util.signGUI.SignManager;
 import net.minecraft.server.v1_8_R3.*;
 import org.bson.Document;
@@ -175,6 +173,8 @@ public class SBX extends JavaPlugin {
         DungeonBoss.registerEntity("Wither",64,EntityWither.class, NecronBoss.class);
         getServer().getMessenger().registerOutgoingPluginChannel(this, MESSAGE_CHANNEL);
         loadSpawners();
+        HypixelItemsHelper.cacheItems();
+        new PlaceHolderAPI().register();
 
         for (int i = 0; i < Enchantment.values().length; i++) {
             for (Enchantment enchant : Enchantment.values()) {
@@ -182,10 +182,6 @@ public class SBX extends JavaPlugin {
                     Enchantment.sortedEnchants.add(enchant);
                 }
             }
-        }
-
-        for (Enchantment enchant : Enchantment.sortedEnchants) {
-            Bukkit.getLogger().info(enchant.getName());
         }
     }
 
@@ -455,54 +451,10 @@ public class SBX extends JavaPlugin {
         return blacklisted;
     }
 
-    private void githubItems() {
-        try {
-            JSONObject hypixelJSON = SUtil.readJsonObjFromUrl("https://api.hypixel.net/resources/skyblock/items");
-            if (!hypixelJSON.getBoolean("success")) return;
-            JSONArray jsonItems = hypixelJSON.getJSONArray("items");
-            int count = -1;
-            for (Object doc : jsonItems) {
-                JSONObject json = (JSONObject) doc;
-                SBItemBuilder item = new SBItemBuilder();
-                try {
-                    item.name(json.has("name") ? json.getString("name") : "Null")
-                            .rarity(Rarity.valueOf(json.has("tier") ? json.getString("tier") : Rarity.COMMON.name()))
-                            .material(Material.valueOf(json.getString("material")))
-                            .type(ItemType.typeFromString(json.has("category") ? json.getString("category") : null))
-                            .id(json.getString("id"))
-                            .stackable(!json.has("unstackable"));
-                    if (json.has("stats")) {
-                        JSONObject statsJSON = json.getJSONObject("stats");
-                        statsJSON.toMap().forEach((key, value) -> {
-                            item.stat(SBPlayer.PlayerStat.getStat(key), Double.parseDouble(String.valueOf(value)));
-                        });
-                    }
-                    if (json.has("color")) {
-                        item.color(json.getString("color"));
-                    }
-                    if (json.has("skin")) {
-                        item.texture(json.getString("skin"));
-                    }
-                    if (json.has("description")) {
-                        for (String line : StackUtils.stringToLore(json.getString("description"), 43, ChatColor.GRAY)) {
-                            item.addDescriptionLine(HypixelColorCodes.translateHypixelColorCodes(line));
-                        }
-                    }
-                    hypixelItemMap.put(json.getString("id"), item.build());
-                } catch (JSONException | NullPointerException e) {
-                    count++;
-                    if (count >= 20) {
-                        return;
-                    }
-                    e.printStackTrace();
-                    System.out.println(json);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
     private void loadSpawners() {
+        if (getServer().getServerName().equals("islands")) {
+            return;
+        }
         spawners = new ArrayList<>();
 
         SpawnersFile file = new SpawnersFile();

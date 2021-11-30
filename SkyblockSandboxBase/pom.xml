@@ -36,13 +36,15 @@
                 <version>3.2.4</version>
                 <executions>
                     <execution>
+                        <id>ex-1</id>
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <outputFile>${user.home}\Desktop\Bungee Server\Servers\hub\plugins\${project.artifactId}-${project.version}.jar
+                            <outputFile>
+                                ${user.home}\Desktop\Bungee Server\Servers\hub\plugins\${project.artifactId}-${project.version}.jar
                             </outputFile>
                         </configuration>
                     </execution>

@@ -1,6 +1,7 @@
 package net.atlas.SkyblockSandbox.item;
 
 import com.google.common.base.Enums;
+import com.google.gson.Gson;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.atlas.SkyblockSandbox.abilityCreator.Ability;
@@ -10,14 +11,15 @@ import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.NumberTruncation.RomanNumber;
 import net.atlas.SkyblockSandbox.util.SUtil;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.Material;
+import net.minecraft.server.v1_8_R3.NBTTagCompound;
+import org.bukkit.*;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.json.JSONObject;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -38,6 +40,7 @@ public class SBItemBuilder {
     public ItemType type = ItemType.ITEM;
     public String url;
     public String texture;
+    public String sign;
     public int normalstar;
     public int masterstar;
     public boolean stackable;
@@ -67,6 +70,7 @@ public class SBItemBuilder {
         reforgeable = getInteger(item, "reforgeable") == 1;
         recombobulated = getInteger(item, "recombobulated") == 1;
         color = getString(item, "color");
+        sign = getString(item, "signature");
         type = Enums.getIfPresent(ItemType.class, getString(item, "type")).orNull();
         if (getEnchants(item) != null) {
             enchants.putAll(getEnchants(item));
@@ -89,6 +93,15 @@ public class SBItemBuilder {
 
     }
 
+    public JSONObject toJson() {
+        NBTTagCompound nbt = CraftItemStack.asNMSCopy(build()).save(new NBTTagCompound());
+        System.out.println(nbt);
+        Gson gson = new Gson();
+        JSONObject json = new JSONObject(gson.toJson(nbt));
+        System.out.println(json);
+        return json;
+    }
+
     public SBItemBuilder material(Material var) {
         this.mat = var;
         return this;
@@ -106,6 +119,11 @@ public class SBItemBuilder {
 
     public SBItemBuilder color(String rgb) {
         color = rgb;
+        return this;
+    }
+
+    public SBItemBuilder sign(String p) {
+        sign = p;
         return this;
     }
 
@@ -311,9 +329,9 @@ public class SBItemBuilder {
                         s = s.replace('_', ' ');
                         if (stat != null) {
                             if (stat.equals(GEAR_SCORE)) {
-                                lore.add(ChatColor.GRAY + s + ":" + stat.getColor() + " " + Math.toIntExact((long) a));
+                                lore.add(ChatColor.GRAY + s + ":" + stat.getColor() + " " + Math.toIntExact((long) a) + stat.getSuffix());
                             } else {
-                                lore.add(ChatColor.GRAY + s + ":" + stat.getColor() + " +" + statString);
+                                lore.add(ChatColor.GRAY + s + ":" + stat.getColor() + " +" + statString + stat.getSuffix());
                             }
                         }
                     }
@@ -399,6 +417,9 @@ public class SBItemBuilder {
                 lore.add(rarity.getColor() + "" + ChatColor.BOLD + rarity.name() + " " + type.getValue());
             }
         }
+        if (sign != null) {
+            lore.add("&b&lCreated by " + Bukkit.getOfflinePlayer(UUID.fromString(sign)).getName() + "!");
+        }
         meta.setLore(SUtil.colorize(lore));
         item.setItemMeta(meta);
         item = setNBT(item);
@@ -416,6 +437,7 @@ public class SBItemBuilder {
         item = setInteger(item, normalstar, "normalStars");
         item = setInteger(item, stackable ? 1 : 0, "stackable");
         item = setInteger(item, glowing ? 1 : 0, "glowing");
+        item = setString(item, sign, "signature");
         item = setInteger(item, reforgeable ? 1 : 0, "reforgeable");
         item = setInteger(item, recombobulated ? 1 : 0, "recombobulated");
         item = setString(item, color, "color");

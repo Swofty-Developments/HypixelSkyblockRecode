@@ -45,23 +45,23 @@ public class MongoHypixelItems {
     }
 
     public void setData(String id, String key, Object value) {
-        Document query = new Document("id", id.toString());
+        Document query = new Document("ID", id.toString());
         Document found = col.find(query).first();
 
         if (found == null) {
-            Document update = new Document("id", id.toString());
+            Document update = new Document("ID", id.toString());
             update.append(key, value);
 
             col.insertOne(update);
             return;
         }
 
-        col.updateOne(Filters.eq("id", id.toString()), Updates.set(key, value));
+        col.updateOne(Filters.eq("ID", id.toString()), Updates.set(key, value));
     }
 
     public Object getData(String id, String key) {
 
-        Document query = new Document("id", id.toString());
+        Document query = new Document("ID", id.toString());
         if (query.isEmpty()) {
             setData(id, key, null);
         } else {
@@ -89,7 +89,7 @@ public class MongoHypixelItems {
 
     public boolean remove(String id) {
 
-        Document query = new Document("id", id.toString());
+        Document query = new Document("ID", id.toString());
         Document found = col.find(query).first();
 
         if (found == null) return false;
@@ -115,8 +115,8 @@ public class MongoHypixelItems {
     }
     
     public void setJsonObject(JSONObject json) {
-        String id = json.getString("id");
-        Document query = new Document("id", id.toString());
+        String id = json.getString("ID");
+        Document query = new Document("ID", id.toString());
         Document found = col.find(query).first();
 
         if (found == null) {
@@ -129,7 +129,7 @@ public class MongoHypixelItems {
     }
 
     public JSONObject getJsonObject(String id) {
-        Document query = new Document("id", id.toString());
+        Document query = new Document("ID", id.toString());
         Document found = col.find(query).first();
 
         if (found != null) {
@@ -140,13 +140,13 @@ public class MongoHypixelItems {
     }
 
     public Document getDoc(String uuid) {
-        Document query = new Document("id", uuid.toString());
+        Document query = new Document("ID", uuid.toString());
 
         return col.find(query).first();
     }
 
     public void setData(String id, JSONObject json) {
-        Document query = new Document("id", id);
+        Document query = new Document("ID", id);
         Document found = col.find(query).first();
 
         if (found == null) {
