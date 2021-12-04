@@ -235,7 +235,7 @@ public class Command_island extends SkyblockCommandFramework {
     }
 
     void createProcess(SBPlayer player) {
-        if (player.getServer().getServerName().equals("islands")) {
+        if (new CfgFile().getConfiguration().getBoolean("island-server")) {
             try {
                 Data.createIsland(player.getPlayer(), IslandId.randomIslandId(), new ArrayList<>());
                 player.sendMessage("§7Island created!");
