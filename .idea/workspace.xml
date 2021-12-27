@@ -30,13 +30,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2b45a77d-a8a6-446f-b4c0-7b906fa70c07" name="Default Changelist" comment="broken  stuff">
-      <change afterPath="$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/entitySpawner/DefaultSpawnerObject.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/entitySpawner/Spawner.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/files/SpawnersFile.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SkyblockSandboxBase/src/main/resources/spawners.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SkyblockSandboxBase/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/SkyblockSandboxBase/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/SBX.java" beforeDir="false" afterPath="$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/SBX.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/item/SBItemBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/item/SBItemBuilder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/command/commands/Command_createitem.java" beforeDir="false" afterPath="$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/command/commands/Command_createitem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/gui/guis/skyblockmenu/SBMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/gui/guis/skyblockmenu/SBMenu.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/gui/guis/storage/StorageGUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/gui/guis/storage/StorageGUI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/player/SBPlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/player/SBPlayer.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,6 +56,17 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RESET_MODE" value="MIXED" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/command/commands/Command_skillXP.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/gui/guis/skyblockmenu/SkillGUI.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/listener/sbEvents/damageEvents/EntityDamageEntityEvent.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="jar://$USER_HOME$/.jdks/openjdk-14.0.2/lib/src.zip!/java.base/java/lang/Math.java" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/listener/sbEvents/skillEvents/SkillXPGainListener.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/command/commands/Command_coins.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/player/SBPlayer.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/listener/sbEvents/PlayerLeave.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/listener/sbEvents/PlayerJoin.java" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectId" id="1x4nrAbtShYPkpFamT5FyEBGe2U" />
   <component name="ProjectLevelVcsManager">
@@ -264,7 +273,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="master" />
+                        <option value="origin/master" />
                       </list>
                     </value>
                   </entry>

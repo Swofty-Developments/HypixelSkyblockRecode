@@ -10,6 +10,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -39,7 +40,7 @@ public class SBMenu extends NormalGUI {
             new PetsMenu(getOwner()).open();
         });
         setAction(20, event -> {
-            Bukkit.getServer().dispatchCommand(getOwner().getPlayer(), "items");
+            Bukkit.getServer().dispatchCommand(getOwner().getPlayer(), "e");
         });
         setAction(24, event -> {
             Bukkit.getServer().dispatchCommand(getOwner().getPlayer(), "gui open store");
@@ -56,27 +57,38 @@ public class SBMenu extends NormalGUI {
                     .create();
             gui.open(getOwner().getPlayer());
         });
+        setAction(32,event -> {
+            Bukkit.getServer().dispatchCommand(getOwner().getPlayer(), "wardrobe");
+        });
+        setAction(33,event -> {
+            Bukkit.getServer().dispatchCommand(getOwner().getPlayer(), "bank");
+        });
+        setAction(22,event -> {
+            Bukkit.getServer().dispatchCommand(getOwner().getPlayer(), "gui open ap1");
+        });
         setAction(8, event -> {
-            if(cachedFairySouls.containsKey(getOwner().getUniqueId())) {
-                if(cachedFairySouls.get(getOwner().getUniqueId())>=FairySouls.maxFairySouls) {
-                    getOwner().sendMessage(SUtil.colorize("&cMax fairy souls!"));
-                    getOwner().playSound(getOwner().getLocation(),Sound.ENDERMAN_TELEPORT,1,0);
-                    return;
+            if (cachedFairySouls.containsKey(getOwner().getUniqueId())) {
+                if (cachedFairySouls.get(getOwner().getUniqueId()) >= FairySouls.maxFairySouls) {
+                    if (!(event.getClick() == ClickType.MIDDLE)) {
+                        getOwner().sendMessage(SUtil.colorize("&cMax fairy souls!"));
+                        getOwner().playSound(getOwner().getLocation(), Sound.ENDERMAN_TELEPORT, 1, 0);
+                        return;
+                    }
                 }
             }
             switch (event.getClick()) {
                 case RIGHT:
-                    cachedFairySouls.put(getOwner().getUniqueId(),cachedFairySouls.get(getOwner().getUniqueId())+20);
+                    cachedFairySouls.put(getOwner().getUniqueId(), cachedFairySouls.get(getOwner().getUniqueId()) + 20);
                     getOwner().sendMessage(SUtil.colorize("&aAdded 20 fairy souls!"));
                     getOwner().playSound(getOwner().getLocation(), Sound.PORTAL, 1, 2);
                     break;
                 case MIDDLE:
-                    cachedFairySouls.put(getOwner().getUniqueId(),0);
+                    cachedFairySouls.put(getOwner().getUniqueId(), 0);
                     getOwner().playSound(getOwner().getLocation(), Sound.CAT_MEOW, 1, 1);
                     getOwner().sendMessage(SUtil.colorize("&cFairy souls reset!"));
                     break;
                 default:
-                    cachedFairySouls.put(getOwner().getUniqueId(),cachedFairySouls.get(getOwner().getUniqueId())+5);
+                    cachedFairySouls.put(getOwner().getUniqueId(), cachedFairySouls.get(getOwner().getUniqueId()) + 5);
                     getOwner().sendMessage(SUtil.colorize("&aAdded 5 fairy souls!"));
                     getOwner().playSound(getOwner().getLocation(), Sound.FIREWORK_TWINKLE, 1, 1);
                     break;
@@ -117,6 +129,7 @@ public class SBMenu extends NormalGUI {
                         "&bIntelligence&r: " + format.format(owner.getMaxStat(SBPlayer.PlayerStat.INTELLIGENCE)),
                         "&eBonus Attack Speed&r: " + format.format(owner.getMaxStat(SBPlayer.PlayerStat.ATTACK_SPEED)) + "%",
                         "&cFerocity&r: " + format.format(owner.getMaxStat(SBPlayer.PlayerStat.FEROCITY)))));
+
         setItem(20, makeColorfulItem(Material.BLAZE_POWDER, "&aItem Catalogue", 1, 0, "&7View a list of every Skyblock item and &emore!", "", "&eClick to open!"));
         setItem(22, makeColorfulItem(Material.EMERALD, "&aUtilities panel", 1, 0, "&8Personal Troubleshooting", "&7Troubleshoot various minor bugs/glitches", "&7that may occur to you.", "", "&eClick to open!"));
         setItem(23, makeColorfulItem(Material.BOOK_AND_QUILL, "&aQuest Log", 1, 0, "&7View your active quests,", "&7progress, and rewards.", "", "&eClick to view!"));
@@ -125,6 +138,9 @@ public class SBMenu extends NormalGUI {
         setItem(19, makeColorfulItem(Material.DIAMOND_SWORD, "&aYour Skills", 1, 0, "&7View your Skill progression and", "&7rewards."));
         setItem(30, makeColorfulItem(Material.BONE, "&aPets", 1, 0, "", "&eClick to open the pets menu!"));
         setItem(31, makeColorfulItem(Material.WORKBENCH, "&aCrafting Table", 1, 0, "", "&7Click to open the crafting grid!"));
+        setItem(32,makeColorfulItem(Material.LEATHER_CHESTPLATE,"&aWardrobe",1,0,"","&7Store and access your armor sets!"));
+        setItem(33,makeColorfulSkullItem("&aPersonal bank","http://textures.minecraft.net/texture/e36e94f6c34a35465fce4a90f2e25976389eb9709a12273574ff70fd4daa6852",
+                1, "&7Access your bank from anywhere!","","&eClick to open!"));
         setItem(49, makeColorfulItem(Material.BARRIER, "&cClose", 1, 0));
         setItem(50, makeColorfulItem(Material.REDSTONE_TORCH_ON, "&aSettings", 1, 0, "&7Configure your SkyBlock", "&7settings.", "", "&eClick to configure!"));
     }
