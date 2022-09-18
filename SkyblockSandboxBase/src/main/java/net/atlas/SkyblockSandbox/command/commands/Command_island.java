@@ -223,6 +223,12 @@ public class Command_island extends SkyblockCommandFramework {
                 PlayerIsland island = player.getPlayerIsland();
                 island.addMember(target);
 
+                for (OfflinePlayer p : island.getMembers()) {
+                    player.sendMessage(p.getUniqueId().toString());
+                }
+
+                player.sendMessage(island.getMembers().toString());
+
                 player.sendMessage("§aSuccessfully added + " + target.getName() + "to your island! ☻");
 
                 BungeeUtil.sendPlayer(new SBPlayer(target.getPlayer()), new CfgFile().getConfiguration().getString("island-server-name"));

@@ -43,9 +43,6 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <outputFile>
-                                ${user.home}\Desktop\Bungee Server\Servers\hub\plugins\${project.artifactId}-${project.version}.jar
-                            </outputFile>
                         </configuration>
                     </execution>
                     <execution>
@@ -57,7 +54,7 @@
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <outputFile>
-                                ${user.home}\Desktop\Bungee Server\Servers\islands\plugins\${project.artifactId}-${project.version}.jar
+                                ${user.home}\Desktop\Bungee\islands\plugins\${project.artifactId}-${project.version}.jar
                             </outputFile>
                         </configuration>
                     </execution>

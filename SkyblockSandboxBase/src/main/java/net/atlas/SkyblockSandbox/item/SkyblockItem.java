@@ -74,7 +74,6 @@ public interface SkyblockItem {
     }
 
     enum Default implements SkyblockItem {
-
         BEDROCK(SBItemBuilder.init().name("Bedrock").id("BEDROCK").mat(Material.BEDROCK).rarity(Rarity.LEGENDARY).type(type()).stat(PlayerStat.DAMAGE,50000D).build()),
         SUMMONING_EYE(SBItemBuilder.init().name("Summoning Eye").id("SUMMONING_EYE").mat(Material.SKULL_ITEM).rarity(Rarity.EPIC).type(type()).url("http://textures.minecraft.net/texture/daa8fc8de6417b48d48c80b443cf5326e3d9da4dbe9b25fcd49549d96168fc0").stackable(false).build()),
         SLEEPING_EYE(SBItemBuilder.init().name("Sleeping Eye").id("SLEEPING_EYE").mat(Material.SKULL_ITEM).rarity(Rarity.EPIC).type(type()).url("http://textures.minecraft.net/texture/37c0d010dd0e512ffea108d7c5fe69d576c31ec266c884b51ec0b28cc457").build()),

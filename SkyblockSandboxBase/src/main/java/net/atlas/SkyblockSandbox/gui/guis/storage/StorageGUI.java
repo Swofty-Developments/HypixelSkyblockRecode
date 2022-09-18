@@ -36,11 +36,14 @@ public class StorageGUI extends NormalGUI
 			getOwner().playSound(player.getLocation(), Sound.CHEST_OPEN, 1, 0);
 		}
 
-		if(event.getSlot()==48) {
-			new SBMenu(getOwner()).open();
-		}
-		if(event.getSlot()==49) {
-			getOwner().getOpenInventory().close();
+		if (event.getCurrentItem().getType() == Material.ARROW && event.getSlot() == 45) {
+			new Thread(() -> {
+				try {
+					Thread.sleep(100);
+				} catch (Exception ignored) { }
+
+				new SBMenu(player).open();
+			}).start();
 		}
 	}
 
@@ -75,8 +78,6 @@ public class StorageGUI extends NormalGUI
 		setItem(15, makeColorfulItem(Material.PAPER, "&aEnder Chest Page 7", 1, 0, "&7\n&eLeft-Click to open!\n&bRight-Click to do nothing!"));
 		setItem(16, makeColorfulItem(Material.PAPER, "&aEnder Chest Page 8", 1, 0, "&7\n&eLeft-Click to open!\n&bRight-Click to do nothing!"));
 		setItem(17, makeColorfulItem(Material.PAPER, "&aEnder Chest Page 9", 1, 0, "&7\n&eLeft-Click to open!\n&bRight-Click to do nothing!"));
-
-		setItem(48,makeColorfulItem(Material.ARROW,"&aGo Back",1,0,""));
-		setItem(49,makeColorfulItem(Material.BARRIER,"&cClose",1,0,""));
+		setItem(45, makeColorfulItem(Material.ARROW, "&aGo Back", 1, 0, "&7To Skyblock Menu"));
 	}
 }

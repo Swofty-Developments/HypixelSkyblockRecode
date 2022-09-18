@@ -72,7 +72,7 @@ public class PlayerIslandHandler implements PlayerIsland {
 	public void addMember(OfflinePlayer member) {
 		List<String> list = new ArrayList<>();
 
-		if (getMembers() != null) {
+		if (Data.getMembers(id.toString()) != null) {
 			for (OfflinePlayer player : getMembers())
 				list.add(player.getUniqueId().toString());
 		}
