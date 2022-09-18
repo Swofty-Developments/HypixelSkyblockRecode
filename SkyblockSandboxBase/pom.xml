@@ -148,8 +148,8 @@
         </dependency>
         <dependency>
             <groupId>net.citizensnpcs</groupId>
-            <artifactId>citizens</artifactId>
-            <version>2.0.27-SNAPSHOT</version>
+            <artifactId>citizens-main</artifactId>
+            <version>2.0.29-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -195,7 +195,7 @@
         <dependency>
             <groupId>dev.triumphteam</groupId>
             <artifactId>triumph-gui</artifactId>
-            <version>3.0.4</version> <!-- replace version here -->
+            <version>3.1.2</version>
         </dependency>
         <dependency>
             <groupId>com.github.koca2000</groupId>
