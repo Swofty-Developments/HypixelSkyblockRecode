@@ -53,9 +53,6 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <outputFile>
-                                ${user.home}\Desktop\Bungee\islands\plugins\${project.artifactId}-${project.version}.jar
-                            </outputFile>
                         </configuration>
                     </execution>
                 </executions>
