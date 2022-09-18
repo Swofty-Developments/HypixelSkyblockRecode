@@ -37,7 +37,7 @@ public class MongoIslands implements MongoDB {
         if (dbinfo.getConfiguration().getBoolean("use"))
             client = MongoClients.create(dbinfo.getConfiguration().getString("uri"));
         else
-            client = MongoClients.create("mongodb+srv://atlasDevelopment:qvm347n89fugyq89@cluster0.ha64p.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
+    /*add your mongo uri*/        client = MongoClients.create("mongodb+srv://atlasDevelopment:qvm347n89fugyq89@cluster0.ha64p.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
 
         MongoDatabase database = client.getDatabase("AtlasSandbox");
         col = database.getCollection("island_data");
