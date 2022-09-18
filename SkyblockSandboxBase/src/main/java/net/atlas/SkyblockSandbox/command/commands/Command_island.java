@@ -28,6 +28,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -240,9 +241,9 @@ public class Command_island extends SkyblockCommandFramework {
     }
 
     void createProcess(SBPlayer player) {
-        if (player.getServer().getServerName().equals("islands")) {
+        if (new CfgFile().getConfiguration().getBoolean("island-server")) {
             try {
-                Data.createIsland(player.getPlayer(), IslandId.randomIslandId());
+                Data.createIsland(player.getPlayer(), IslandId.randomIslandId(), new ArrayList<>());
                 player.sendMessage("§7Island created!");
             } catch (Exception ex) {
                 ex.printStackTrace();

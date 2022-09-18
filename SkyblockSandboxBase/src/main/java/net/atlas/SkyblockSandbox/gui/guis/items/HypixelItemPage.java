@@ -4,8 +4,12 @@ import dev.triumphteam.gui.builder.item.ItemBuilder;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.gui.AnvilGUI;
 import net.atlas.SkyblockSandbox.gui.PaginatedGUI;
+import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.auto.EnchantGUI;
+import net.atlas.SkyblockSandbox.item.ItemType;
+import net.atlas.SkyblockSandbox.item.Rarity;
+import net.atlas.SkyblockSandbox.item.SBItemBuilder;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
-import net.atlas.SkyblockSandbox.util.SUtil;
+import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -16,17 +20,19 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static net.atlas.SkyblockSandbox.util.SUtil.colorize;
 
 public class HypixelItemPage extends PaginatedGUI {
     public static final HashMap<UUID,String> search = new HashMap<>();
+    List<ItemType> types = Arrays.asList(ItemType.CUSTOM, ItemType.SWORD, ItemType.ARMOR, ItemType.BOW, ItemType.ITEM, ItemType.ACCESSORY, ItemType.AXE, ItemType.PICKAXE, ItemType.HOE);
+    public static final HashMap<UUID, ItemType> selectedType = new HashMap<>();
+
     public HypixelItemPage(SBPlayer owner) {
         super(owner);
+        selectedType.putIfAbsent(getOwner().getUniqueId(), ItemType.CUSTOM);
     }
 
     @Override
@@ -92,6 +98,23 @@ public class HypixelItemPage extends PaginatedGUI {
 
                 break;
             }
+            case 51: {
+                if (event.isRightClick()) {
+                    if (types.indexOf(selectedType.get(getOwner().getUniqueId())) == 0) {
+                        selectedType.put(getOwner().getUniqueId(), ItemType.HOE);
+                    } else {
+                        selectedType.put(getOwner().getUniqueId(), types.get(types.indexOf(selectedType.get(getOwner().getUniqueId())) - 1));
+                    }
+                } else {
+                    if (types.indexOf(selectedType.get(getOwner().getUniqueId())) == types.size() - 1) {
+                        selectedType.put(getOwner().getUniqueId(), ItemType.CUSTOM);
+                    } else {
+                        selectedType.put(getOwner().getUniqueId(), types.get(types.indexOf(selectedType.get(getOwner().getUniqueId())) + 1));
+                    }
+                }
+                new HypixelItemPage(getOwner()).open();
+                break;
+            }
             case 53:
                 if(getGui().getNextPageNum()==getGui().getPagesNum()&&getGui().getCurrentPageNum()==getGui().getPagesNum()) {
                     p.sendMessage("&cYou are on the last page");
@@ -102,7 +125,10 @@ public class HypixelItemPage extends PaginatedGUI {
             default:
                 if(event.getCurrentItem().getItemMeta().getDisplayName().equals(colorize("&7 "))) return;
                 if (p.hasSpace()) {
-                    p.getInventory().addItem(event.getCurrentItem());
+                    ItemStack item1 = event.getCurrentItem();
+                    SBItemBuilder item = new SBItemBuilder(item1.clone());
+                    item.sign(null);
+                    p.getInventory().addItem(item.build());
                     p.playSound(p.getLocation(), Sound.NOTE_PLING, 1f, 2f);
                 }
                 break;
@@ -142,17 +168,46 @@ public class HypixelItemPage extends PaginatedGUI {
 
         }
         setItem(45, prev);
-        for(ItemStack item : items(getOwner())) {
-            getGui().addItem(ItemBuilder.from(item).asGuiItem());
+        ArrayList<String> lore = new ArrayList<>();
+        lore.add("&7Filter through item categories");
+        lore.add("");
+        for (ItemType type : types) {
+            if (selectedType.get(getOwner().getUniqueId()) == type) {
+                lore.add("&6► " + type.getValue());
+            } else {
+                lore.add("&7" + type.getValue());
+            }
+        }
+        lore.add("");
+        lore.add("&bRight-Click to go backwards!");
+        lore.add("&eClick to switch categories!");
+        setItem(51, makeColorfulItem(Material.GOLD_BLOCK, "&bItem Categories", 1, 0, lore));
+        for(SBItemBuilder item : items(getOwner())) {
+            getGui().addItem(ItemBuilder.from(item.build()).asGuiItem());
         }
     }
 
-    private Collection<ItemStack> items(SBPlayer player) {
-        Collection<ItemStack> items = SBX.hypixelItemMap.values();
+    private ArrayList<SBItemBuilder> items(SBPlayer player) {
+        ArrayList<SBItemBuilder> items = new ArrayList<>();
+        for (SBItemBuilder item : HypixelItemsHelper.hypixelItems) {
+            if (selectedType.get(player.getUniqueId()) == ItemType.CUSTOM) {
+                items.add(item);
+            }
+            if (selectedType.get(player.getUniqueId()) == ItemType.ARMOR) {
+                for (ItemType type : Arrays.asList(ItemType.BOOTS, ItemType.LEGGINGS, ItemType.CHESTPLATE, ItemType.HELMET)) {
+                    if (item.type == type) {
+                        items.add(item);
+                    }
+                }
+            }
+            if (selectedType.get(player.getUniqueId()) == item.type) {
+                items.add(item);
+            }
+        }
         if (search.containsKey(player.getUniqueId())) {
-            ArrayList<ItemStack> searchItems = new ArrayList<>();
-            for (ItemStack item : items) {
-                if (ChatColor.stripColor(item.getItemMeta().getDisplayName()).toUpperCase().contains(search.get(player.getUniqueId()).toUpperCase())) {
+            ArrayList<SBItemBuilder> searchItems = new ArrayList<>();
+            for (SBItemBuilder item : items) {
+                if (item.name.contains(search.get(player.getUniqueId()).toUpperCase())) {
                     searchItems.add(item);
                 }
             }

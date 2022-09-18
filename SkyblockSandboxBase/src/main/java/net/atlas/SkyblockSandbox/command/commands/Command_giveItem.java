@@ -29,7 +29,7 @@ public class Command_giveItem extends SkyblockCommandFramework {
             String[] args = cmd.getArgs();
             if(args.length>=1) {
                 String itemString = args[0].toUpperCase();
-                for(SBItemStack i:SkyblockItem.getAllItems()) {
+                /*for(SBItemStack i:SkyblockItem.getAllItems()) {
                     if(i.getItemID().equalsIgnoreCase(itemString)) {
                         SBItemStack ii = new SBItemStack(i.asBukkitItem());
                         ItemStack b = ii.refreshLore();
@@ -43,6 +43,8 @@ public class Command_giveItem extends SkyblockCommandFramework {
                         break;
                     }
                 }
+
+                 */
             }
         }
 

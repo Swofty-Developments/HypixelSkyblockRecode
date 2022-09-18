@@ -22,6 +22,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -121,7 +122,7 @@ public class Particle extends Function {
         },
         LINE(Material.STICK) {
             public List<Location> getShape(SBPlayer p, int rad) {
-                return getCircle(p.getLocation(), rad, 40);
+                return getLine(p.getLocation(), rad);
             }
         };
 
@@ -213,6 +214,17 @@ public class Particle extends Function {
         return locations;
     }
 
+    public static List<Location> getLine(Location location, int range) {
+        List<Location> locations = new ArrayList<>();
+        World world = location.getWorld();
+        Vector direction = location.getDirection().normalize();
+        direction.multiply(range);
+        for (double i = 0; i < range / 5f; i += 0.1) {
+            locations.add(location.add(direction));
+        }
+        return locations;
+    }
+
     public static List<Location> getSquare(Location center, double radius, int amount) {
         List<Location> locations = new ArrayList<>();
         World world = center.getWorld();
@@ -279,7 +291,7 @@ public class Particle extends Function {
             }
         });
         setAction(14,event -> {
-            new ParticleShapeGUI(getPlayer(),getAbilIndex(),getFunctionIndex()).open();
+            new ParticleShapeGUI(getPlayer(),getAbilIndex(),getFunctionIndex(), getFunctionType()).open();
         });
         setAction(15,event -> {
             anvilGUI(dataValues.PARTICLE_RANGE,1,30);

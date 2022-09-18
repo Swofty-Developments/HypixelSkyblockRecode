@@ -1,5 +1,6 @@
 package net.atlas.SkyblockSandbox.player;
 
+import net.atlas.SkyblockSandbox.util.NBTUtil;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.conversations.Conversation;
@@ -702,6 +703,10 @@ public abstract class PluginPlayer implements Player {
 
     public ItemStack getItemInHand() {
         return player.getItemInHand();
+    }
+
+    public String getStringFromItemInHand(String key) {
+        return NBTUtil.getString(getItemInHand(), key);
     }
 
     public void setItemInHand(ItemStack itemStack) {

@@ -3,6 +3,7 @@ package net.atlas.SkyblockSandbox.listener.sbEvents;
 import net.atlas.SkyblockSandbox.AuctionHouse.guis.AuctionCreatorGUI;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.database.mongo.MongoCoins;
+import net.atlas.SkyblockSandbox.gui.guis.skyblockmenu.SettingsMenu;
 import net.atlas.SkyblockSandbox.island.islands.FairySouls;
 import net.atlas.SkyblockSandbox.economy.Coins;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
@@ -13,8 +14,11 @@ import org.bson.Document;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import static net.atlas.SkyblockSandbox.SBX.cachedSkillLvls;
-import static net.atlas.SkyblockSandbox.SBX.cachedSkills;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.concurrent.TimeUnit;
+
+import static net.atlas.SkyblockSandbox.SBX.*;
 
 public class PlayerLeave extends SkyblockListener<PlayerQuitEvent> {
 
@@ -24,6 +28,7 @@ public class PlayerLeave extends SkyblockListener<PlayerQuitEvent> {
         if (AuctionCreatorGUI.PlayerItems.containsKey(event.getPlayer().getUniqueId())) {
             playerData.setData(event.getPlayer().getUniqueId(), "AuctionItem", AuctionCreatorGUI.PlayerItems.get(event.getPlayer().getUniqueId()));
         }
+        AuctionCreatorGUI.PlayerItems.remove(event.getPlayer().getUniqueId());
         SBX.getInstance().coins.cacheCoins(event.getPlayer());
         Document doc = new Document();
         SBPlayer p = new SBPlayer(event.getPlayer());
@@ -39,11 +44,27 @@ public class PlayerLeave extends SkyblockListener<PlayerQuitEvent> {
         }
         playerData.setData(event.getPlayer().getUniqueId(),"Skills",doc);
         playerData.setData(event.getPlayer().getUniqueId(),"fairy-souls", FairySouls.cachedFairySouls.get(event.getPlayer().getUniqueId()));
+        playerData.setData(event.getPlayer().getUniqueId(),"pets",cachedPets.get(event.getPlayer().getUniqueId()));
+        cachedPets.remove(event.getPlayer().getUniqueId());
         cachedSkillLvls.remove(event.getPlayer().getUniqueId());
         cachedSkills.remove(event.getPlayer().getUniqueId());
         StorageCache storage = new StorageCache(new SBPlayer(event.getPlayer()));
         for (int i = 1; i <= 9; i++) {
             storage.toMongoFromCache(i);
         }
+
+        //Unloading settings cache
+        Document docs = new Document();
+        for(SBPlayer.Settings setting : SBPlayer.Settings.values()) {
+            docs.put(setting.name(), setting.map.get(p.getUniqueId()));
+        }
+        playerData.setData(p.getUniqueId(), "Settings", docs);
+
+        //PlayTime
+        int minutes = 0;
+        minutes = Math.toIntExact(TimeUnit.MILLISECONDS.toMinutes(ZonedDateTime.now(ZoneId.of("-05:00")).toInstant().toEpochMilli() - PlayerJoin.time.get(p.getUniqueId()).toInstant().toEpochMilli()));
+        playerData.setData(p.getUniqueId(), "PlayTime", PlayerJoin.playTimeMinutes.get(p.getUniqueId()) + minutes);
+        PlayerJoin.playTimeMinutes.remove(p.getUniqueId());
+        PlayerJoin.time.remove(p.getUniqueId());
     }
 }

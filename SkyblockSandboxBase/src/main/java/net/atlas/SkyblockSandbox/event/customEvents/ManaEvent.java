@@ -6,45 +6,57 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 public class ManaEvent extends Event implements Cancellable {
-        private static final HandlerList HANDLER_LIST = new HandlerList();
+    private static final HandlerList HANDLER_LIST = new HandlerList();
 
-        private boolean isCancelled = false;
-        private final ManaCause manaCause;
-        private final SBPlayer p;
+    private boolean isCancelled = false;
+    private final ManaCause manaCause;
+    private final SBPlayer p;
+    private final int manaCost;
+    private final String abilityName;
 
-        public ManaEvent(SBPlayer p, ManaCause manaCause) {
-                this.manaCause = manaCause;
-                this.p = p;
-        }
+    public ManaEvent(SBPlayer p, ManaCause manaCause, int manaCost, String abilityName) {
+        this.manaCause = manaCause;
+        this.p = p;
+        this.manaCost = manaCost;
+        this.abilityName = abilityName;
+    }
 
-        public ManaCause getManaCause() {
-                return manaCause;
-        }
+    public String getAbilityName() {
+        return abilityName;
+    }
 
-        public SBPlayer getPlayer() {
-                return p;
-        }
+    public int getManaCost() {
+        return manaCost;
+    }
 
-        @Override
-        public HandlerList getHandlers() {
-                return HANDLER_LIST;
-        }
+    public ManaCause getManaCause() {
+        return manaCause;
+    }
 
-        public static HandlerList getHandlerList() {
-                return HANDLER_LIST;
-        }
+    public SBPlayer getPlayer() {
+        return p;
+    }
 
-        @Override
-        public boolean isCancelled() {
-                return isCancelled;
-        }
+    @Override
+    public HandlerList getHandlers() {
+        return HANDLER_LIST;
+    }
 
-        @Override
-        public void setCancelled(boolean b) {
-                isCancelled = b;
-        }
+    public static HandlerList getHandlerList() {
+        return HANDLER_LIST;
+    }
 
-        public enum ManaCause {
-                ABILITY(),CUSTOM();
-        }
+    @Override
+    public boolean isCancelled() {
+        return isCancelled;
+    }
+
+    @Override
+    public void setCancelled(boolean b) {
+        isCancelled = b;
+    }
+
+    public enum ManaCause {
+        ABILITY(), CUSTOM();
+    }
 }

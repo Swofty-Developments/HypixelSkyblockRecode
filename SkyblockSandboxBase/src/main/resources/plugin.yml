@@ -5,3 +5,4 @@
   authors: [Vespertilo, Ender, Maploop]
   softdepend:
     - PlaceholderAPI
+    - Multiverse-Core

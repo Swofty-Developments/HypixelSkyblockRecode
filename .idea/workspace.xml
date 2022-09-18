@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="BRANCH:origin/master" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </select>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="2b45a77d-a8a6-446f-b4c0-7b906fa70c07" name="Default Changelist" comment="broken  stuff">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/command/commands/Command_createitem.java" beforeDir="false" afterPath="$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/command/commands/Command_createitem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/gui/guis/skyblockmenu/SBMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/gui/guis/skyblockmenu/SBMenu.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/gui/guis/storage/StorageGUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/gui/guis/storage/StorageGUI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/player/SBPlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/player/SBPlayer.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="MIXED" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/command/commands/Command_skillXP.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/gui/guis/skyblockmenu/SkillGUI.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/listener/sbEvents/damageEvents/EntityDamageEntityEvent.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="jar://$USER_HOME$/.jdks/openjdk-14.0.2/lib/src.zip!/java.base/java/lang/Math.java" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/listener/sbEvents/skillEvents/SkillXPGainListener.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/command/commands/Command_coins.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/player/SBPlayer.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/listener/sbEvents/PlayerLeave.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/SkyblockSandboxBase/src/main/java/net/atlas/SkyblockSandbox/listener/sbEvents/PlayerJoin.java" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="ProjectId" id="1x4nrAbtShYPkpFamT5FyEBGe2U" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../AtlasLauncher" />
+    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.0" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+  </component>
+  <component name="RunManager">
+    <configuration name="SkyblockSandboxBase [install]" type="MavenRunConfiguration" factoryName="Maven" nameIsGenerated="true">
+      <MavenSettings>
+        <option name="myGeneralSettings" />
+        <option name="myRunnerSettings" />
+        <option name="myRunnerParameters">
+          <MavenRunnerParameters>
+            <option name="profiles">
+              <set />
+            </option>
+            <option name="goals">
+              <list>
+                <option value="install" />
+              </list>
+            </option>
+            <option name="pomFileName" />
+            <option name="profilesMap">
+              <map />
+            </option>
+            <option name="resolveToWorkspace" value="false" />
+            <option name="workingDirPath" value="$PROJECT_DIR$/SkyblockSandboxBase" />
+          </MavenRunnerParameters>
+        </option>
+      </MavenSettings>
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="MavenRunConfiguration" factoryName="Maven">
+      <MavenSettings>
+        <option name="myGeneralSettings" />
+        <option name="myRunnerSettings" />
+        <option name="myRunnerParameters">
+          <MavenRunnerParameters>
+            <option name="profiles">
+              <set />
+            </option>
+            <option name="goals">
+              <list>
+                <option value="install" />
+              </list>
+            </option>
+            <option name="pomFileName" />
+            <option name="profilesMap">
+              <map />
+            </option>
+            <option name="resolveToWorkspace" value="false" />
+            <option name="workingDirPath" value="" />
+          </MavenRunnerParameters>
+        </option>
+      </MavenSettings>
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SQLPlugin.ProjectConfiguration">
+    <queries />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2b45a77d-a8a6-446f-b4c0-7b906fa70c07" name="Default Changelist" comment="" />
+      <created>1629623424875</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1629623424875</updated>
+      <workItem from="1631293864058" duration="718000" />
+      <workItem from="1631336547726" duration="631000" />
+      <workItem from="1631338458079" duration="869000" />
+      <workItem from="1631439097248" duration="367000" />
+      <workItem from="1631454145893" duration="753000" />
+      <workItem from="1631458010060" duration="2197000" />
+      <workItem from="1631513296244" duration="3095000" />
+      <workItem from="1631525069629" duration="778000" />
+      <workItem from="1631540681693" duration="3466000" />
+      <workItem from="1631609646150" duration="2743000" />
+      <workItem from="1631620612611" duration="7038000" />
+      <workItem from="1631639072405" duration="545000" />
+      <workItem from="1631644537694" duration="1553000" />
+      <workItem from="1631682332392" duration="2218000" />
+      <workItem from="1631687788644" duration="100000" />
+      <workItem from="1631696461971" duration="4596000" />
+      <workItem from="1631704614966" duration="179000" />
+      <workItem from="1631712047530" duration="1470000" />
+      <workItem from="1631770282521" duration="1693000" />
+      <workItem from="1632138353002" duration="2697000" />
+      <workItem from="1632211039258" duration="959000" />
+      <workItem from="1632234788909" duration="587000" />
+      <workItem from="1632329182399" duration="355000" />
+      <workItem from="1632656447411" duration="18000" />
+      <workItem from="1632726853688" duration="4252000" />
+      <workItem from="1632834640493" duration="4405000" />
+      <workItem from="1632905543282" duration="806000" />
+      <workItem from="1632983357708" duration="196000" />
+      <workItem from="1632985428635" duration="849000" />
+      <workItem from="1632993342506" duration="1932000" />
+      <workItem from="1633003169882" duration="3870000" />
+      <workItem from="1633011899395" duration="885000" />
+      <workItem from="1633434002197" duration="1620000" />
+      <workItem from="1635495347582" duration="1836000" />
+      <workItem from="1635527275717" duration="748000" />
+      <workItem from="1635661526917" duration="2604000" />
+      <workItem from="1635680310157" duration="233000" />
+      <workItem from="1635851011273" duration="2632000" />
+      <workItem from="1635856223630" duration="1499000" />
+      <workItem from="1635858921111" duration="36000" />
+      <workItem from="1636876931391" duration="63000" />
+      <workItem from="1636877045149" duration="69000" />
+    </task>
+    <task id="LOCAL-00001" summary="Added easy way for files to be implemented&#10;also added a way to use another uri for mongodb.">
+      <created>1629624653861</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1629624653861</updated>
+    </task>
+    <task id="LOCAL-00002" summary="✅ Player islands are working, (1 server ONLY) will be fixed later.&#10;🐛 View/add bugs and tasks at https://trello.com/c/nEa8qMex/1-player-islands">
+      <created>1629720322232</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1629720322232</updated>
+    </task>
+    <task id="LOCAL-00003" summary="pushing non-functional storage">
+      <created>1630495219391</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1630495219391</updated>
+    </task>
+    <task id="LOCAL-00004" summary="pushing non-functional storage v2">
+      <created>1630495741658</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1630495741658</updated>
+    </task>
+    <task id="LOCAL-00005" summary="ender chest page">
+      <created>1630992235085</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1630992235085</updated>
+    </task>
+    <task id="LOCAL-00006" summary="added things to make ender chest look more beatutiful, basically done">
+      <created>1631012472115</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1631012472125</updated>
+    </task>
+    <task id="LOCAL-00007" summary="added coops. still WIP might need changes">
+      <created>1631701779533</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1631701779533</updated>
+    </task>
+    <task id="LOCAL-00008" summary="tried to add visits">
+      <created>1632905787627</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1632905787628</updated>
+    </task>
+    <task id="LOCAL-00009" summary="broken  stuff">
+      <created>1634316122009</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1634316122009</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/master" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Added easy way for files to be implemented&#10;also added a way to use another uri for mongodb." />
+    <MESSAGE value="Player islands are working, (1 server ONLY) will be fixed later." />
+    <MESSAGE value="✅ Player islands are working, (1 server ONLY) will be fixed later.&#10; View/add bugs and tasks at https://trello.com/c/nEa8qMex/1-player-islands" />
+    <MESSAGE value="pushing non-functional storage" />
+    <MESSAGE value="pushing non-functional storage v2" />
+    <MESSAGE value="ender chest page" />
+    <MESSAGE value="added things to make ender chest look more beatutiful, basically done" />
+    <MESSAGE value="added coops. still WIP might need changes" />
+    <MESSAGE value="tried to add visits" />
+    <MESSAGE value="broken  stuff" />
+    <option name="LAST_COMMIT_MESSAGE" value="broken  stuff" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>

@@ -1,10 +1,11 @@
 package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator;
 
+import net.atlas.SkyblockSandbox.abilityCreator.Ability;
 import net.atlas.SkyblockSandbox.abilityCreator.AbilityUtil;
-import net.atlas.SkyblockSandbox.abilityCreator.AbilityValue;
+import net.atlas.SkyblockSandbox.gui.Backable;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
-import net.atlas.SkyblockSandbox.gui.SBGUI;
-import net.atlas.SkyblockSandbox.item.ability.AbilityData;
+import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.auto.ItemCreatorGUIMain;
+import net.atlas.SkyblockSandbox.item.SBItemBuilder;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -12,7 +13,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class AbilitySelectorGUI extends NormalGUI {
+public class AbilitySelectorGUI extends NormalGUI implements Backable {
     public AbilitySelectorGUI(SBPlayer owner) {
         super(owner);
     }
@@ -35,41 +36,14 @@ public class AbilitySelectorGUI extends NormalGUI {
         for (int i = 0; i < 5; i++) {
             int finalI = i;
             if (i + 1 <= abilAmount - 1) {
-                String abilName = AbilityUtil.getAbilityData(stack, i, AbilityValue.NAME);
-                String clickType = AbilityUtil.getAbilityData(stack, i, AbilityValue.CLICK_TYPE);
-                String manaCost = AbilityUtil.getAbilityData(stack, i, AbilityValue.MANA_COST);
-                String cooldown = AbilityUtil.getAbilityData(stack, i, AbilityValue.COOLDOWN);
-                if (cooldown.equals("")) {
-                    cooldown = AbilityUtil.getAbilityString(stack, i, "cooldown");
-                    AbilityUtil.setAbilityData(stack,i,AbilityValue.COOLDOWN,cooldown);
-                    if (cooldown.equals("")) {
-                        cooldown = "&cNOT SET";
-                    }
-                }
-                if (abilName.equals("")) {
-                    abilName = AbilityUtil.getAbilityString(stack, i, "name");
-                    AbilityUtil.setAbilityData(stack,i,AbilityValue.NAME,abilName);
-                    if (abilName.equals("")) {
-                        abilName = "&cNOT SET";
-                    }
-                }
-                if (clickType.equals("")) {
-                    clickType = AbilityUtil.getAbilityString(stack, i, "function");
-                    AbilityUtil.setAbilityData(stack,i,AbilityValue.CLICK_TYPE,clickType.replace(" ","_").replace("_CLICK",""));
-                    if (clickType.equals("")) {
-                        clickType = "&cNOT SET";
-                    }
-                }
-                if (manaCost.equals("")) {
-                    manaCost = AbilityUtil.getAbilityString(stack, i, "mana_cost");
-                    AbilityUtil.setAbilityData(stack,i,AbilityValue.MANA_COST,manaCost);
-                    if (manaCost.equals("")) {
-                        manaCost = "&cNOT SET";
-                    }
-                }
+                Ability ability = new Ability(new SBItemBuilder(stack), i);
+                int cooldown = ability.cooldown;
+                String name = ability.name;
+                ClickType type = ability.clickType;
+                int manaCost = ability.manaCost;
                 setItem(i + 20, makeColorfulItem(Material.COMMAND, "&aAbility #" + (i + 1),
-                        1, 0, "&7Ability Name: &b" + abilName,
-                        "&7Click Type: &a" + clickType,
+                        1, 0, "&7Ability Name: &b" + (!name.equals("") ? name : "&cNOT SET"),
+                        "&7Click Type: &a" + type + " CLICK",
                         "&7Cooldown: &a" + cooldown,
                         "&7Mana Cost: &a" + manaCost,
                         "",
@@ -99,5 +73,28 @@ public class AbilitySelectorGUI extends NormalGUI {
     @Override
     public boolean setClickActions() {
         return true;
+    }
+
+    @Override
+    public void openBack() {
+        if (getOwner().getStringFromItemInHand("non-legacy").equals("true") && SBPlayer.Settings.LORE_GEN.map.get(getOwner().getUniqueId())) {
+            new ItemCreatorGUIMain(getOwner()).open();
+        } else {
+            new net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.advanced.ItemCreatorGUIMain(getOwner()).open();
+        }
+    }
+
+    @Override
+    public String backTitle() {
+        if (getOwner().getStringFromItemInHand("non-legacy").equals("true") && SBPlayer.Settings.LORE_GEN.map.get(getOwner().getUniqueId())) {
+            return "Auto Item Creator";
+        } else {
+            return "Normal Item Creator";
+        }
+    }
+
+    @Override
+    public int backItemSlot() {
+        return 39;
     }
 }

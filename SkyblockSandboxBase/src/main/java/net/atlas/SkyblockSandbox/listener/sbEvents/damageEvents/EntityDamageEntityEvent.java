@@ -62,6 +62,16 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
             }
 
         }
+        if (damager instanceof Arrow) {
+            if (((Arrow) damager).getShooter() instanceof Player) {
+                if (damagee instanceof Player) {
+                    if (!SBX.pvpEnabled) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+            }
+        }
         if (damager instanceof Player) {
             event.setCancelled(true);
             SBPlayer p = new SBPlayer(((Player) damager));
@@ -129,6 +139,9 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                 SBPlayer p = new SBPlayer((Player) arrow.getShooter());
                 p.playSound(p.getLocation(), Sound.SUCCESSFUL_HIT, 1, 1);
                 if (damagee instanceof LivingEntity) {
+                    if (damagee instanceof Player) {
+                        return;
+                    }
                     LivingEntity en = (LivingEntity) damagee;
                     event.setCancelled(true);
                     en.setMaximumNoDamageTicks(0);
@@ -171,7 +184,16 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                 event.setCancelled(false);
                 if (event.getCause().equals(EntityDamageEvent.DamageCause.CUSTOM)) {
                     //Actually dealing damage
-                    damagee.damage(dmg);
+                    if (damagee instanceof Player) {
+                        SBPlayer player = new SBPlayer((Player) damagee);
+                        player.setStat(SBPlayer.PlayerStat.HEALTH, player.getStat(SBPlayer.PlayerStat.HEALTH) - dmg);
+                    } else {
+                        if (damagee.getHealth() - dmg < 0) {
+                            damagee.damage(dmg);
+                        } else {
+                            damagee.setHealth(damagee.getHealth() - dmg);
+                        }
+                    }
                 } else {
                     if (damagee.hasMetadata(Slayers.ENDERMAN.toString())) {
                         if (damagee.getMetadata("hitshield").get(0).asInt() == 0) {
@@ -236,25 +258,30 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                         Location loc = damagee.getLocation();
                         if (dmg != 0) {
                             //damagee.damage(dmg);
-                            if (damagee.getHealth() - dmg < 0) {
-                                damagee.damage(dmg);
+                            if (damagee instanceof Player) {
+                                SBPlayer player = new SBPlayer((Player) damagee);
+                                player.setStat(SBPlayer.PlayerStat.HEALTH, player.getStat(SBPlayer.PlayerStat.HEALTH) - dmg);
                             } else {
-                                damagee.setHealth(damagee.getHealth() - dmg);
-                            }
-                            DamageUtil.doDragonDamage(damagee, p, dmg);
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
-                                    damagee.setNoDamageTicks(0);
-                                    damagee.setMaximumNoDamageTicks(0);
-                                    if (!damagee.hasMetadata(Slayers.ENDERMAN.toString())) {
-                                        PacketPlayOutEntityStatus packet = new PacketPlayOutEntityStatus(((CraftEntity) damagee).getHandle(), (byte) 2);
-                                        ((CraftPlayer) p.getPlayer()).getHandle().playerConnection.sendPacket(packet);
-                                    }
+                                if (damagee.getHealth() - dmg < 0) {
+                                    damagee.damage(dmg);
+                                } else {
+                                    damagee.setHealth(damagee.getHealth() - dmg);
                                 }
-                            }.runTaskLater(SBX.getInstance(), 1L);
+                                DamageUtil.doDragonDamage(damagee, p, dmg);
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        damagee.setNoDamageTicks(0);
+                                        damagee.setMaximumNoDamageTicks(0);
+                                        if (!damagee.hasMetadata(Slayers.ENDERMAN.toString())) {
+                                            PacketPlayOutEntityStatus packet = new PacketPlayOutEntityStatus(((CraftEntity) damagee).getHandle(), (byte) 2);
+                                            ((CraftPlayer) p.getPlayer()).getHandle().playerConnection.sendPacket(packet);
+                                        }
+                                    }
+                                }.runTaskLater(SBX.getInstance(), 1L);
+                            }
+                            p.playJingle(Jingle.FEROCITY, false);
                         }
-                        p.playJingle(Jingle.FEROCITY, false);
                     }
                 }
             }.runTaskLater(SBX.getInstance(), 10L);
@@ -286,27 +313,30 @@ public class EntityDamageEntityEvent extends SkyblockListener<EntityDamageByEnti
                 Location loc = damagee.getLocation();
                 if (dmg != 0) {
                     //damagee.damage(dmg);
-                    if (damagee.getHealth() - dmg < 0) {
-                        damagee.damage(dmg);
+                    if (damagee instanceof Player) {
+                        SBPlayer player = new SBPlayer((Player) damagee);
+                        player.setStat(SBPlayer.PlayerStat.HEALTH, player.getStat(SBPlayer.PlayerStat.HEALTH) - dmg);
                     } else {
-                        damagee.setHealth(damagee.getHealth() - dmg);
-                    }
-                    DamageUtil.doDragonDamage(damagee,p,dmg);
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            damagee.setNoDamageTicks(0);
-                            damagee.setMaximumNoDamageTicks(0);
-                            if (!damagee.hasMetadata(Slayers.ENDERMAN.toString())) {
-                                PacketPlayOutEntityStatus packet = new PacketPlayOutEntityStatus(((CraftEntity) damagee).getHandle(), (byte) 2);
-                                ((CraftPlayer) p.getPlayer()).getHandle().playerConnection.sendPacket(packet);
-                            }
+                        if (damagee.getHealth() - dmg < 0) {
+                            damagee.damage(dmg);
+                        } else {
+                            damagee.setHealth(damagee.getHealth() - dmg);
                         }
-                    }.runTaskLater(SBX.getInstance(), 1L);
-                } else {
-                    //damagee.damage(0);
+                        DamageUtil.doDragonDamage(damagee, p, dmg);
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                damagee.setNoDamageTicks(0);
+                                damagee.setMaximumNoDamageTicks(0);
+                                if (!damagee.hasMetadata(Slayers.ENDERMAN.toString())) {
+                                    PacketPlayOutEntityStatus packet = new PacketPlayOutEntityStatus(((CraftEntity) damagee).getHandle(), (byte) 2);
+                                    ((CraftPlayer) p.getPlayer()).getHandle().playerConnection.sendPacket(packet);
+                                }
+                            }
+                        }.runTaskLater(SBX.getInstance(), 1L);
+                        p.playJingle(Jingle.FEROCITY, false);
+                    }
                 }
-                p.playJingle(Jingle.FEROCITY, false);
             }
         }
     }

@@ -3,6 +3,7 @@ package net.atlas.SkyblockSandbox.listener.sbEvents;
 import com.google.common.base.Enums;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.abilityCreator.AbilityHandler;
+import net.atlas.SkyblockSandbox.command.commands.Command_island;
 import net.atlas.SkyblockSandbox.gui.guis.backpacks.Backpack;
 import net.atlas.SkyblockSandbox.gui.guis.skyblockmenu.SBMenu;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.SummonListener;
@@ -21,7 +22,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 
+import static net.atlas.SkyblockSandbox.SBX.cachedPets;
 import static net.atlas.SkyblockSandbox.island.islands.end.dragFight.StartFight.spawnLoc;
+import static net.atlas.SkyblockSandbox.playerIsland.PlayerIslandHandler.dist;
 
 public class PlayerInteractEvent extends SkyblockListener<org.bukkit.event.player.PlayerInteractEvent> {
     AbilityHandler handler = new AbilityHandler();
@@ -48,10 +51,38 @@ public class PlayerInteractEvent extends SkyblockListener<org.bukkit.event.playe
                     }
                 }
             }
+
             if(event.getAction().equals(Action.RIGHT_CLICK_AIR)) {
                 runPetLogic(event);
                 runBPLogic(event);
                 sbmenuLogic(event);
+            }
+
+            switch (event.getItem().getType()) {
+                case LAVA_BUCKET:
+                case WATER_BUCKET:
+                case BUCKET:
+                case MILK_BUCKET: {
+                    SBPlayer pl = new SBPlayer(event.getPlayer());
+
+                    if (Command_island.getVisiting(pl) != null) {
+                        event.setCancelled(true);
+
+                        return;
+                    }
+
+                    if(pl.hasIsland()) {
+                        if (pl.getWorld() == pl.getPlayerIsland().getCenter().getWorld()) {
+                            if(pl.getLocation().distance(pl.getPlayerIsland().getCenter()) > dist()) {
+                                event.setCancelled(true);
+                                pl.sendMessage(SUtil.colorize("&cYou cannot place blocks more than " + dist() + " blocks in that direction!"));
+                            }
+                            return;
+                        }
+                    }
+
+                    event.setCancelled(true);
+                    }
             }
         }
     }
@@ -70,11 +101,12 @@ public class PlayerInteractEvent extends SkyblockListener<org.bukkit.event.playe
         if(Boolean.parseBoolean(NBTUtil.getString(e.getItem(),"is-pet"))) {
             Player p = e.getPlayer();
             ItemStack it = NBTUtil.setString(e.getItem(), "true", "is-equipped");
+            it = NBTUtil.setString(it, "false", "is-active");
             it = NBTUtil.removeTag(it,"mf-gui");
             SBItemStack itnew = new SBItemStack(it);
             it = itnew.refreshLore();
             String serialized = Serialization.itemStackToBase64(it);
-            SBX.getMongoStats().setData(e.getPlayer().getUniqueId(), "pet_" + serialized, serialized);
+            cachedPets.get(e.getPlayer().getUniqueId()).put("pet_" + serialized, serialized);
 
             p.sendMessage(SUtil.colorize("&aAdded " + e.getItem().getItemMeta().getDisplayName() + "&a to your pets menu!"));
             p.playSound(p.getLocation(), Sound.ORB_PICKUP, 5, 1);

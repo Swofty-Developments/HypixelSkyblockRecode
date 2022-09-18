@@ -3,7 +3,14 @@ package net.atlas.SkyblockSandbox.listener.sbEvents;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.files.CfgFile;
 import net.atlas.SkyblockSandbox.island.islands.FairySouls;
+import net.atlas.SkyblockSandbox.island.islands.bossRush.BossHall;
+import net.atlas.SkyblockSandbox.island.islands.bossRush.DungeonBoss;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.StartFight;
+import net.atlas.SkyblockSandbox.island.islands.hub.ShowcaseArea;
+import net.atlas.SkyblockSandbox.island.islands.hub.ShowcaseHandler;
+import net.atlas.SkyblockSandbox.item.ItemType;
+import net.atlas.SkyblockSandbox.item.Rarity;
+import net.atlas.SkyblockSandbox.item.SBItemBuilder;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
@@ -18,17 +25,26 @@ import net.minecraft.server.v1_8_R3.MobEffect;
 import net.minecraft.server.v1_8_R3.MobEffectList;
 import net.minecraft.server.v1_8_R3.PacketPlayOutEntityEffect;
 import org.bson.Document;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitTask;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
+import static net.atlas.SkyblockSandbox.SBX.cachedPets;
 import static net.atlas.SkyblockSandbox.SBX.cachedSkills;
 import static net.atlas.SkyblockSandbox.player.SBPlayer.PlayerStat.*;
 
@@ -37,10 +53,18 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
     //public static HashMap<UUID,HashMap<SBPlayer.PlayerStat, Double>> currStats = new HashMap<>();
     public static HashMap<UUID, HashMap<SBPlayer.PlayerStat, Double>> maxStats = new HashMap<>();
     public static HashMap<UUID, HashMap<SBPlayer.PlayerStat, Double>> bonusStats = new HashMap<>();
+    public static HashMap<UUID, ZonedDateTime> time = new HashMap<>();
+    public static HashMap<UUID, Double> playTimeMinutes = new HashMap<>();
 
     @EventHandler
     public void callEvent(PlayerJoinEvent event) {
         SBPlayer p = new SBPlayer(event.getPlayer());
+
+
+        ShowcaseArea area = new ShowcaseArea();
+        area.spawnArea(p);
+
+
         Document playerDoc = SBX.getMongoStats().getPlayerDocument(p.getUniqueId());
 
         if (StartFight.fightActive) {
@@ -56,11 +80,29 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
                 p.teleport(teleLoc);
             } else {
                 try {
-                    Data.createIsland(p.getPlayer(), IslandId.randomIslandId());
+                    Data.createIsland(p.getPlayer(), IslandId.randomIslandId(), new ArrayList<>());
                 } catch (Exception ex) {
                     p.sendMessage(SUtil.colorize("&cFailed to create island. Please contact a server administrator if this issue persists."));
                 }
             }
+            //remove clientside mining fatigue
+            p.removePotionEffect(PotionEffectType.SLOW_DIGGING);
+        } else {
+            if(Bukkit.getWorld("Hypixel")!=null) {
+                p.teleport(new Location(Bukkit.getWorld("Hypixel"), -2.5, 70, -70.5));
+            }
+
+            //clientside mining fatigue
+            p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, Integer.MAX_VALUE, 255, true, false));
+            PacketPlayOutEntityEffect entityEffect = new PacketPlayOutEntityEffect(p.getEntityId(), new MobEffect(MobEffectList.SLOWER_DIG.getId(), Integer.MAX_VALUE, -1, true, false));
+            ((CraftPlayer) p.getPlayer()).getHandle().playerConnection.sendPacket(entityEffect);
+        }
+
+        //loading fairy souls
+        if (playerDoc.getInteger("fairy-souls") == null) {
+            FairySouls.cachedFairySouls.put(p.getUniqueId(), 0);
+        } else {
+            FairySouls.cachedFairySouls.put(p.getUniqueId(), playerDoc.getInteger("fairy-souls"));
         }
 
         HashMap<SBPlayer.PlayerStat, Double> maxStat = new HashMap<>();
@@ -75,12 +117,14 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
         SBX.getInstance().coins.loadCoins(p.getPlayer());
 
         //loading storage
-        MongoStorage mongoStorage = SBX.getInstance().mongoStorage;
-        mongoStorage.setPlayerData(p.getUniqueId().toString());
-        StorageCache storage = new StorageCache(p);
-        for (int i = 1; i <= 9; i++) {
-            storage.refresh(i);
-        }
+        Bukkit.getScheduler().runTaskAsynchronously(SBX.getInstance(), () -> {
+            MongoStorage mongoStorage = SBX.getInstance().mongoStorage;
+            mongoStorage.setPlayerData(p.getUniqueId().toString());
+            StorageCache storage = new StorageCache(p);
+            for (int i = 1; i <= 9; i++) {
+                storage.refresh(i);
+            }
+        });
 
         //scoreboard
         DragonScoreboard scoreboard = new DragonScoreboard(SBX.getInstance());
@@ -90,7 +134,6 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
         for (SBPlayer.PlayerStat s : SBPlayer.PlayerStat.values()) {
             p.setStat(s, p.getMaxStat(s));
         }
-
 
         //health loading
         if (p.getMaxStat(HEALTH) > 100) {
@@ -108,46 +151,63 @@ public class PlayerJoin extends SkyblockListener<PlayerJoinEvent> {
             p.setMaxHealth(20);
         }
 
-        //clientside mining fatigue
-        p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, Integer.MAX_VALUE, 255, true, false));
-        PacketPlayOutEntityEffect entityEffect = new PacketPlayOutEntityEffect(p.getEntityId(), new MobEffect(MobEffectList.SLOWER_DIG.getId(), Integer.MAX_VALUE, -1, true, false));
-        ((CraftPlayer) p.getPlayer()).getHandle().playerConnection.sendPacket(entityEffect);
-
         //loading skill cache
-        Document doc = SBX.getMongoStats().getDocument(p.getUniqueId(), "Skills");
-        Document doc2 = new Document(doc);
-        HashMap<SkillType, Double> temp = new HashMap<>();
-        for (SkillType t : SkillType.values()) {
-            p.addSkillXP(t, 0);
-            p.setSkillLvl(t, 0);
-            Object lvl = doc.putIfAbsent(t.getName() + "_lvl", 0);
-            if (lvl instanceof Double) {
-                p.setSkillLvl(t, ((Double) lvl).intValue());
-            } else {
-                if (lvl instanceof Integer) {
-                    p.setSkillLvl(t, (Integer) lvl);
+        Bukkit.getScheduler().runTaskAsynchronously(SBX.getInstance(), () -> {
+            Document doc = SBX.getMongoStats().getDocument(p.getUniqueId(), "Skills");
+            Document doc2 = new Document(doc);
+            HashMap<SkillType, Double> temp = new HashMap<>();
+            for (SkillType t : SkillType.values()) {
+                p.addSkillXP(t, 0);
+                p.setSkillLvl(t, 0);
+                Object lvl = doc.putIfAbsent(t.getName() + "_lvl", 0);
+                if (lvl instanceof Double) {
+                    p.setSkillLvl(t, ((Double) lvl).intValue());
                 } else {
-                    p.setSkillLvl(t, 0);
+                    if (lvl instanceof Integer) {
+                        p.setSkillLvl(t, (Integer) lvl);
+                    } else {
+                        p.setSkillLvl(t, 0);
+                    }
+                }
+
+
+                Object xp = doc.putIfAbsent(t.getName() + "_xp", 0D);
+                temp.put(t, (Double) xp);
+                if (doc2 != doc) {
+                    SBX.getMongoStats().setData(p.getUniqueId(), "Skills", doc);
                 }
             }
+            cachedSkills.put(p.getUniqueId(), temp);
+        });
 
+        //pets cache
+        Document petsDoc = (Document) playerDoc.get("pets");
+        if(petsDoc==null) {
+            petsDoc = new Document();
+        }
+        cachedPets.put(p.getUniqueId(),petsDoc);
 
-            Object xp = doc.putIfAbsent(t.getName() + "_xp", 0D);
-            temp.put(t, (Double) xp);
-            if (doc2 != doc) {
-                SBX.getMongoStats().setData(p.getUniqueId(), "Skills", doc);
+        //settings cache
+        Document docs = (Document) playerDoc.get("Settings");
+        if (docs == null) {
+            HashMap<String, Object> emptyMap = new HashMap<>();
+            for (SBPlayer.Settings setting : SBPlayer.Settings.values()) {
+                emptyMap.put(setting.name(), true);
             }
+            docs = new Document(emptyMap);
+            playerDoc.put("Settings", docs);
         }
-        cachedSkills.put(p.getUniqueId(), temp);
-
-
-        //loading fairy souls
-        if (playerDoc.getInteger("fairy-souls") == null) {
-            FairySouls.cachedFairySouls.put(p.getUniqueId(), 0);
-        } else {
-            FairySouls.cachedFairySouls.put(p.getUniqueId(), playerDoc.getInteger("fairy-souls"));
+        for (SBPlayer.Settings setting : SBPlayer.Settings.values()) {
+            setting.map.put(p.getUniqueId(), !docs.containsKey(setting.name()) ? Boolean.valueOf(false) : docs.getBoolean(setting.name()));
         }
 
+        //PlayTime
+        time.put(p.getUniqueId(), ZonedDateTime.now(ZoneId.of("-05:00")));
+        Object time = playerDoc.get("PlayTime");
+        if (time == null) {
+            time = 0D;
+        }
 
+        playTimeMinutes.put(p.getUniqueId(), (Double) time);
     }
 }

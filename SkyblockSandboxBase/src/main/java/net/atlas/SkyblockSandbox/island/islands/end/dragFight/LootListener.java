@@ -5,6 +5,7 @@ import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.dragClasses.AbstractDragon;
 import net.atlas.SkyblockSandbox.database.mongo.MongoCoins;
 import net.atlas.SkyblockSandbox.item.Rarity;
+import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.util.StandUtils;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Material;
@@ -43,7 +44,7 @@ public class LootListener implements Listener {
     static MongoCoins db;
 
 
-    private static void strangeCircleStuff(ArrayList<ArmorStand> as) {
+    private static void strangeCircleStuff(ArrayList<Location> as) {
         HashMap<Location, Material> reset = new HashMap<Location, Material>();
         HashMap<Location, Byte> resetData = new HashMap<Location, Byte>();
         new BukkitRunnable() {
@@ -53,10 +54,28 @@ public class LootListener implements Listener {
             public void run() {
 
                 try {
-                    for (ArmorStand armor : as) {
-                        if (armor.isOnGround()) {
+                    for (Location armor : as) {
+                        while (armor.clone().add(0,-1,0).getBlock().getType()==Material.AIR) {
+                            armor.setY(armor.getY()-1);
+                        }
+                        Block b = armor.clone().add(0, -1, 0).getBlock();
+                        if (b.getLocation().getY() >= 10) {
+                            //distance formula lmao
+                            double wtfisthis = Math.abs(Math.sqrt((spawnLoc.getX() - (b.getLocation().getX()) * (spawnLoc.getX() - (b.getLocation().getX()))) + (spawnLoc.getZ() - (b.getLocation().getZ())) * (spawnLoc.getZ() - (b.getLocation().getZ()))));
+                            if (!(wtfisthis >= 70)) {
+                                b.getLocation().setY(9);
+                            }
+
+                        }
+                        reset.put(b.getLocation(), b.getType());
+                        resetData.put(b.getLocation(), b.getData());
+                        b.setType(Material.STAINED_CLAY);
+                        b.setData((byte) 6);
+                        as.remove(armor);
+                        /*if (armor.isOnGround()) {
                             Block b = armor.getLocation().clone().add(0, -1, 0).getBlock();
                             if (b.getLocation().getY() >= 10) {
+                                //distance formula lmao
                                 double wtfisthis = Math.abs(Math.sqrt((spawnLoc.getX() - (b.getLocation().getX()) * (spawnLoc.getX() - (b.getLocation().getX()))) + (spawnLoc.getZ() - (b.getLocation().getZ())) * (spawnLoc.getZ() - (b.getLocation().getZ()))));
                                 if (!(wtfisthis >= 70)) {
                                     b.getLocation().setY(9);
@@ -69,7 +88,7 @@ public class LootListener implements Listener {
                             b.setData((byte) 6);
                             armor.remove();
                             as.remove(armor);
-                        }
+                        }*/
                     }
                 } catch (ConcurrentModificationException ignored) {
                 }
@@ -186,7 +205,7 @@ public class LootListener implements Listener {
                 }
             }.runTaskTimer(SBX.getInstance(), 0, 0);
         }
-        ArrayList<ArmorStand> as = new ArrayList<>();
+        /*ArrayList<ArmorStand> as = new ArrayList<>();
         for (Location loc : StandUtils.generateSphere(location, 6, false)) {
             ArmorStand uff = (ArmorStand) loc.getWorld().spawnEntity(loc.clone().add(0.5, 0, 0.5), EntityType.ARMOR_STAND);
             uff.setVisible(false);
@@ -195,17 +214,8 @@ public class LootListener implements Listener {
             uff.setHealth(1000);
             uff.setGravity(true);
             as.add(uff);
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (uff.isOnGround()) {
-                        this.cancel();
-                    }
-                }
-            }.runTaskTimer(SBX.getInstance(), 0, 0);
-
-        }
-        strangeCircleStuff(as);
+        }*/
+        strangeCircleStuff(new ArrayList<>(StandUtils.generateSphere(location, 6, false)));
     }
 
     private static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
@@ -273,38 +283,39 @@ public class LootListener implements Listener {
         String dragID = ChatColor.stripColor(splitDrag[0]);
 
         double random = Math.random() * 100;
-        double petChance = Math.random()-(StartFight.aotdChance.get(p)/1000000);
+        double petChance = Math.random() - (StartFight.aotdChance.get(p) / 1000000);
         double aotdChance = StartFight.aotdChance.get(p) + (Math.random() * 100);
         p.sendMessage(String.valueOf(aotdChance));
         try {
             if (playerWeight >= 450) {
-                if (petChance <0.0008) {
+                if (petChance < 0.0008) {
+                    //if(petChance>0.0001) {
                     drop = DragonDrop.Universal.PET.getDrop(Rarity.EPIC);
                     double legChance = Math.random();
-                    if(legChance<=0.5) {
+                    if (legChance <= 0.2) {
                         drop = DragonDrop.Universal.PET.getDrop(Rarity.LEGENDARY);
                     }
                 }
             }
-            if (playerWeight >= 450 && !StartFight.activeDrag.getBukkitEntity().hasMetadata(DragonTypes.SUPERIOR.getMobName()) && StartFight.aotdChance.containsKey(p) && aotdChance > 130 && drop == null) {
+            if (playerWeight >= 450 && !StartFight.activeDrag.getBukkitEntity().hasMetadata(DragonTypes.SUPERIOR.getMobName()) && aotdChance > 140 && drop == null) {
                 drop = DragonDrop.Universal.SWORD.getDrop();
                 playerWeight -= 450;
             }
             if (drop == null && playerWeight >= 400) {
                 if (random > 65) {
-                    DragonDrop.CHESTPLATE.getDrop(DragonTypes.valueOf(dragID.toUpperCase()));
+                    drop = DragonDrop.CHESTPLATE.getDrop(DragonTypes.valueOf(dragID.toUpperCase()));
                     playerWeight -= 400;
                 }
             }
             if (drop == null && playerWeight >= 350) {
                 if (random > 55) {
-                    DragonDrop.LEGGINGS.getDrop(DragonTypes.valueOf(dragID.toUpperCase()));
+                    drop = DragonDrop.LEGGINGS.getDrop(DragonTypes.valueOf(dragID.toUpperCase()));
                     playerWeight -= 350;
                 }
             }
             if (drop == null && playerWeight >= 325) {
                 if (random > 40) {
-                    DragonDrop.HELMET.getDrop(DragonTypes.valueOf(dragID.toUpperCase()));
+                    drop = DragonDrop.HELMET.getDrop(DragonTypes.valueOf(dragID.toUpperCase()));
                     playerWeight -= 325;
                 }
             }
@@ -316,10 +327,12 @@ public class LootListener implements Listener {
             }
             //spawning drop
             if (drop != null) {
+                drop = new SBItemStack(drop).refreshLore();
                 spawnLoot(p, loc, drop);
             }
-        } catch (Exception ignored) {
-            System.out.println("[ERROR] Dragon loot could not be dropped!");
+        } catch (Exception ex) {
+            System.out.println("[SkyblockSandboxBase] Dragon loot could not be dropped at: ");
+            ex.printStackTrace();
             p.sendMessage(ChatColor.RED + "Something went wrong while dropping loot! Please contact a staff member if this issue persists.");
         }
     }

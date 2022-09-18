@@ -6,31 +6,39 @@ import com.google.common.base.Enums;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import net.atlas.SkyblockSandbox.AuctionHouse.AuctionItemHandler;
-import net.atlas.SkyblockSandbox.command.abstraction.SBCommandArgs;
-import net.atlas.SkyblockSandbox.command.abstraction.SBCompleter;
 import net.atlas.SkyblockSandbox.command.abstraction.SkyblockCommandFramework;
-import net.atlas.SkyblockSandbox.command.commands.*;
 import net.atlas.SkyblockSandbox.customMining.BreakListener;
 import net.atlas.SkyblockSandbox.customMining.MineUtil;
 import net.atlas.SkyblockSandbox.database.mongo.MongoAH;
 import net.atlas.SkyblockSandbox.database.mongo.MongoCoins;
+import net.atlas.SkyblockSandbox.database.mongo.MongoHypixelItems;
 import net.atlas.SkyblockSandbox.database.sql.MySQL;
-import net.atlas.SkyblockSandbox.database.sql.SQLBpCache;
 import net.atlas.SkyblockSandbox.economy.Coins;
 import net.atlas.SkyblockSandbox.entity.SkyblockEntity;
+import net.atlas.SkyblockSandbox.entitySpawner.DefaultSpawnerObject;
+import net.atlas.SkyblockSandbox.entitySpawner.Spawner;
 import net.atlas.SkyblockSandbox.event.customEvents.ManaEvent;
 import net.atlas.SkyblockSandbox.event.customEvents.SkillEXPGainEvent;
 import net.atlas.SkyblockSandbox.files.CfgFile;
 import net.atlas.SkyblockSandbox.files.DatabaseInformationFile;
 import net.atlas.SkyblockSandbox.files.IslandInfoFile;
+import net.atlas.SkyblockSandbox.gui.guis.ShowcaseGUI;
+import net.atlas.SkyblockSandbox.island.islands.bossRush.BossHall;
+import net.atlas.SkyblockSandbox.island.islands.bossRush.DungeonBoss;
+import net.atlas.SkyblockSandbox.island.islands.bossRush.components.NecronBoss;
+import net.atlas.SkyblockSandbox.files.SpawnersFile;
+import net.atlas.SkyblockSandbox.gui.guis.items.HypixelItemsHelper;
 import net.atlas.SkyblockSandbox.island.islands.end.dragFight.LootListener;
+import net.atlas.SkyblockSandbox.island.islands.hub.ShowcaseHandler;
+import net.atlas.SkyblockSandbox.item.ItemType;
 import net.atlas.SkyblockSandbox.item.Rarity;
-import net.atlas.SkyblockSandbox.item.SBItemStack;
+import net.atlas.SkyblockSandbox.item.SBItemBuilder;
 import net.atlas.SkyblockSandbox.item.ability.AbiltyListener;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.HellShatter;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.ShortBowTerm;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.SoulCry;
 import net.atlas.SkyblockSandbox.item.ability.itemAbilities.WitherImpact;
+import net.atlas.SkyblockSandbox.item.enchant.Enchantment;
 import net.atlas.SkyblockSandbox.listener.SkyblockListener;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.player.skills.SkillType;
@@ -39,13 +47,10 @@ import net.atlas.SkyblockSandbox.playerIsland.MongoIslands;
 import net.atlas.SkyblockSandbox.slayer.SlayerTier;
 import net.atlas.SkyblockSandbox.slayer.Slayers;
 import net.atlas.SkyblockSandbox.storage.MongoStorage;
-import net.atlas.SkyblockSandbox.util.NBTUtil;
+import net.atlas.SkyblockSandbox.util.*;
 import net.atlas.SkyblockSandbox.util.NumberTruncation.NumberSuffix;
-import net.atlas.SkyblockSandbox.util.SUtil;
-import net.atlas.SkyblockSandbox.util.StackUtils;
 import net.atlas.SkyblockSandbox.util.signGUI.SignManager;
 import net.minecraft.server.v1_8_R3.*;
-import org.apache.commons.io.FileUtils;
 import org.bson.Document;
 import org.bukkit.Material;
 import org.bukkit.WorldType;
@@ -53,39 +58,29 @@ import org.bukkit.*;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.craftbukkit.libs.jline.internal.Log;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
-import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.*;
+import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.entity.*;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.util.*;
 
 import static net.atlas.SkyblockSandbox.command.commands.Command_forward.MESSAGE_CHANNEL;
 import static net.atlas.SkyblockSandbox.listener.sbEvents.entityEvents.EntitySpawnEvent.holoMap;
 import static net.atlas.SkyblockSandbox.listener.sbEvents.entityEvents.EntitySpawnEvent.holoMap2;
-import static net.atlas.SkyblockSandbox.command.commands.Command_forward.MESSAGE_CHANNEL;
 
 public class SBX extends JavaPlugin {
     public static HashMap<UUID, Boolean> isSoulCryActive = new HashMap<>();
@@ -104,15 +99,18 @@ public class SBX extends JavaPlugin {
     public static HashMap<Player, Boolean> canfire = new HashMap<>();
     public static HashMap<Player, List<EntityArmorStand>> thrownAxes = new HashMap<>();
     public static final TreeMap<String, ItemStack> hypixelItemMap = new TreeMap<>();
+    public static HashMap<UUID, Document> cachedPets = new HashMap<>();
     public static boolean pvpEnabled;
     public MySQL sql;
     public SignManager signManager;
+    public List<Spawner> spawners;
 
     private static SBX instance;
     SkyblockCommandFramework framework;
     private static MongoCoins mongoStats;
     private MongoIslands mongoIslands;
     public MongoStorage mongoStorage;
+    public MongoHypixelItems hypixelItems;
     public Coins coins;
     private static ProtocolManager protocolManager;
 
@@ -125,12 +123,15 @@ public class SBX extends JavaPlugin {
         instance = this;
         mongoStorage = new MongoStorage();
         mongoIslands = new MongoIslands();
+        hypixelItems = new MongoHypixelItems();
         framework = new SkyblockCommandFramework(this);
         createDataFiles();
         mongoStats = new MongoCoins();
         mongoStats.connect();
+        hypixelItems.connect();
         protocolManager = ProtocolLibrary.getProtocolManager();
-        MongoAH mongoAH = new MongoAH();
+        new ShowcaseHandler();
+        /*MongoAH mongoAH = new MongoAH();
         mongoAH.connect();
         long time = System.currentTimeMillis();
         System.out.println("Starting to cache all ah data....");
@@ -151,34 +152,46 @@ public class SBX extends JavaPlugin {
             System.err.println("Failed to cache all ah data! (" + (System.currentTimeMillis() - time) + " ms)");
             e.printStackTrace();
         }
+
+         */
         mongoStorage.connect();
         mongoIslands.connect();
         coins = new Coins();
 
         Data.initialize();
-        sql = new MySQL();
-        SQLBpCache.init();
         signManager = new SignManager(this);
         signManager.init();
         registerListeners();
         registerCommands();
         createIslandWorld();
-        githubItems();
-
         startOnlineRunnables();
         createDataFiles();
 
         MineUtil.setupPacketListeners();
 
-
-        //registerEntity("Enderman", 58, EntityZombie.class, NoTeleportEnderman.class);
         SkyblockEntity.registerEntities();
+        DungeonBoss.registerEntity("Wither",64,EntityWither.class, NecronBoss.class);
         getServer().getMessenger().registerOutgoingPluginChannel(this, MESSAGE_CHANNEL);
+        loadSpawners();
+        HypixelItemsHelper.cacheItems();
+        new PlaceHolderAPI().register();
+
+        for (int i = 0; i < Enchantment.values().length; i++) {
+            for (Enchantment enchant : Enchantment.values()) {
+                if (i == enchant.getIndex()) {
+                    Enchantment.sortedEnchants.add(enchant);
+                }
+            }
+        }
     }
 
     @Override
     public void onDisable() {
         cacheSkills();
+        cachePets();
+        for (Spawner spawner : spawners) {
+            spawner.stop();
+        }
     }
 
     public static void cacheSkills() {
@@ -188,13 +201,19 @@ public class SBX extends JavaPlugin {
             Document skillDoc = (Document) playerDoc.get("Skills");
             for (SkillType type : cachedSkills.get(uid).keySet()) {
                 double amt = cachedSkills.get(uid).get(type);
-                skillDoc.put(type.getName() + "_xp",amt);
+                skillDoc.put(type.getName() + "_xp", amt);
             }
             for (SkillType type : cachedSkillLvls.get(uid).keySet()) {
                 int amt = cachedSkillLvls.get(uid).get(type);
-                skillDoc.put(type.getName() + "_lvl",amt);
+                skillDoc.put(type.getName() + "_lvl", amt);
             }
-            SBX.getMongoStats().setData(uid,"Skills",skillDoc);
+            SBX.getMongoStats().setData(uid, "Skills", skillDoc);
+        }
+    }
+
+    public static void cachePets() {
+        for (UUID uid : cachedPets.keySet()) {
+            getMongoStats().setData(uid, "pets", cachedPets.get(uid));
         }
     }
 
@@ -207,7 +226,9 @@ public class SBX extends JavaPlugin {
         pm.registerEvents(new AbiltyListener(new WitherImpact()), this);
         pm.registerEvents(new AbiltyListener(new ShortBowTerm()), this);
         pm.registerEvents(new LootListener(), this);
-        pm.registerEvents(new BreakListener(),this);
+        pm.registerEvents(new BreakListener(), this);
+
+
     }
 
     void registerCommands() {
@@ -227,6 +248,7 @@ public class SBX extends JavaPlugin {
         new DatabaseInformationFile().create();
         new IslandInfoFile().create();
         new CfgFile().create();
+        new SpawnersFile().create();
     }
 
     public static ProtocolManager getProtcolManager() {
@@ -240,7 +262,7 @@ public class SBX extends JavaPlugin {
             public void run() {
                 for (Document doc : new MongoAH().getAllDocuments()) {
                     AuctionItemHandler item = AuctionItemHandler.mongoToCache(UUID.fromString(doc.getString("auctionID")));
-                    if(AuctionItemHandler.time(item.getEndTime(), item.getStartTime()).equals("")) {
+                    if (AuctionItemHandler.time(item.getEndTime(), item.getStartTime()).equals("")) {
                         item.setHasEnded(true);
                         mongo.setData(item.getAuctionID(), "isClaimed", false);
                         item.setClaimed(false);
@@ -251,10 +273,44 @@ public class SBX extends JavaPlugin {
                 }
             }
         }.runTaskTimerAsynchronously(this, 0, 100);
+        updateAH.cancel();
 
+        HashMap<BossHall.BossPedestal, Hologram> bossStandList = new HashMap<>();
         BukkitTask runnable = new BukkitRunnable() {
             @Override
             public void run() {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    for (BossHall.BossPedestal bp : new ArrayList<>(BossHall.bossList)) {
+                        Entity en = bp.getBoss().getSpawnedEn();
+                        if(en.isDead()) {
+                            BossHall.bossList.remove(bp);
+                        } else {
+                            Location eye = p.getEyeLocation();
+                            Vector toEntity = en.getLocation().add(0, 2, 0).toVector().subtract(eye.toVector());
+                            double dot = toEntity.normalize().dot(eye.getDirection());
+                            if (dot > 0.99D) {
+                                Location spawnLoc = en.getLocation().add(toEntity.multiply(-1).normalize());
+                                Hologram hg;
+                                if (!bossStandList.containsKey(bp)) {
+                                    hg = new Hologram(spawnLoc);
+                                    hg.addLine("&7Requires Boss Rush 6 Completion");
+                                    hg.addLine("");
+                                    hg.addLine("&eRight Click to fight!");
+                                    hg.addLine("&c&l" + en.getCustomName());
+                                    bossStandList.put(bp, hg);
+                                } else {
+                                    hg = bossStandList.get(bp);
+                                }
+                                hg.displayHolo(p);
+                            } else {
+                                if (bossStandList.containsKey(bp)) {
+                                    bossStandList.get(bp).removeHolo(p);
+                                }
+                            }
+                        }
+                    }
+
+                }
                 if (!holoMap2.isEmpty()) {
                     HashMap<Integer, HashMap<Entity, EntityArmorStand>> holoMapClone = new HashMap<>(holoMap2);
                     for (int x : holoMapClone.keySet()) {
@@ -337,13 +393,16 @@ public class SBX extends JavaPlugin {
     public static String getStatMessage(SBPlayer p) {
         DecimalFormat f = new DecimalFormat("#");
         String middlemsg = "";
+        if (p.getMaxStat(SBPlayer.PlayerStat.DEFENSE) != 0) {
+            middlemsg = "    &a" + f.format(p.getMaxStat(SBPlayer.PlayerStat.DEFENSE)) + "❈ Defense§b    ";
+        }
         if (queuedBarMessages.containsKey(p.getUniqueId())) {
             String s = queuedBarMessages.get(p.getUniqueId()).keySet().stream().findFirst().orElse("");
             if (!s.equals("")) {
                 middlemsg = s;
             }
         }
-        return SUtil.colorize("&c" + f.format(p.getStat(SBPlayer.PlayerStat.HEALTH)) + "/" + f.format(p.getMaxStat(SBPlayer.PlayerStat.HEALTH)) + "❤ Health " + middlemsg + " &b" + f.format(p.getStat(SBPlayer.PlayerStat.INTELLIGENCE)) + "/" + f.format(p.getMaxStat(SBPlayer.PlayerStat.INTELLIGENCE)) + "✎ Mana");
+        return SUtil.colorize("&c" + f.format(p.getStat(SBPlayer.PlayerStat.HEALTH)) + "/" + f.format(p.getMaxStat(SBPlayer.PlayerStat.HEALTH)) + "❤ " + middlemsg + " &b" + f.format(p.getStat(SBPlayer.PlayerStat.INTELLIGENCE)) + "/" + f.format(p.getMaxStat(SBPlayer.PlayerStat.INTELLIGENCE)) + "✎ Mana");
     }
 
     public static String getStatMessage(SBPlayer p, ManaEvent e) {
@@ -392,146 +451,30 @@ public class SBX extends JavaPlugin {
         return blacklisted;
     }
 
-    private void githubItems() {
-        try {
-            System.err.println("Starting to download neu-repo");
-            File repoLocation = new File(getDataFolder(), File.separator + "github");
-            repoLocation.mkdirs();
-            File itemsZip = new File(repoLocation, "neu-items-master.zip");
-            try {
-                itemsZip.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return;
-            }
+    private void loadSpawners() {
+        if (getServer().getServerName().equals("islands")) {
+            return;
+        }
+        spawners = new ArrayList<>();
 
+        SpawnersFile file = new SpawnersFile();
 
-            URL url = new URL("https://github.com/Moulberry/NotEnoughUpdates-REPO/archive/refs/heads/master.zip");
-            URLConnection urlConnection = url.openConnection();
-            urlConnection.setConnectTimeout(15000);
-            urlConnection.setReadTimeout(30000);
+        for (String s : file.a().getConfigurationSection("spawners").getKeys(false)) {
+            Location loc = new Location(Bukkit.getWorld(file.a().getString("spawners." + s + ".location.world")), file.a().getDouble("spawners." + s + ".location.x"), file.a().getDouble("spawners." + s + ".location.y"), file.a().getDouble("spawners." + s + ".location.z"));
+            System.out.println(loc.getWorld().getName());
+            loc.setWorld(getServer().getWorld(file.a().getString("spawners." + s + ".location.world")));
+            Spawner spawner = new DefaultSpawnerObject().setSpawnerLocation(loc).setSpawnerType(Enums.getIfPresent(EntityType.class, file.a().getString("spawners." + s + ".entity.type")).get()
+            ).setDisplayname(file.a().getString("spawners." + s + ".entity.name")
+            ).setHealth(file.a().getInt("spawners." + s + ".entity.health")
+            ).setSpawnDelay(file.a().getInt("spawners." + s + ".properties.delay")
+            ).setSpawnCount(file.a().getInt("spawners." + s + ".properties.count")
+            ).setSpawnRange(file.a().getInt("spawners." + s + ".properties.range"));
 
-            try (InputStream is = urlConnection.getInputStream()) {
-                FileUtils.copyInputStreamToFile(is, itemsZip);
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.err.println("Failed to download NEU Repo! Please report this issue to the mod creator");
-                return;
-            }
-            System.out.println("Successfully downloaded NEU Repo!");
-            System.out.println("Starting to unzip NEU Repo!");
+            spawners.add(spawner);
+        }
 
-            SUtil.unzipIgnoreFirstFolder(itemsZip.getAbsolutePath(), repoLocation.getAbsolutePath());
-            File items = new File(repoLocation, "items");
-            if (items.exists()) {
-                File[] itemFiles = new File(repoLocation, "items").listFiles();
-                if (itemFiles != null) {
-                    for (File f : itemFiles) {
-                        JSONParser parser = new JSONParser();
-                        JSONObject json;
-                        try {
-                            try (Reader reader = Files.newBufferedReader(f.toPath().toAbsolutePath(), StandardCharsets.UTF_8)) {
-                                json = (JSONObject) parser.parse(reader);
-                            }
-                            try {
-                                MinecraftKey mk = new MinecraftKey(json.get("itemid").toString());
-                                ItemStack item = CraftItemStack.asNewCraftStack(net.minecraft.server.v1_8_R3.Item.REGISTRY.get(mk));
-                                Material mat = item.getType();
-                                switch (mat) {
-                                    case BARRIER:
-                                    case COMMAND:
-                                    case COMMAND_MINECART:
-                                    case BURNING_FURNACE:
-                                    case SOIL:
-                                        continue;
-                                }
-                                String displayname = String.valueOf(json.get("displayname"));
-                                ArrayList<String> lore = new ArrayList<>();
-                                for (Object list : (JSONArray) json.get("lore")) {
-                                    lore.add(list.toString());
-                                }
-                                String parsedRarity = ChatColor.stripColor(lore.get(lore.size() - 1)).split(" ")[0];
-                                Rarity r = Enums.getIfPresent(Rarity.class, parsedRarity).orNull();
-                                net.minecraft.server.v1_8_R3.ItemStack itemStack = CraftItemStack.asNMSCopy(StackUtils.makeColorfulItem(mat, displayname, 1, Integer.parseInt(json.get("damage").toString()), lore));
-                                if (json.get("nbttag") != null) {
-                                    NBTTagCompound nbt = MojangsonParser.parse(json.get("nbttag").toString());
-                                    itemStack.setTag(nbt);
-                                }
-                                ItemStack bukkitStack = CraftItemStack.asBukkitCopy(itemStack);
-                                for (String s : lore) {
-                                    String parsedStat = ChatColor.stripColor(s).replace(' ', '_').toUpperCase().split(":")[0];
-                                    List<String> statsFormat = new ArrayList<>(Arrays.asList(SBItemStack.statsformat));
-                                    if (statsFormat.stream().anyMatch(parsedStat::equalsIgnoreCase)) {
-                                        SBPlayer.PlayerStat stat = Enums.getIfPresent(SBPlayer.PlayerStat.class, parsedStat).orNull();
-                                        if (stat != null) {
-                                            try {
-                                                String split1 = ChatColor.stripColor(s).replace(' ', '_').toUpperCase();
-                                                if (split1.contains("{")) {
-                                                    split1 = "0";
-                                                } else {
-                                                    if (split1.contains(":")) {
-                                                        split1 = split1.split(":")[1];
-                                                    }
-                                                    if (split1.contains("_HP")) {
-                                                        split1 = split1.replace("_HP", "");
-                                                    }
-                                                    if (split1.contains("%")) {
-                                                        split1 = split1.replace("%", "");
-                                                    }
-                                                    if (split1.contains("+")) {
-                                                        split1 = split1.replace("+", "");
-                                                    }
-                                                    if (split1.contains(".")) {
-                                                        split1 = split1.split("\\.")[0];
-                                                    }
-                                                    if (split1.contains("-")) {
-                                                        split1 = "0";
-                                                    }
-                                                    if (split1.contains(",")) {
-                                                        split1 = split1.replace(",", "");
-                                                    }
-                                                    if (split1.contains("_")) {
-                                                        split1 = split1.replace("_", "");
-                                                    }
-                                                    if (split1.contains("?")) {
-                                                        split1 = split1.replace("?", "");
-                                                    }
-                                                    if (split1.contains("HEALTH") || split1.contains("PERSECOND") || split1.contains("SPEED") || split1.contains("INTELLIGENCE") || split1.contains("DAMAGE") || split1.contains("STRENGTH")) {
-                                                        split1 = "0";
-                                                    }
-                                                    int amt = Integer.parseInt(split1);
-                                                    if (amt != 0) {
-                                                        bukkitStack = NBTUtil.setInteger(bukkitStack, amt, stat.name());
-                                                    }
-                                                }
-                                            } catch (NumberFormatException ex) {
-                                                ex.printStackTrace();
-                                            }
-                                        }
-                                    } else {
-                                        SBItemStack stack = new SBItemStack(bukkitStack);
-                                        bukkitStack = stack.addDescriptionLine(s, lore.indexOf(s));
-                                    }
-
-                                }
-                                if (r != null) {
-                                    bukkitStack = NBTUtil.setString(bukkitStack, r.toString(), "RARITY");
-                                }
-                                bukkitStack = NBTUtil.setString(bukkitStack, "true", "is-hypixel");
-
-                                hypixelItemMap.put(String.valueOf(json.get("internalname")), bukkitStack);
-                            } catch (MojangsonParseException e) {
-                                e.printStackTrace();
-                            }
-                        } catch (NullPointerException | IllegalArgumentException ignored) {
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        for (Spawner s : spawners) {
+            s.start();
         }
     }
 }

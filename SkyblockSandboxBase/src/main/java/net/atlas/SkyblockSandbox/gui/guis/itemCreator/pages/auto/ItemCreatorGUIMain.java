@@ -1,24 +1,25 @@
-package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages;
+package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.auto;
 
+import me.nemo_64.spigotutilities.playerinputs.chatinput.PlayerChatInput;
 import net.atlas.SkyblockSandbox.SBX;
-import net.atlas.SkyblockSandbox.gui.AnvilGUI;
 import net.atlas.SkyblockSandbox.gui.NormalGUI;
 import net.atlas.SkyblockSandbox.gui.guis.itemCreator.ItemTypeGUI;
 import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator.AbilitySelectorGUI;
+import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.TagsEditorGUI;
 import net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.petbuilder.PetBuilderGUI;
+import net.atlas.SkyblockSandbox.item.SBItemBuilder;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
-import net.atlas.SkyblockSandbox.util.NBTUtil;
 import net.atlas.SkyblockSandbox.util.SUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.stream.Stream;
+
+import static net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.auto.ItemDescriptionGUI.PROFANITIES;
+import static net.atlas.SkyblockSandbox.util.SUtil.colorize;
 
 public class ItemCreatorGUIMain extends NormalGUI {
 
@@ -35,47 +36,21 @@ public class ItemCreatorGUIMain extends NormalGUI {
             event.getWhoClicked().closeInventory();
         });
         setAction(4, event -> {
-            AnvilGUI gui = new AnvilGUI((Player) event.getWhoClicked(), event1 -> {
-                SBPlayer player = new SBPlayer((Player) event.getWhoClicked());
-                if (event1.getSlot().equals(AnvilGUI.AnvilSlot.INPUT_LEFT)) {
-                    event1.setWillDestroy(false);
-                    event1.setWillClose(false);
-                    return;
-                }
-                if (event1.getSlot().equals(AnvilGUI.AnvilSlot.OUTPUT)) {
-                    ItemMeta meta = player.getItemInHand().getItemMeta();
-
-                    for (String s : ItemLoreGUI.PROFANITIES) {
-                        if (ChatColor.stripColor(event1.getName()).toLowerCase().contains(s)) {
-                            player.sendMessage(SUtil.colorize("&cYou cannot use that word in your item name!"));
-                            player.closeInventory();
-                            return;
-                        }
-                    }
-
-
-                    meta.setDisplayName(SUtil.colorize(event1.getName()));
-                    player.getItemInHand().setItemMeta(meta);
-                    ItemStack i = NBTUtil.setString(player.getItemInHand(),SUtil.colorize(event1.getName()),"item-name");
-                    player.setItemInHand(i);
-
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            open(player);
-                        }
-                    }.runTaskLater(SBX.getInstance(), 2);
-                }
-            });
-
-            gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, makeColorfulItem(Material.NAME_TAG, "Enter item name", 1, 0));
-            gui.open();
+            startChat(getOwner());
         });
         setAction(13, event -> {
-            new ItemLoreGUI(getOwner()).open();
+            if (getOwner().getStringFromItemInHand("non-legacy").equals("true")) {
+                new ItemDescriptionGUI(getOwner()).open();
+            } else {
+                getOwner().sendMessage("&cNeed to set a name or rarity before doing this.");
+            }
         });
         setAction(15, event -> {
-            new AbilitySelectorGUI(getOwner()).open();
+            if (getOwner().getStringFromItemInHand("non-legacy").equals("true")) {
+                new AbilitySelectorGUI(getOwner()).open();
+            } else {
+                getOwner().sendMessage("&cNeed to set a name or rarity before doing this.");
+            }
         });
         setAction(22, event -> {
             SBPlayer player = new SBPlayer((Player) event.getWhoClicked());
@@ -91,12 +66,7 @@ public class ItemCreatorGUIMain extends NormalGUI {
         });
         setAction(12, event -> {
             SBPlayer player = new SBPlayer((Player) event.getWhoClicked());
-            if (player.getItemInHand().getItemMeta().hasDisplayName() && player.getItemInHand().getItemMeta().hasLore()) {
-                new RaritiesGUI(getOwner()).open();
-            } else {
-                player.sendMessage("§cYour item must have a displayname and lore first in order to set it's rarity!");
-                player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1f, 0f);
-            }
+            new RaritiesGUI(getOwner()).open();
         });
         setAction(11, event -> {
             SBPlayer player = new SBPlayer((Player) event.getWhoClicked());
@@ -114,7 +84,11 @@ public class ItemCreatorGUIMain extends NormalGUI {
             }
         });
         setAction(20,event -> {
-            new ItemTypeGUI(getOwner()).open();
+            if (getOwner().getStringFromItemInHand("non-legacy").equals("true")) {
+                new ItemTypeGUI(getOwner()).open();
+            } else {
+                getOwner().sendMessage("&cNeed to set a name or rarity before doing this.");
+            }
         });
         setAction(21,event -> {
             new PetBuilderGUI(getOwner()).open();
@@ -122,12 +96,23 @@ public class ItemCreatorGUIMain extends NormalGUI {
         setAction(40,event -> {
             getOwner().closeInventory();
         });
+        setAction(23, event -> {
+            if (getOwner().getStringFromItemInHand("non-legacy").equals("true")) {
+                if (getOwner().getStringFromItemInHand("type") != null) {
+                    new EnchantGUI(getOwner()).open();
+                } else {
+                    getOwner().sendMessage("&cYou need to set an item type before doing this!");
+                }
+            } else {
+                getOwner().sendMessage("&cNeed to set a name or rarity before doing this.");
+            }
+        });
         return true;
     }
 
     @Override
     public String getTitle() {
-        return "Create an item";
+        return "Auto Item Creator";
     }
 
     @Override
@@ -148,9 +133,44 @@ public class ItemCreatorGUIMain extends NormalGUI {
         setItem(12, makeColorfulItem(Material.PAINTING, "§aSet item Rarity", 1, 0, SUtil.colorize("&7Set the rarity of your item", "&7you can choose anything", "&7between: &fCommon&7, &aUncommon", "&9Rare&7, &5Epic&7, &6Legendary&7,", "&dMythic&7, &cSpecial&7.", "", "§cNote: The last line of", "§clore in your item will", "§cturn into the rarity name.", "", "&eClick to set!")));
         setItem(15, makeColorfulItem(Material.GLOWSTONE_DUST, "§aSet item ability", 1, 0, SUtil.colorize("&7Create your own custom ability!", "&7Using the Base Abilites or", "&7the Advanced functions!", "", "&eClick to create!")));
         setItem(21,makeColorfulItem(Material.BARRIER,"&aPet Builder",1,0,SUtil.colorize("&7Create your own custom pet!","","&eClick to create!")));
-        setItem(22, makeColorfulItem(Material.ENCHANTED_BOOK, "§aEdit Item Tags", 1, 0, SUtil.colorize("&7Edit the tags the item has!", "&7Including Unbreakable, Enchant tag,", "&7Glowing tag, and the Damage Tag!", "", "&eClick to edit!")));
+        setItem(23, makeColorfulItem(Material.ENCHANTED_BOOK, "§aEdit Item Enchants", 1, 0, SUtil.colorize("&7Edit the enchants the item has!", "", "&eClick to edit!")));
+        setItem(22, makeColorfulItem(Material.BOOK_AND_QUILL, "§aEdit Item Tags", 1, 0, SUtil.colorize("&7Edit the tags the item has!", "&7Including Unbreakable, Enchant tag,", "&7Glowing tag, and the Damage Tag!", "", "&eClick to edit!")));
         setItem(11, makeColorfulItem(Material.INK_SACK, "§aSet item color", 1, 5, SUtil.colorize("&7Edit the color of the item!", "&7you can change any item", "&7from: &aWool &7, &aStained_Clay &7, ", "&aStained_Glass_Panes &7, &aStained_Glass  ", "&7or &aINK_SACK(DYES)")));
         setItem(20,makeColorfulItem(Material.GOLD_AXE,"&aSet item type",1,0,"&7Set the item type!","","&eClick to set the item type!"));
 
+    }
+
+    private void startChat(Player p) {
+        SBItemBuilder item = new SBItemBuilder(p.getItemInHand());
+        p.closeInventory();
+        PlayerChatInput.PlayerChatInputBuilder<String> builder = new PlayerChatInput.PlayerChatInputBuilder<>(SBX.getInstance(), p);
+        builder.onExpireMessage(colorize("&cYou failed to set the name after 3 minute.")).sendValueMessage(colorize("&7Please input the name of the item!" + "\n&eSay &ccancel &eto stop."));
+        builder.setValue((player, str) -> {
+            return str;
+        });
+        builder.isValidInput((player, str) -> {
+            if (str.isEmpty()) {
+                getOwner().sendMessage("&cThat is not a valid input!");
+                new ItemCreatorGUIMain(getOwner()).open();
+                return false;
+            }
+            for (String s : PROFANITIES) {
+                if (ChatColor.stripColor(str).toLowerCase().contains(s)) {
+                    player.sendMessage("§cYou cannot use that word in your name!");
+                    new ItemCreatorGUIMain(getOwner()).open();
+                    return false;
+                }
+            }
+            return true;
+        }).onFinish((player, str) -> {
+            player.setItemInHand(item.name(str).build());
+            new ItemCreatorGUIMain(getOwner()).open();
+        }).onInvalidInput(((player, s) -> true)).expiresAfter(3600).onExpire((player -> {
+            new ItemCreatorGUIMain(getOwner()).open();
+        })).toCancel("cancel").onCancel((player -> {
+            getOwner().sendMessage("&cCanceled!");
+            new ItemCreatorGUIMain(getOwner()).open();
+        }));
+        builder.build().start();
     }
 }

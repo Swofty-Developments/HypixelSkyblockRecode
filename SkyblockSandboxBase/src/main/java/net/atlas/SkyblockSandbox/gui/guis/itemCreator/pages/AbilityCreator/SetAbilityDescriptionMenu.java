@@ -1,13 +1,15 @@
 package net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.AbilityCreator;
 
 import dev.triumphteam.gui.builder.item.ItemBuilder;
+import me.nemo_64.spigotutilities.playerinputs.chatinput.PlayerChatInput;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.gui.AnvilGUI;
+import net.atlas.SkyblockSandbox.gui.Backable;
 import net.atlas.SkyblockSandbox.gui.PaginatedGUI;
+import net.atlas.SkyblockSandbox.item.SBItemBuilder;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.player.SBPlayer;
 import net.atlas.SkyblockSandbox.util.NBTUtil;
-import net.atlas.SkyblockSandbox.util.SUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
@@ -22,7 +24,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
-public class SetAbilityDescriptionMenu extends PaginatedGUI {
+import static net.atlas.SkyblockSandbox.gui.guis.itemCreator.pages.auto.ItemDescriptionGUI.PROFANITIES;
+import static net.atlas.SkyblockSandbox.util.NBTUtil.getInteger;
+import static net.atlas.SkyblockSandbox.util.SUtil.colorize;
+
+public class SetAbilityDescriptionMenu extends PaginatedGUI implements Backable {
     private final int indexx;
 
     public SetAbilityDescriptionMenu(SBPlayer owner, int indexx) {
@@ -51,26 +57,7 @@ public class SetAbilityDescriptionMenu extends PaginatedGUI {
         Player p = (Player) event.getWhoClicked();
         switch (event.getSlot()) {
             case 52:
-                AnvilGUI anvilGUI = new AnvilGUI(p, event1 -> {
-                    if(event1.getSlot().equals(AnvilGUI.AnvilSlot.OUTPUT)) {
-                        event1.setWillClose(true);
-                        event1.setWillDestroy(true);
-
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                SBItemStack p1 = new SBItemStack(getOwner().getItemInHand());
-                                ItemStack i = p1.addAbilityDescriptionLine(getOwner().getItemInHand(), SUtil.colorize(event1.getName()),indexx);
-                                p1 = new SBItemStack(i);
-                                i = p1.refreshLore();
-                                getOwner().setItemInHand(i);
-                                new SetAbilityDescriptionMenu(getOwner(),indexx).open();
-                            }
-                        }.runTaskLater(SBX.getInstance(), 1);
-                    }
-                });
-                anvilGUI.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, makeColorfulItem(Material.PAPER, "Enter Lore Line", 1, 0, "§a^^^^^","§7Enter a lore line in the","§7text box!"));
-                anvilGUI.open();
+                startChat(p, event.getCurrentItem(), true);
                 break;
             case 45:
                 if(getGui().getPrevPageNum()==1&&getGui().getCurrentPageNum()==1) {
@@ -98,7 +85,7 @@ public class SetAbilityDescriptionMenu extends PaginatedGUI {
                                         public void run() {
                                             SBItemStack p1 = new SBItemStack(getOwner().getItemInHand());
                                             SBItemStack p2 = new SBItemStack(event.getCurrentItem());
-                                            ItemStack i = p1.setAbilDescriptLine(SUtil.colorize(event2.getName()),indexx, p2.getInteger(p1.asBukkitItem(),"Line"));
+                                            ItemStack i = p1.setAbilDescriptLine(colorize(event2.getName()),indexx, p2.getInteger(p1.asBukkitItem(),"Line"));
                                             p1 = new SBItemStack(i);
                                             i = p1.refreshLore();
                                             getOwner().setItemInHand(i);
@@ -111,7 +98,10 @@ public class SetAbilityDescriptionMenu extends PaginatedGUI {
                         anvilGUI2.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, makeColorfulItem(Material.PAPER, "Enter Lore Line", 1, 0, "§a^^^^^","§7Enter a lore line in the","§7text box!"));
                         anvilGUI2.open();
                         break;
-                    } else {
+                    } else if (event.getClick() == ClickType.RIGHT) {
+                        startChat(p, event.getCurrentItem(), false);
+                    }
+                    else {
                         if(event.getClick()==ClickType.MIDDLE) {
                             ItemStack i = event.getCurrentItem();
 
@@ -131,10 +121,10 @@ public class SetAbilityDescriptionMenu extends PaginatedGUI {
 
     @Override
     public void setItems() {
-        getGui().getFiller().fillBorder(ItemBuilder.from(super.FILLER_GLASS).name(Component.text(SUtil.colorize("&7 "))).asGuiItem());
+        getGui().getFiller().fillBorder(ItemBuilder.from(super.FILLER_GLASS).name(Component.text(colorize("&7 "))).asGuiItem());
         
-        SBItemStack i = new SBItemStack(getOwner().getItemInHand());
-        List<String> lore = i.getAbilityDescription(getOwner().getItemInHand(),indexx);
+        SBItemBuilder builder = new SBItemBuilder(getOwner().getItemInHand());
+        List<String> lore = builder.abilities.get(indexx).description;
 
         ItemStack next = makeColorfulItem(Material.ARROW, ChatColor.GREEN + "Next Page", 1, 0, "§7Go to the next page.");
         ItemStack prev = makeColorfulItem(Material.ARROW, ChatColor.GREEN + "Previous Page", 1, 0, "§7Go to the previous page.");
@@ -155,14 +145,12 @@ public class SetAbilityDescriptionMenu extends PaginatedGUI {
             for(String s:lore) {
                 ItemStack loreItem = new ItemStack(Material.WOOL,1,DyeColor.LIME.getData());
                 ItemMeta meta = loreItem.getItemMeta();
-                meta.setDisplayName(SUtil.colorize("&aLine #" + lore.indexOf(s)));
-                String newLore = lore.get(lore.indexOf(s));
+                meta.setDisplayName(colorize("&aLine #" + lore.indexOf(s)));
+                String newLore = colorize(lore.get(lore.indexOf(s)));
                 List<String> finalList = new ArrayList<>();
                 finalList.add(newLore);
 
-                for(String b:SUtil.colorize("","&eLeft-Click to edit!","","&eRight-Click to edit in chat!","&7or if you don't have enough space","&7and want to add special &aSymbols&7.","","&bMiddle-Click to remove!")) {
-                    finalList.add(b);
-                }
+                finalList.addAll(colorize("", "&eLeft-Click to edit!", "", "&eRight-Click to edit in chat!", "&7or if you don't have enough space", "&7and want to add special &aSymbols&7.", "", "&bMiddle-Click to remove!"));
                 meta.setLore(finalList);
                 loreItem.setItemMeta(meta);
                 loreItem = NBTUtil.setString(loreItem, UUID.randomUUID().toString(),"UUID");
@@ -175,5 +163,54 @@ public class SetAbilityDescriptionMenu extends PaginatedGUI {
     @Override
     public boolean setClickActions() {
         return false;
+    }
+
+    private void startChat(Player p, ItemStack stack, boolean add) {
+        p.closeInventory();
+        int line = getInteger(stack, "Line");
+        PlayerChatInput.PlayerChatInputBuilder<String> builder = new PlayerChatInput.PlayerChatInputBuilder<>(SBX.getInstance(), p);
+        builder.onExpireMessage(colorize("&cYou failed to set the lore after 3 minute.")).sendValueMessage(colorize("&7Please input your description for line " + line + "!\n&eSay &ccancel &eto stop."));
+        builder.setValue((player, str) -> str);
+        builder.isValidInput((player, str) -> {
+            if (str.isEmpty()) {
+                getOwner().sendMessage("&cThat is not a valid input!");
+                return false;
+            }
+            for (String s : PROFANITIES) {
+                if (ChatColor.stripColor(str).toLowerCase().contains(s)) {
+                    player.sendMessage("§cYou cannot use that word in your lore!");
+                    open(getOwner());
+                    return false;
+                }
+            }
+            return true;
+        }).onFinish((player, str) -> {
+            SBItemBuilder item = new SBItemBuilder(player.getItemInHand());
+            if(add) {
+                player.setItemInHand(item.abilities.get(indexx).addDescription(str).build().build());
+            } else {
+                player.setItemInHand(item.abilities.get(indexx).setDescription(line, str).build().build());
+            }
+            new SetAbilityDescriptionMenu(getOwner(),indexx).open();
+        }).onInvalidInput(((player, s) -> true)).expiresAfter(3600).onExpire((player -> new SetAbilityDescriptionMenu(getOwner(),indexx).open())).toCancel("cancel").onCancel((player -> {
+            getOwner().sendMessage("&cCanceled!");
+            new SetAbilityDescriptionMenu(getOwner(),indexx).open();
+        }));
+        builder.build().start();
+    }
+
+    @Override
+    public void openBack() {
+        new AbilityCreatorGUI(getOwner(), indexx).open();
+    }
+
+    @Override
+    public String backTitle() {
+        return "Ability Editor";
+    }
+
+    @Override
+    public int backItemSlot() {
+        return 48;
     }
 }

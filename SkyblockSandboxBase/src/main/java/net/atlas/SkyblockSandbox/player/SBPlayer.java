@@ -5,11 +5,14 @@ import com.xxmicloxx.NoteBlockAPI.model.RepeatMode;
 import com.xxmicloxx.NoteBlockAPI.model.Song;
 import com.xxmicloxx.NoteBlockAPI.songplayer.RadioSongPlayer;
 import com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder;
+import lombok.Getter;
 import lombok.Setter;
 import net.atlas.SkyblockSandbox.AuctionHouse.AuctionBidHandler;
 import net.atlas.SkyblockSandbox.AuctionHouse.AuctionItemHandler;
 import net.atlas.SkyblockSandbox.SBX;
 import net.atlas.SkyblockSandbox.database.mongo.MongoAH;
+import net.atlas.SkyblockSandbox.event.customEvents.PlayerCustomDeathEvent;
+import net.atlas.SkyblockSandbox.gui.guis.skyblockmenu.SettingsMenu;
 import net.atlas.SkyblockSandbox.island.islands.FairySouls;
 import net.atlas.SkyblockSandbox.item.SBItemStack;
 import net.atlas.SkyblockSandbox.item.SkyblockItem;
@@ -27,6 +30,8 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -47,6 +52,7 @@ import static net.atlas.SkyblockSandbox.util.StackUtils.makeColorfulSkullItem;
 public class SBPlayer extends PluginPlayer {
 
     static SBPlayer sbPlayer;
+    public static HashMap<UUID, EntityDamageEvent.DamageCause> causes = new HashMap<>();
 
     public SBPlayer(Player player) {
         super(player);
@@ -109,7 +115,7 @@ public class SBPlayer extends PluginPlayer {
 
     public void giveItem(SkyblockItem item) {
         if (hasSpace()) {
-            sbPlayer.getInventory().addItem(item.item().asBukkitItem());
+            sbPlayer.getInventory().addItem(item.item());
             sbPlayer.sendMessage(SUtil.colorize("&aSuccessfully gave &e" + item));
         }
     }
@@ -122,7 +128,7 @@ public class SBPlayer extends PluginPlayer {
     }
 
     public void setItemInHand(SkyblockItem i) {
-        sbPlayer.getPlayer().setItemInHand(i.item().asBukkitItem());
+        sbPlayer.getPlayer().setItemInHand(i.item());
     }
 
     public boolean hasSpace() {
@@ -139,12 +145,13 @@ public class SBPlayer extends PluginPlayer {
             SBPlayer pl = new SBPlayer(p);
             HashMap<PlayerStat, Double> map = NBTUtil.getAllStats(sbPlayer);
 
+            if(pl.getStat(HEALTH) <= 0) {
+              pl.setStat(HEALTH, pl.getMaxStat(HEALTH));
+              Bukkit.getPluginManager().callEvent(new PlayerCustomDeathEvent(p, pl, pl.getCause()));
+            }
+
             for (PlayerStat s : PlayerStat.values()) {
                 double stat = map.get(s);
-                HashMap<PlayerStat,Double> fairyMap = FairySouls.getPlayerRewards(pl);
-                if(fairyMap.containsKey(s)) {
-                    stat+=fairyMap.get(s);
-                }
                 if (pl.getStat(s) < pl.getMaxStat(s) && !s.isRegen()) {
                     pl.setStat(s, pl.getMaxStat(s));
                 }
@@ -165,7 +172,7 @@ public class SBPlayer extends PluginPlayer {
 
             }
 
-            if (sbPlayer.getMaxStat(HEALTH) > 100) {
+            if (sbPlayer.getMaxStat(HEALTH) >= 100) {
                 double newHealth = 0;
                 double oldrng = (sbPlayer.getMaxStat(SBPlayer.PlayerStat.HEALTH) - 0);
                 if (oldrng == 0) {
@@ -195,6 +202,7 @@ public class SBPlayer extends PluginPlayer {
 
             } else {
                 pl.getPlayer().setMaxHealth(20);
+                pl.getPlayer().setHealth(20);
             }
 
             //maxStats.put(sbPlayer.getUniqueId(),map);
@@ -409,28 +417,30 @@ public class SBPlayer extends PluginPlayer {
         return list;
     }
 
+
     public enum PlayerStat {
-        HEALTH("&a", "health", 100, true, makeColorfulItem(Material.GOLDEN_APPLE, "&cHealth", 1, 0, "")),
-        DEFENSE("&a", "defense", 0, false, makeColorfulItem(Material.IRON_CHESTPLATE, "&aDefense", 1, 0, "")),
-        STRENGTH("strength", 0, false, makeColorfulItem(Material.BLAZE_POWDER, "&cStrength", 1, 0, "")),
-        SPEED("&a", "speed", 100, false, makeColorfulItem(Material.SUGAR, "&rSpeed", 1, 0, "")),
-        CRIT_CHANCE("crit_chance", 30, false, makeColorfulSkullItem("&9Crit Chance", "http://textures.minecraft.net/texture/3e4f49535a276aacc4dc84133bfe81be5f2a4799a4c04d9a4ddb72d819ec2b2b", 1, "")),
-        CRIT_DAMAGE("crit_damage", 50, false, makeColorfulSkullItem("&9Crit Damage", "http://textures.minecraft.net/texture/ddafb23efc57f251878e5328d11cb0eef87b79c87b254a7ec72296f9363ef7c", 1, "")),
-        INTELLIGENCE("&a", "intelligence", 100, true, makeColorfulItem(Material.ENCHANTED_BOOK, "&bIntelligence", 1, 0, "")),
-        MINING_SPEED("&a", "mining_speed", 0, false, makeColorfulItem(Material.DIAMOND_PICKAXE, "&6Mining Speed", 1, 0, "")),
-        ATTACK_SPEED("attack_speed", 0, false, makeColorfulItem(Material.GOLD_AXE, "&eAttack Speed", 1, 0, "")),
-        SEA_CREATURE_CHANCE("sea_creature_chance", 0, false, makeColorfulItem(Material.PRISMARINE_CRYSTALS, "&3Sea Creature Chance", 1, 0, "")),
-        MAGIC_FIND("magic_find", 0, false, makeColorfulItem(Material.STICK, "&bMagic Find", 1, 0, "")),
-        PET_LUCK("pet_luck", 0, false, makeColorfulSkullItem("&dPet Luck", "http://textures.minecraft.net/texture/93c8aa3fde295fa9f9c27f734bdbab11d33a2e43e855accd7465352377413b", 1, "")),
-        TRUE_DEFENSE("true_defense", 0, false, makeColorfulItem(Material.INK_SACK, "&rTrue Defense", 1, 15, "")),
-        FEROCITY("&a", "ferocity", 0, false, makeColorfulItem(Material.INK_SACK, "&cFerocity", 1, 1, "")),
-        ABILITY_DAMAGE("ability_damage", 0, false, makeColorfulItem(Material.BEACON, "&cAbility Damage", 1, 0, "")),
-        MINING_FORTUNE("&a", "mining_fortune", 0, false, makeColorfulSkullItem("&6Mining Fortune", "http://textures.minecraft.net/texture/f07dff657d61f302c7d2e725265d17b64aa73642391964fb48fc15be950831d8", 1, "")),
-        FARMING_FORTUNE("&a", "farming_fortune", 0, false, makeColorfulSkullItem("&6Farming Fortune", "http://textures.minecraft.net/texture/2ab879e1e590041146bc78c018af5877d39e5475eb7db368fcaf2acda373833d", 1, "")),
-        FORAGING_FORTUNE("&a", "foraging_fortune", 0, false, makeColorfulSkullItem("&6Foraging Fortune", "http://textures.minecraft.net/texture/4f960c639d4004d1882575aeba69f456fb3c744077935714947e19c1306d2733", 1, "")),
-        PRISTINE("pristine", 0, false, makeColorfulSkullItem("&5Pristine", "http://textures.minecraft.net/texture/db6975af70724d6a44fd5946e60b2717737dfdb545b4dab1893351a9c9dd183c", 1, "")),
-        DAMAGE("damage", 0, false, makeColorfulItem(Material.IRON_SWORD, "&cDamage", 1, 0, "")),
-        GEAR_SCORE("&d", "gear_score", 0, false, makeColorfulItem(Material.INK_SACK, "&dGear Score", 1, 0, ""));
+        HEALTH("&a", "Health", 100, true, "", makeColorfulItem(Material.GOLDEN_APPLE, "&cHealth", 1, 0, "")),
+        DEFENSE("&a", "Defense", 0, false, "", makeColorfulItem(Material.IRON_CHESTPLATE, "&aDefense", 1, 0, "")),
+        STRENGTH("Strength", 0, false, "", makeColorfulItem(Material.BLAZE_POWDER, "&cStrength", 1, 0, "")),
+        SPEED("&a", "Speed", 100, false, "", makeColorfulItem(Material.SUGAR, "&rSpeed", 1, 0, ""), new String[]{"WALK_SPEED"}),
+        CRIT_CHANCE("Crit_Chance", 30, false, "%", 100, makeColorfulSkullItem("&9Crit Chance", "http://textures.minecraft.net/texture/3e4f49535a276aacc4dc84133bfe81be5f2a4799a4c04d9a4ddb72d819ec2b2b", 1, ""), new String[]{"CRITICAL_CHANCE"}),
+        CRIT_DAMAGE("Crit_Damage", 50, false, "%", makeColorfulSkullItem("&9Crit Damage", "http://textures.minecraft.net/texture/ddafb23efc57f251878e5328d11cb0eef87b79c87b254a7ec72296f9363ef7c", 1, ""), new String[]{"CRITICAL_DAMAGE"}),
+        INTELLIGENCE("&a", "Intelligence", 100, true, "", makeColorfulItem(Material.ENCHANTED_BOOK, "&bIntelligence", 1, 0, "")),
+        MINING_SPEED("&a", "Mining_Speed", 0, false, "", makeColorfulItem(Material.DIAMOND_PICKAXE, "&6Mining Speed", 1, 0, "")),
+        ATTACK_SPEED("Attack_Speed", 0, false, "%", 100, makeColorfulItem(Material.GOLD_AXE, "&eAttack Speed", 1, 0, "")),
+        SEA_CREATURE_CHANCE("Sea_Creature_Chance", 0, false, "", makeColorfulItem(Material.PRISMARINE_CRYSTALS, "&3Sea Creature Chance", 1, 0, "")),
+        MAGIC_FIND("Magic_Find", 0, false, "", makeColorfulItem(Material.STICK, "&bMagic Find", 1, 0, "")),
+        PET_LUCK("Pet_Luck", 0, false, "", makeColorfulSkullItem("&dPet Luck", "http://textures.minecraft.net/texture/93c8aa3fde295fa9f9c27f734bdbab11d33a2e43e855accd7465352377413b", 1, "")),
+        TRUE_DEFENSE("True_Defense", 0, false, "", makeColorfulItem(Material.INK_SACK, "&rTrue Defense", 1, 15, "")),
+        FEROCITY("&a", "Ferocity", 0, false, "", makeColorfulItem(Material.INK_SACK, "&cFerocity", 1, 1, "")),
+        ABILITY_DAMAGE("Ability_Damage", 0, false, "", makeColorfulItem(Material.BEACON, "&cAbility Damage", 1, 0, ""), new String[]{"ABILITY_DAMAGE_PERCENT", "WEAPON_ABILITY_DAMAGE"}),
+        MINING_FORTUNE("&a", "Mining_Fortune", 0, false, "", makeColorfulSkullItem("&6Mining Fortune", "http://textures.minecraft.net/texture/f07dff657d61f302c7d2e725265d17b64aa73642391964fb48fc15be950831d8", 1, "")),
+        FARMING_FORTUNE("&a", "Farming_Fortune", 0, false, "", makeColorfulSkullItem("&6Farming Fortune", "http://textures.minecraft.net/texture/2ab879e1e590041146bc78c018af5877d39e5475eb7db368fcaf2acda373833d", 1, "")),
+        FORAGING_FORTUNE("&a", "Foraging_Fortune", 0, false, "", makeColorfulSkullItem("&6Foraging Fortune", "http://textures.minecraft.net/texture/4f960c639d4004d1882575aeba69f456fb3c744077935714947e19c1306d2733", 1, "")),
+        PRISTINE("Pristine", 0, false, "", makeColorfulSkullItem("&5Pristine", "http://textures.minecraft.net/texture/db6975af70724d6a44fd5946e60b2717737dfdb545b4dab1893351a9c9dd183c", 1, "")),
+        DAMAGE("Damage", 0, false, "", makeColorfulItem(Material.IRON_SWORD, "&cDamage", 1, 0, "")),
+        GEAR_SCORE("&d", "Gear_Score", 0, false, "", makeColorfulItem(Material.INK_SACK, "&dGear Score", 1, 0, "")),
+        BREAKING_POWER("Breaking_Power", 0, false, "", makeColorfulItem(Material.IRON_PICKAXE, "&7Breaking Power", 1, 0, ""));
 
 
         private String name;
@@ -438,21 +448,91 @@ public class SBPlayer extends PluginPlayer {
         private boolean isRegen;
         private ItemStack stack;
         private String color;
+        private int max;
+        private String[] alias;
+        private String suffix;
 
-        PlayerStat(String color, String name, double base, boolean isRegen, ItemStack stack) {
+        PlayerStat(String color, String name, double base, boolean isRegen, String suffix, int max, ItemStack stack) {
             this.name = name;
             this.base = base;
             this.isRegen = isRegen;
             this.stack = stack;
             this.color = color;
+            this.max = max;
+            this.suffix = suffix;
+        }
+        PlayerStat(String color, String name, double base, boolean isRegen, String suffix, int max, ItemStack stack, String[] alias) {
+            this.name = name;
+            this.base = base;
+            this.isRegen = isRegen;
+            this.stack = stack;
+            this.color = color;
+            this.alias = alias;
+            this.suffix = suffix;
+            this.max = max;
+
         }
 
-        PlayerStat(String name, double base, boolean isRegen, ItemStack stack) {
+        PlayerStat(String name, double base, boolean isRegen, String suffix, int max, ItemStack stack) {
+            this.name = name;
+            this.base = base;
+            this.isRegen = isRegen;
+            this.stack = stack;
+            this.suffix = suffix;
+            this.color = "&c";
+            this.max = max;
+
+        }
+
+        PlayerStat(String name, double base, boolean isRegen, String suffix, int max, ItemStack stack, String[] alias) {
             this.name = name;
             this.base = base;
             this.isRegen = isRegen;
             this.stack = stack;
             this.color = "&c";
+            this.suffix = suffix;
+            this.max = max;
+            this.alias = alias;
+        }
+        PlayerStat(String color, String name, double base, boolean isRegen, String suffix, ItemStack stack) {
+            this.name = name;
+            this.base = base;
+            this.isRegen = isRegen;
+            this.stack = stack;
+            this.suffix = suffix;
+            this.color = color;
+            this.max = 100000;
+        }
+        PlayerStat(String color, String name, double base, boolean isRegen, String suffix, ItemStack stack, String[] alias) {
+            this.name = name;
+            this.base = base;
+            this.isRegen = isRegen;
+            this.stack = stack;
+            this.color = color;
+            this.suffix = suffix;
+            this.alias = alias;
+            this.max = 100000;
+        }
+
+        PlayerStat(String name, double base, boolean isRegen, String suffix, ItemStack stack) {
+            this.name = name;
+            this.base = base;
+            this.isRegen = isRegen;
+            this.stack = stack;
+            this.suffix = suffix;
+            this.color = "&c";
+            this.max = 100000;
+        }
+
+        PlayerStat(String name, double base, boolean isRegen, String suffix, ItemStack stack, String[] alias) {
+            this.name = name;
+            this.base = base;
+            this.isRegen = isRegen;
+            this.stack = stack;
+            this.suffix = suffix;
+            this.color = "&c";
+            this.alias = alias;
+            this.max = 100000;
         }
 
         public double getBase() {
@@ -470,6 +550,62 @@ public class SBPlayer extends PluginPlayer {
         public String getColor() {
             return SUtil.colorize(color);
         }
+
+        public String getDisplayName() {
+            return name;
+        }
+
+        public int getMax() {
+            return max;
+        }
+
+        public String getSuffix() {
+            return suffix;
+        }
+
+        public static PlayerStat getStat(String stat) {
+            for (PlayerStat value : PlayerStat.values()) {
+                if(value.name().equals(stat)) {
+                    return value;
+                }
+                if(value.alias != null) {
+                    for (String key : value.alias) {
+                        if(stat.equals(key)) {
+                            return value;
+                        }
+                    }
+                }
+                if(value.name.equals(stat)) {
+                    return value;
+                }
+            }
+            return null;
+        }
+    }
+
+    public enum Settings {
+        LORE_GEN(11, makeColorfulItem(Material.PAPER, "&aAuto Lore generation", 1, 0, "&7Toggle auto lore creation.\n\n&eClick to toggle")),
+        VISIBILITY(13, makeColorfulItem(Material.INK_SACK, "&aPlayer Visibility", 1, 11, "&7Toggle other player visibility.\n\n&eClick to toggle")),
+        SCOREBOARD(15, makeColorfulItem(Material.STAINED_CLAY, "&aToggle Scoreboard", 1, 5, "&7Toggle the scoreboard.\n\n&eClick to toggle"));
+        @Getter
+        @Setter
+        public int slot;
+        @Getter
+        @Setter
+        public ItemStack item;
+        public final HashMap<UUID, Boolean> map = new HashMap<>();
+        Settings(int slot, ItemStack item) {
+            this.slot = slot;
+            this.item = item;
+        }
+
+        public void putDefault(SBPlayer player, boolean def) {
+            map.putIfAbsent(player.getUniqueId(), def);
+        }
+    }
+
+    public boolean getSetting(Settings setting) {
+        return setting.map.get(getUniqueId());
     }
 
     public PlayerIsland getPlayerIsland() {
@@ -485,4 +621,10 @@ public class SBPlayer extends PluginPlayer {
         return getPlayerIsland() != null;
     }
 
+    public DamageCause getCause() {
+        return causes.get(getUniqueId());
+    }
+    public void setCause(DamageCause cause) {
+        causes.put(getUniqueId(), cause);
+    }
 }

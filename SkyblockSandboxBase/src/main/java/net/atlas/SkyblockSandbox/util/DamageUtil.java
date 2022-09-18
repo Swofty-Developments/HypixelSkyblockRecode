@@ -14,18 +14,17 @@ import net.atlas.SkyblockSandbox.slayer.Slayers;
 import net.minecraft.server.v1_8_R3.EntityArmorStand;
 import net.minecraft.server.v1_8_R3.PacketPlayOutEntityDestroy;
 import net.minecraft.server.v1_8_R3.PacketPlayOutSpawnEntityLiving;
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEnderDragon;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -144,6 +143,8 @@ public class DamageUtil {
                 }
                 if (pcntHealth == 0) {
                     damagee.setHealth(0);
+                    EntityDeathEvent event = new EntityDeathEvent(damagee,null,0);
+                    Bukkit.getPluginManager().callEvent(event);
                 } else {
                     damagee.setHealth(pcntHealth);
                     damagee.damage(0);
@@ -250,7 +251,7 @@ public class DamageUtil {
         }
         double wpDmg = playerStats.get(SBPlayer.PlayerStat.DAMAGE);
         double str = playerStats.get(SBPlayer.PlayerStat.STRENGTH);
-        double cd = playerStats.get(SBPlayer.PlayerStat.CRIT_DAMAGE);
+        double cd = playerStats.get(CRIT_DAMAGE);
         double init = (wpDmg + 5) * (1 + (str / 100));
         double mult = 1 + (/*combat lvl*/0 * 0.04); /*+enchants + weaponbonus*/
         double dmg = 0;
@@ -420,14 +421,17 @@ public class DamageUtil {
     }
 
     public static double calculateEnchants(SBPlayer p, LivingEntity en, double curDmg) {
-
-        for (Enchantment ench : Enchantment.values()) {
-            if (ench.getItemType().equals(ItemType.SWORD) || ench.getItemType().equals(ItemType.ITEM)) {
-                int enchLvl = new SBItemStack(p.getItemInHand()).getEnchantment(ench);
-                if (enchLvl != 0) {
-                    EntityDamageByEntityEvent event1 = new EntityDamageByEntityEvent(p.getPlayer(), en, EntityDamageEvent.DamageCause.CUSTOM, curDmg);
-                    if(ench.getDamageAction()!=null) {
-                        curDmg = ench.getDamageAction().apply(event1, (int) curDmg, enchLvl);
+        if (!(p.getItemInHand().getType().equals(Material.AIR) || p.getItemInHand() == null)) {
+            for (Enchantment ench : Enchantment.values()) {
+                if (ench.getItemType() != null) {
+                    if (ench.getItemType().equals(ItemType.SWORD) || ench.getItemType().equals(ItemType.ITEM)) {
+                        int enchLvl = new SBItemStack(p.getItemInHand()).getEnchantment(ench);
+                        if (enchLvl != 0) {
+                            EntityDamageByEntityEvent event1 = new EntityDamageByEntityEvent(p.getPlayer(), en, EntityDamageEvent.DamageCause.CUSTOM, curDmg);
+                            if (ench.getDamageAction() != null) {
+                                curDmg = ench.getDamageAction().apply(event1, (int) curDmg, enchLvl);
+                            }
+                        }
                     }
                 }
             }

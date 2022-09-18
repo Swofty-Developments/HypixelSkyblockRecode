@@ -43,9 +43,9 @@ public class Command_spawnmob extends SkyblockCommandFramework {
                     en.setCustomName(name);
 
                     if (en instanceof LivingEntity) {
-                        int health = 1;
+                        double health = 1;
                         try {
-                            health = Integer.parseInt(args[2]);
+                            health = Double.parseDouble(args[2]);
                             ((LivingEntity) en).setMaxHealth(health);
                             ((LivingEntity) en).setHealth(health);
                         } catch (NumberFormatException ignored) {
