@@ -1,3 +1,6 @@
+# NEW REPO
+# There is a much more updated repo available at https://github.com/Swofty-Developments/HypixelSkyBlock/
+
 # SkyblockSandboxRecode
 A comprehensive recode of the core skyblock sandbox plugin.
 All changes you want to make for the plugin must be made in this format:
